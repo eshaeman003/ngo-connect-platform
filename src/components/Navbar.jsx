@@ -14,10 +14,12 @@ function Navbar() {
   return (
     <nav className="navbar">
       <div className="navbar-container">
+        {/* LEFT: Logo */}
         <Link to="/" className="navbar-logo">
           🌿 NGO Connect
         </Link>
 
+        {/* CENTER: Navigation Links */}
         <ul className="navbar-links">
           {navLinks.map((link) => (
             <li key={link.path}>
@@ -31,6 +33,7 @@ function Navbar() {
           ))}
         </ul>
 
+        {/* RIGHT: Auth Buttons */}
         <div className="navbar-auth">
           <Link to="/login" className="btn-login">Login</Link>
           <Link to="/register" className="btn-register">Register</Link>
