@@ -1,118 +1,3 @@
-/* NGO PAGE */
-
-
-.ngo-container {
-
-display:flex;
-
-justify-content:center;
-
-align-items:center;
-
-gap:30px;
-
-flex-wrap:wrap;
-
-margin-top:40px;
-
-}
-
-
-
-.ngo-details {
-
-display:flex;
-
-justify-content:center;
-
-}
-
-
-
-/* category buttons */
-
-
-.category-buttons {
-
-display:flex;
-
-justify-content:center;
-
-gap:15px;
-
-margin:25px 0;
-
-}
-
-
-
-.category-buttons button {
-
-
-background:#14532d;
-
-color:white;
-
-border:none;
-
-padding:12px 25px;
-
-border-radius:12px;
-
-font-size:16px;
-
-cursor:pointer;
-
-}
-
-
-.category-buttons button:hover{
-
-background:#0f3d22;
-
-}
-.search-wrapper {
-
-display:flex;
-
-justify-content:center;
-
-align-items:center;
-
-margin-top:30px;
-
-}
-
-
-.search-wrapper input {
-
-
-width:350px;
-
-padding:14px 45px 14px 20px;
-
-border-radius:30px;
-
-border:2px solid #95d5b2;
-
-background:#d8f3dc;
-
-font-size:16px;
-
-outline:none;
-
-
-}
-
-
-
-.search-wrapper span {
-
-margin-left:-45px;
-
-font-size:22px;
-
-}
 /* ==================== NGO DETAILS PAGE ==================== */
 
 .ngo-details {
@@ -130,6 +15,18 @@ font-size:22px;
   border-radius: 24px;
   box-shadow: 0 20px 60px rgba(45, 106, 79, 0.15);
   overflow: hidden;
+  animation: slideUp 0.5s ease;
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .details-header {
@@ -137,24 +34,41 @@ font-size:22px;
   color: white;
   padding: 50px 40px;
   text-align: center;
+  position: relative;
+}
+
+.details-header::after {
+  content: "";
+  position: absolute;
+  bottom: -20px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 60px;
+  height: 4px;
+  background: rgba(255, 255, 255, 0.4);
+  border-radius: 2px;
 }
 
 .details-icon {
   font-size: 4rem;
+  margin-bottom: 20px;
   display: block;
-  margin-bottom: 16px;
 }
 
 .details-header h1 {
   margin: 0 0 16px 0;
   font-size: 2.2rem;
+  font-weight: 700;
 }
 
 .details-category {
-  background: rgba(255, 255, 255, 0.25);
+  background: rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(10px);
   padding: 8px 24px;
   border-radius: 30px;
   font-size: 0.95rem;
+  font-weight: 500;
+  display: inline-block;
 }
 
 .details-body {
@@ -169,14 +83,22 @@ font-size:22px;
   border-bottom: 1px solid #f0f0f0;
 }
 
+.detail-row:last-of-type {
+  border-bottom: none;
+}
+
 .detail-label {
   color: #666;
   font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 
 .detail-value {
   color: #2d6a4f;
   font-weight: 600;
+  font-size: 1.05rem;
 }
 
 .detail-section {
@@ -190,6 +112,7 @@ font-size:22px;
 .detail-section h3 {
   color: #2d6a4f;
   margin: 0 0 14px 0;
+  font-size: 1.2rem;
 }
 
 .detail-section p {
@@ -211,6 +134,9 @@ font-size:22px;
   text-decoration: none;
   color: #666;
   font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 6px;
   transition: all 0.3s ease;
   padding: 10px 20px;
   border-radius: 10px;
@@ -228,12 +154,16 @@ font-size:22px;
   padding: 14px 32px;
   border-radius: 12px;
   font-weight: 600;
+  font-size: 1rem;
   cursor: pointer;
   transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(45, 106, 79, 0.3);
 }
 
 .contact-btn:hover {
   background: #1b4332;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(45, 106, 79, 0.4);
 }
 
 .ngo-not-found {
@@ -244,4 +174,7 @@ font-size:22px;
 .ngo-not-found h2 {
   color: #e74c3c;
   margin-bottom: 20px;
+  font-size: 2rem;
 }
+
+/* ==================== END NGO DETAILS ==================== */
