@@ -1,0 +1,116 @@
+.applications-page {
+  padding: 40px 20px;
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.applications-header {
+  text-align: center;
+  margin-bottom: 40px;
+}
+
+.applications-header h1 {
+  color: #2d6a4f;
+  font-size: 2.5rem;
+  margin-bottom: 10px;
+}
+
+.applications-header p {
+  color: #666;
+}
+
+.filter-tabs {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  margin-bottom: 30px;
+  flex-wrap: wrap;
+}
+
+.filter-tabs button {
+  padding: 10px 24px;
+  border: 2px solid #e8f5e9;
+  background: white;
+  border-radius: 25px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: all 0.3s;
+}
+
+.filter-tabs button.active,
+.filter-tabs button:hover {
+  background: #2d6a4f;
+  color: white;
+  border-color: #2d6a4f;
+}
+
+.applications-list {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.application-card {
+  background: white;
+  border-radius: 16px;
+  padding: 30px;
+  box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  transition: transform 0.3s;
+}
+
+.application-card:hover {
+  transform: translateX(5px);
+}
+
+.app-info h3 {
+  color: #333;
+  margin-bottom: 10px;
+  font-size: 1.2rem;
+}
+
+.app-ngo,
+.app-date {
+  color: #666;
+  margin-bottom: 6px;
+  font-size: 0.95rem;
+}
+
+.status-badge {
+  padding: 8px 20px;
+  border-radius: 20px;
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+.status-pending {
+  background: #fff3cd;
+  color: #856404;
+}
+
+.status-approved {
+  background: #d4edda;
+  color: #155724;
+}
+
+.status-rejected {
+  background: #f8d7da;
+  color: #721c24;
+}
+
+.empty-state {
+  text-align: center;
+  padding: 60px 20px;
+  color: #666;
+  font-size: 1.1rem;
+}
+
+@media (max-width: 600px) {
+  .application-card {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 15px;
+  }
+}
