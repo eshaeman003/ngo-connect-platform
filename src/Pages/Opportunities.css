@@ -2,6 +2,8 @@
   padding: 40px 20px;
   max-width: 1200px;
   margin: 0 auto;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .opportunities-header {
@@ -21,6 +23,7 @@
 
 .opportunities-filters {
   margin-bottom: 30px;
+  width: 100%;
 }
 
 .search-input {
@@ -31,6 +34,7 @@
   border-radius: 12px;
   font-size: 1rem;
   margin-bottom: 20px;
+  box-sizing: border-box;
 }
 
 .search-input:focus {
@@ -51,6 +55,7 @@
   border-radius: 25px;
   cursor: pointer;
   transition: all 0.3s;
+  font-size: 0.9rem;
 }
 
 .category-filters button.active,
@@ -60,10 +65,12 @@
   border-color: #2d6a4f;
 }
 
+/* GRID FIX - Mobile pe 1 column, Desktop pe 2-3 columns */
 .opportunities-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
   gap: 25px;
+  width: 100%;
 }
 
 .opportunity-card {
@@ -72,6 +79,8 @@
   padding: 30px;
   box-shadow: 0 5px 20px rgba(0,0,0,0.08);
   transition: transform 0.3s;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .opportunity-card:hover {
@@ -82,6 +91,8 @@
   display: flex;
   justify-content: space-between;
   margin-bottom: 15px;
+  flex-wrap: wrap;
+  gap: 8px;
 }
 
 .opp-category {
@@ -102,6 +113,7 @@
   color: #333;
   margin-bottom: 10px;
   font-size: 1.3rem;
+  word-wrap: break-word;
 }
 
 .opp-ngo,
@@ -115,6 +127,7 @@
   color: #555;
   line-height: 1.6;
   margin-bottom: 20px;
+  word-wrap: break-word;
 }
 
 .apply-btn {
@@ -138,4 +151,50 @@
   color: #666;
   font-size: 1.2rem;
   grid-column: 1 / -1;
+}
+
+/* ==================== MOBILE RESPONSIVE ==================== */
+
+@media (max-width: 768px) {
+  .opportunities-page {
+    padding: 20px 15px;
+  }
+  
+  .opportunities-header h1 {
+    font-size: 1.8rem;
+  }
+  
+  .search-input {
+    max-width: 100%;
+  }
+  
+  /* FIX: Mobile pe 1 column */
+  .opportunities-grid {
+    grid-template-columns: 1fr !important;
+    gap: 20px;
+  }
+  
+  .opportunity-card {
+    padding: 20px;
+    max-width: 100%;
+  }
+  
+  .opportunity-card h3 {
+    font-size: 1.1rem;
+  }
+  
+  .opportunity-header {
+    flex-direction: column;
+  }
+}
+
+@media (max-width: 480px) {
+  .opportunities-header h1 {
+    font-size: 1.5rem;
+  }
+  
+  .category-filters button {
+    padding: 8px 14px;
+    font-size: 0.8rem;
+  }
 }

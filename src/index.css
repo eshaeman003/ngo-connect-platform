@@ -245,3 +245,194 @@ font-size:22px;
   color: #e74c3c;
   margin-bottom: 20px;
 }
+/* ==================== GLOBAL MOBILE RESPONSIVE FIXES ==================== */
+
+/* Prevent horizontal scroll on all pages */
+html, body {
+  overflow-x: hidden;
+  max-width: 100vw;
+}
+
+/* Ensure all containers fit within screen */
+* {
+  box-sizing: border-box;
+}
+
+/* Mobile: max-width 768px */
+@media (max-width: 768px) {
+  
+  /* Navbar */
+  .navbar-container {
+    padding: 0 15px;
+  }
+  
+  /* Hero Section */
+  .hero {
+    padding: 60px 15px !important;
+  }
+  
+  .hero-content h1 {
+    font-size: 2rem !important;
+    line-height: 1.2;
+  }
+  
+  .hero-content p {
+    font-size: 1rem !important;
+  }
+  
+  .hero-buttons {
+    flex-direction: column !important;
+    gap: 15px !important;
+    align-items: center !important;
+  }
+  
+  .hero-buttons a {
+    width: 100% !important;
+    max-width: 250px;
+    text-align: center;
+  }
+  
+  /* Stats Section */
+  .stats {
+    flex-direction: column !important;
+    gap: 30px !important;
+    padding: 40px 15px !important;
+  }
+  
+  /* Features Section */
+  .features {
+    padding: 40px 15px !important;
+  }
+  
+  .feature-grid {
+    flex-direction: column !important;
+    align-items: center !important;
+    gap: 20px !important;
+  }
+  
+  .feature-card {
+    width: 100% !important;
+    max-width: 320px;
+  }
+  
+  /* NGOs Page */
+  .ngos-page,
+  .opportunities-page,
+  .applications-page {
+    padding: 20px 15px !important;
+  }
+  
+  .ngos-header h1,
+  .opportunities-header h1,
+  .applications-header h1 {
+    font-size: 1.8rem !important;
+  }
+  
+  .category-buttons,
+  .category-filters,
+  .filter-tabs {
+    flex-wrap: wrap !important;
+    gap: 8px !important;
+  }
+  
+  .category-buttons button,
+  .category-filters button,
+  .filter-tabs button {
+    padding: 8px 14px !important;
+    font-size: 0.85rem !important;
+  }
+  
+  /* Cards Grid */
+  .ngo-container,
+  .opportunities-grid {
+    grid-template-columns: 1fr !important;
+    gap: 20px !important;
+  }
+  
+  .ngo-card,
+  .opportunity-card,
+  .application-card {
+    width: 100% !important;
+    max-width: 100%;
+  }
+  
+  /* Search Input */
+  .search-input,
+  .search-bar input {
+    width: 100% !important;
+    max-width: 100%;
+  }
+  
+  /* Auth Pages */
+  .auth-page {
+    padding: 20px 15px !important;
+  }
+  
+  .auth-card {
+    width: 100% !important;
+    max-width: 100%;
+  }
+  
+  .auth-form {
+    padding: 30px 20px !important;
+  }
+  
+  .role-selector {
+    flex-direction: column !important;
+  }
+  
+  /* Footer */
+  .footer-container {
+    flex-direction: column !important;
+    gap: 30px !important;
+    padding: 0 20px !important;
+  }
+  
+  /* NGO Details Page */
+  .ngo-details {
+    padding: 20px 15px !important;
+  }
+  
+  .details-card {
+    width: 100% !important;
+    max-width: 100%;
+  }
+  
+  .details-header {
+    padding: 30px 20px !important;
+  }
+  
+  .details-body {
+    padding: 30px 20px !important;
+  }
+  
+  .details-footer {
+    flex-direction: column !important;
+    gap: 15px !important;
+    padding: 20px !important;
+  }
+}
+
+/* Tablet: max-width 1024px */
+@media (max-width: 1024px) {
+  .feature-grid,
+  .ngo-container,
+  .opportunities-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+}
+
+/* Small phones: max-width 480px */
+@media (max-width: 480px) {
+  .hero-content h1 {
+    font-size: 1.5rem !important;
+  }
+  
+  .navbar-logo {
+    font-size: 1.1rem !important;
+  }
+  
+  .stat-card h3 {
+    font-size: 2rem !important;
+  }
+}
