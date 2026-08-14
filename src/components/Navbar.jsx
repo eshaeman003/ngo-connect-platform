@@ -1,119 +1,74 @@
 import { useState, useEffect } from "react";
-import { Link, useNavigate } from "react-router-dom";
-import { supabase } from "../utils/supabase";
+import { Link, useLocation } from "react-router-dom";
 import "./Navbar.css";
 
+const MenuIcon = () => (
+  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+);
+const XIcon = () => (
+  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+);
+
 function Navbar() {
-  const [menuOpen, setMenuOpen] = useState(false);
-  const [user, setUser] = useState(null);
-  const [userRole, setUserRole] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const navigate = useNavigate();
+  const [scrolled, setScrolled] = useState(false);
+  const [mobileOpen, setMobileOpen] = useState(false);
+  const location = useLocation();
 
   useEffect(() => {
-    let authSubscription;
-
-    const getUser = async () => {
-      try {
-        const { data: { user } } = await supabase.auth.getUser();
-        setUser(user);
-
-        if (user) {
-          const { data } = await supabase
-            .from("profiles")
-            .select("role")
-            .eq("id", user.id)
-            .single();
-          setUserRole(data?.role || null);
-        }
-      } catch (err) {
-        console.error("Navbar auth error:", err);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    getUser();
-
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (event, session) => {
-        const currentUser = session?.user ?? null;
-        setUser(currentUser);
-
-        if (currentUser) {
-          const { data } = await supabase
-            .from("profiles")
-            .select("role")
-            .eq("id", currentUser.id)
-            .single();
-          setUserRole(data?.role || null);
-        } else {
-          setUserRole(null);
-        }
-      }
-    );
-
-    authSubscription = subscription;
-
-    return () => {
-      authSubscription?.unsubscribe();
-    };
+    const onScroll = () => setScrolled(window.scrollY > 20);
+    window.addEventListener("scroll", onScroll);
+    return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
-  const handleLogout = async () => {
-    await supabase.auth.signOut();
-    setUser(null);
-    setUserRole(null);
-    navigate("/");
-  };
+  useEffect(() => setMobileOpen(false), [location]);
 
-  if (loading) return null;
+  const links = [
+    { to: "/", label: "Home" },
+    { to: "/opportunities", label: "Opportunities" },
+    { to: "/ngos", label: "NGOs" },
+    { to: "/about", label: "About" },
+  ];
 
   return (
-    <nav className="navbar">
-      <div className="nav-logo">
-        <Link to="/">🌿 NGO Connect</Link>
+    <nav className={`navbar ${scrolled ? "scrolled" : ""}`}>
+      <div className="navbar-inner">
+        <Link to="/" className="navbar-logo">
+          <span className="logo-icon">🌿</span>
+          <span className="logo-text">NGO Connect</span>
+        </Link>
+
+        <div className="navbar-links">
+          {links.map((l) => (
+            <Link key={l.to} to={l.to} className={`nav-link ${location.pathname === l.to ? "active" : ""}`}>
+              {l.label}
+              {location.pathname === l.to && <span className="nav-dot" />}
+            </Link>
+          ))}
+        </div>
+
+        <div className="navbar-cta">
+          <Link to="/login" className="nav-btn-ghost">Log In</Link>
+          <Link to="/register" className="nav-btn-primary">Get Started</Link>
+        </div>
+
+        <button className="navbar-hamburger" onClick={() => setMobileOpen(!mobileOpen)}>
+          {mobileOpen ? <XIcon /> : <MenuIcon />}
+        </button>
       </div>
 
-      <div className="hamburger" onClick={() => setMenuOpen(!menuOpen)}>
-        ☰
-      </div>
-
-      <div className={`nav-links ${menuOpen ? "open" : ""}`}>
-        <Link to="/" onClick={() => setMenuOpen(false)}>Home</Link>
-        <Link to="/ngos" onClick={() => setMenuOpen(false)}>NGOs</Link>
-        <Link to="/opportunities" onClick={() => setMenuOpen(false)}>Opportunities</Link>
-        
-        {user ? (
-          <>
-            {userRole === "admin" && (
-              <Link to="/admin" onClick={() => setMenuOpen(false)}>Admin</Link>
-            )}
-            
-            {userRole !== "admin" && (
-              <Link 
-                to={userRole === "ngo" ? "/ngo/dashboard" : "/volunteer/dashboard"} 
-                onClick={() => setMenuOpen(false)}
-              >
-                Dashboard
-              </Link>
-            )}
-            
-            <button onClick={handleLogout} className="nav-btn logout-btn">
-              Logout
-            </button>
-          </>
-        ) : (
-          <>
-            <Link to="/login" onClick={() => setMenuOpen(false)} className="nav-btn">
-              Login
+      {mobileOpen && (
+        <div className="navbar-mobile">
+          {links.map((l) => (
+            <Link key={l.to} to={l.to} className={`nav-link-mobile ${location.pathname === l.to ? "active" : ""}`}>
+              {l.label}
             </Link>
-            <Link to="/register" onClick={() => setMenuOpen(false)} className="nav-btn">
-              Register
-            </Link>
-          </>
-        )}
-      </div>
+          ))}
+          <div className="navbar-mobile-cta">
+            <Link to="/login" className="nav-btn-ghost-mobile">Log In</Link>
+            <Link to="/register" className="nav-btn-primary-mobile">Get Started</Link>
+          </div>
+        </div>
+      )}
     </nav>
   );
 }
