@@ -24,9 +24,6 @@ const GlobeIcon = () => (
 const AwardIcon = () => (
   <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="8" r="7"/><polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"/></svg>
 );
-const TrendingUpIcon = () => (
-  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>
-);
 
 /* ===== useCountUp Hook ===== */
 function useCountUp(end, duration = 2000) {
@@ -87,19 +84,12 @@ const values = [
   { icon: <ZapIcon />, title: "Impact Focused", desc: "We measure success not by numbers, but by the real, lasting change we create together." },
 ];
 
-const team = [
-  { name: "Ayesha Khan", role: "Founder & CEO", img: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=200&h=200&fit=crop&crop=face" },
-  { name: "Bilal Ahmed", role: "Head of Operations", img: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&h=200&fit=crop&crop=face" },
-  { name: "Sara Malik", role: "Community Lead", img: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=200&h=200&fit=crop&crop=face" },
-  { name: "Omar Farooq", role: "Tech Lead", img: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=200&h=200&fit=crop&crop=face" },
-];
-
 function About() {
   const heroRef = useReveal();
   const storyRef = useReveal();
   const statsRef = useReveal();
   const valuesRef = useReveal();
-  const teamRef = useReveal();
+  const founderRef = useReveal();
   const ctaRef = useReveal();
 
   const [volCount, volRef] = useCountUp(500);
@@ -192,22 +182,23 @@ function About() {
         </div>
       </section>
 
-      {/* TEAM */}
-      <section className="about-team" ref={teamRef}>
-        <div className="about-team-header">
-          <span className="about-label">THE TEAM</span>
-          <h2>Meet the People Behind NGO Connect</h2>
+      {/* FOUNDER — TUMHARI PHOTO YAHAN HAI */}
+      <section className="about-founder" ref={founderRef}>
+        <div className="about-founder-header">
+          <span className="about-label">THE FOUNDER</span>
+          <h2>Meet the Mind Behind NGO Connect</h2>
         </div>
-        <div className="about-team-grid">
-          {team.map((t, i) => (
-            <div className="team-card" key={i}>
-              <div className="team-img-wrap">
-                <img src={t.img} alt={t.name} />
-              </div>
-              <h4>{t.name}</h4>
-              <p>{t.role}</p>
-            </div>
-          ))}
+        <div className="about-founder-card">
+          <div className="founder-avatar">
+            <img src="/esha-eman.jpg" alt="Esha Eman" />
+          </div>
+          <h3>Esha Eman</h3>
+          <p className="founder-role">Founder & CEO</p>
+          <p className="founder-bio">
+            Passionate about leveraging technology for social good. 
+            Building NGO Connect to bridge the gap between volunteers 
+            and communities that need them most.
+          </p>
         </div>
       </section>
 
