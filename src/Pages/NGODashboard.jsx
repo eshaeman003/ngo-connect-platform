@@ -19,16 +19,10 @@ function NGODashboard() {
     setTimeout(() => setToast({ show: false, msg: "", type: "" }), 3000);
   };
 
-  // Load dashboard data (opportunities + applications)
   const loadApprovedData = async (ngoData, userId) => {
     const [{ data: oppData }] = await Promise.all([
-      supabase
-        .from("opportunities")
-        .select("*")
-        .eq("ngo_id", userId)
-        .order("created_at", { ascending: false }),
+      supabase.from("opportunities").select("*").eq("ngo_id", userId).order("created_at", { ascending: false }),
     ]);
-
     setOpportunities(oppData || []);
 
     const { data: appData } = await supabase
@@ -36,57 +30,50 @@ function NGODashboard() {
       .select(`*, opportunities:opportunity_id (title), profiles:volunteer_id (full_name, email, phone)`)
       .in("opportunity_id", oppData?.map((o) => o.id) || [])
       .order("applied_at", { ascending: false });
-
     setApplications(appData || []);
   };
 
-  // 🔥 Separate complaints fetch taake poll kar sakein
+  // 🔥 Separate complaints fetch
   const fetchComplaints = async (userId) => {
-    const { data } = await supabase
+    console.log("[NGO Poll] Fetching complaints for reported_id:", userId);
+    const { data, error } = await supabase
       .from("complaints")
       .select("*")
       .eq("reported_id", userId)
       .order("created_at", { ascending: false });
+
+    if (error) {
+      console.error("[NGO Poll] Error:", error);
+      return;
+    }
+    console.log("[NGO Poll] Got:", data?.length || 0, "complaints", data);
     setComplaintsAgainstMe(data || []);
   };
 
-  // Initial load
   useEffect(() => {
     const init = async () => {
       const { data: { user: authUser } } = await supabase.auth.getUser();
       if (!authUser) { navigate("/login"); return; }
       setUser(authUser);
 
-      const { data: ngoData } = await supabase
-        .from("ngos")
-        .select("*")
-        .eq("user_id", authUser.id)
-        .single();
-
+      const { data: ngoData } = await supabase.from("ngos").select("*").eq("user_id", authUser.id).single();
       setNgo(ngoData);
 
       if (ngoData?.approval_status === "approved") {
         await loadApprovedData(ngoData, authUser.id);
         await fetchComplaints(authUser.id);
       }
-
       setLoading(false);
     };
     init();
   }, [navigate]);
 
-  // POLLING: Har 3 sec mein status check jab tak approved na ho
+  // Polling: NGO approval status
   useEffect(() => {
     if (!user?.id || !ngo?.id || ngo.approval_status === "approved") return;
-
     const timer = setInterval(async () => {
       setCheckCount((c) => c + 1);
-      const { data } = await supabase
-        .from("ngos")
-        .select("approval_status, name, id")
-        .eq("user_id", user.id)
-        .single();
-
+      const { data } = await supabase.from("ngos").select("approval_status, name, id").eq("user_id", user.id).single();
       if (data?.approval_status === "approved") {
         setNgo(data);
         await loadApprovedData(data, user.id);
@@ -94,19 +81,22 @@ function NGODashboard() {
         clearInterval(timer);
       }
     }, 3000);
-
     return () => clearInterval(timer);
   }, [user?.id, ngo?.id, ngo?.approval_status]);
 
-  // 🔥 POLLING: Har 5 sec mein complaints refresh (admin ne status change kiya ho toh)
+  // 🔥 POLLING: Complaints refresh every 3 sec
   useEffect(() => {
     if (!user?.id || ngo?.approval_status !== "approved") return;
+    console.log("[NGO Poll] Started for user:", user.id);
 
     const interval = setInterval(() => {
       fetchComplaints(user.id);
-    }, 5000);
+    }, 3000);
 
-    return () => clearInterval(interval);
+    return () => {
+      console.log("[NGO Poll] Stopped");
+      clearInterval(interval);
+    };
   }, [user?.id, ngo?.approval_status]);
 
   const handleAppStatus = async (appId, status) => {
@@ -154,7 +144,6 @@ function NGODashboard() {
     );
   }
 
-  // BLOCK SCREEN for pending/rejected
   if (ngo.approval_status !== "approved") {
     const isRejected = ngo.approval_status === "rejected";
     return (
@@ -166,20 +155,14 @@ function NGODashboard() {
             {isRejected ? "Registration Rejected" : "Account Under Review"}
           </h1>
           <p style={{ color: "#6B7268", fontSize: "15px", lineHeight: 1.7, marginBottom: "28px" }}>
-            {isRejected
-              ? "Your NGO registration was rejected by the admin."
-              : "Your NGO registration is pending admin approval. Auto-checking every 3 seconds..."}
+            {isRejected ? "Your NGO registration was rejected by the admin." : "Your NGO registration is pending admin approval. Auto-checking every 3 seconds..."}
           </p>
           <div style={{ background: "white", border: "1px solid #E4E0D6", borderRadius: "12px", padding: "20px 24px", marginBottom: "24px", textAlign: "left" }}>
             <div style={{ fontSize: "13px", color: "#8A8F86" }}>NGO Name</div>
             <div style={{ fontWeight: 600, color: "#1C2B22", marginBottom: "12px" }}>{ngo.name}</div>
             <div style={{ fontSize: "13px", color: "#8A8F86" }}>Status</div>
-            <span className={`ngo-status ngo-status-${ngo.approval_status}`} style={{ fontSize: "12px" }}>
-              {ngo.approval_status}
-            </span>
-            <div style={{ fontSize: "11px", color: "#8A8F86", marginTop: "8px" }}>
-              Auto-checks: {checkCount} {checkCount > 0 ? "✓" : ""}
-            </div>
+            <span className={`ngo-status ngo-status-${ngo.approval_status}`} style={{ fontSize: "12px" }}>{ngo.approval_status}</span>
+            <div style={{ fontSize: "11px", color: "#8A8F86", marginTop: "8px" }}>Auto-checks: {checkCount} {checkCount > 0 ? "✓" : ""}</div>
           </div>
           <div style={{ display: "flex", gap: "12px", justifyContent: "center" }}>
             <Link to="/ngo/profile" className="ngo-btn-secondary">Edit Profile</Link>
@@ -190,7 +173,6 @@ function NGODashboard() {
     );
   }
 
-  // APPROVED DASHBOARD
   return (
     <div className="ngo-dashboard">
       {toast.show && <div className={`ngo-toast ${toast.type}`}>{toast.msg}</div>}
@@ -264,7 +246,7 @@ function NGODashboard() {
             )}
           </div>
 
-          {/* 🔥 Complaints — Auto-updating every 5 seconds */}
+          {/* 🔥 Complaints — Auto-updating */}
           <div className="ngo-panel" style={{ marginTop: "24px", border: "1.5px solid #FBE9E7" }}>
             <div className="ngo-panel-head">
               <h2 style={{ color: "#B24444" }}>🚨 Complaints Against Your NGO</h2>

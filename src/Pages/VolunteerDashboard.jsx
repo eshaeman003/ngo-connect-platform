@@ -23,39 +23,25 @@ function VolunteerDashboard() {
     setTimeout(() => setToast({ show: false, msg: "", type: "" }), 3000);
   };
 
-  // Fetch all data
-  const fetchData = async (userId) => {
-    try {
-      const { data: prof } = await supabase
-        .from("profiles")
-        .select("*")
-        .eq("id", userId)
-        .single();
-      setProfile(prof);
-
-      const { data: apps } = await supabase
-        .from("applications")
-        .select(`*, opportunities:opportunity_id (*)`)
-        .eq("volunteer_id", userId)
-        .order("applied_at", { ascending: false });
-      setApplications(apps || []);
-
-      await fetchMyComplaints(userId);
-    } catch (err) {
-      console.error("Fetch error:", err);
-    }
-  };
-
-  // 🔥 Fetch complaints filed BY this volunteer
+  // Fetch complaints filed BY this volunteer
   const fetchMyComplaints = async (userId) => {
-    const { data } = await supabase
+    console.log("[Volunteer Poll] Fetching complaints for:", userId);
+    const { data, error } = await supabase
       .from("complaints")
       .select("*")
       .eq("reporter_id", userId)
       .order("created_at", { ascending: false });
+
+    if (error) {
+      console.error("[Volunteer Poll] Error:", error);
+      return;
+    }
+
+    console.log("[Volunteer Poll] Got:", data?.length || 0, "complaints", data);
     setMyComplaints(data || []);
   };
 
+  // Initial load
   useEffect(() => {
     const init = async () => {
       const { data: { user: authUser } } = await supabase.auth.getUser();
@@ -64,19 +50,40 @@ function VolunteerDashboard() {
         return;
       }
       setUser(authUser);
-      await fetchData(authUser.id);
+
+      const { data: prof } = await supabase
+        .from("profiles")
+        .select("*")
+        .eq("id", authUser.id)
+        .single();
+      setProfile(prof);
+
+      const { data: apps } = await supabase
+        .from("applications")
+        .select(`*, opportunities:opportunity_id (*)`)
+        .eq("volunteer_id", authUser.id)
+        .order("applied_at", { ascending: false });
+      setApplications(apps || []);
+
+      await fetchMyComplaints(authUser.id);
       setLoading(false);
     };
     init();
   }, [navigate]);
 
-  // 🔥 POLLING: Har 5 sec mein complaints refresh
+  // 🔥 POLLING: Har 3 sec mein complaints refresh
   useEffect(() => {
     if (!user?.id) return;
+    console.log("[Volunteer Poll] Started for user:", user.id);
+
     const interval = setInterval(() => {
       fetchMyComplaints(user.id);
-    }, 5000);
-    return () => clearInterval(interval);
+    }, 3000);
+
+    return () => {
+      console.log("[Volunteer Poll] Stopped");
+      clearInterval(interval);
+    };
   }, [user?.id]);
 
   const handleCancelApp = async (appId) => {
@@ -89,7 +96,7 @@ function VolunteerDashboard() {
     }
   };
 
-  // 🔥 Log Hours (Mock)
+  // Log Hours
   const handleLogHoursSubmit = (e) => {
     e.preventDefault();
     if (!hours || hours <= 0) {
@@ -102,7 +109,7 @@ function VolunteerDashboard() {
     setLogNote("");
   };
 
-  // 🔥 Download Certificate
+  // Certificate Download
   const handleGetCertificate = () => {
     const name = profile?.full_name || "Volunteer";
     const html = `
@@ -113,74 +120,16 @@ function VolunteerDashboard() {
           <title>Certificate - ${name}</title>
           <style>
             @import url('https://fonts.googleapis.com/css2?family=Fraunces:wght@400;600;700&family=Inter:wght@400;500&display=swap');
-            body {
-              margin: 0;
-              padding: 0;
-              background: #F7F5EF;
-              display: flex;
-              align-items: center;
-              justify-content: center;
-              min-height: 100vh;
-              font-family: 'Inter', sans-serif;
-            }
-            .cert {
-              width: 900px;
-              background: white;
-              border: 12px solid #2F5D50;
-              padding: 60px 80px;
-              text-align: center;
-              box-shadow: 0 20px 60px rgba(0,0,0,0.15);
-            }
-            .cert-header {
-              font-size: 18px;
-              color: #8A8F86;
-              letter-spacing: 0.2em;
-              text-transform: uppercase;
-              margin-bottom: 30px;
-            }
-            .cert h1 {
-              font-family: 'Fraunces', serif;
-              font-size: 52px;
-              color: #1B3A28;
-              margin: 0 0 30px;
-            }
-            .cert-line {
-              width: 120px;
-              height: 3px;
-              background: #B8792A;
-              margin: 0 auto 30px;
-            }
-            .cert-text {
-              font-size: 20px;
-              color: #4B534E;
-              line-height: 1.6;
-              margin-bottom: 20px;
-            }
-            .cert-name {
-              font-family: 'Fraunces', serif;
-              font-size: 42px;
-              color: #2F5D50;
-              margin: 30px 0;
-              font-weight: 600;
-            }
-            .cert-footer {
-              margin-top: 50px;
-              display: flex;
-              justify-content: space-between;
-              align-items: center;
-              padding-top: 30px;
-              border-top: 1px solid #E4E0D6;
-            }
-            .cert-date {
-              font-size: 14px;
-              color: #8A8F86;
-            }
-            .cert-logo {
-              font-family: 'Fraunces', serif;
-              font-size: 18px;
-              color: #1B3A28;
-              font-weight: 600;
-            }
+            body { margin: 0; padding: 0; background: #F7F5EF; display: flex; align-items: center; justify-content: center; min-height: 100vh; font-family: 'Inter', sans-serif; }
+            .cert { width: 900px; background: white; border: 12px solid #2F5D50; padding: 60px 80px; text-align: center; box-shadow: 0 20px 60px rgba(0,0,0,0.15); }
+            .cert-header { font-size: 18px; color: #8A8F86; letter-spacing: 0.2em; text-transform: uppercase; margin-bottom: 30px; }
+            .cert h1 { font-family: 'Fraunces', serif; font-size: 52px; color: #1B3A28; margin: 0 0 30px; }
+            .cert-line { width: 120px; height: 3px; background: #B8792A; margin: 0 auto 30px; }
+            .cert-text { font-size: 20px; color: #4B534E; line-height: 1.6; margin-bottom: 20px; }
+            .cert-name { font-family: 'Fraunces', serif; font-size: 42px; color: #2F5D50; margin: 30px 0; font-weight: 600; }
+            .cert-footer { margin-top: 50px; display: flex; justify-content: space-between; align-items: center; padding-top: 30px; border-top: 1px solid #E4E0D6; }
+            .cert-date { font-size: 14px; color: #8A8F86; }
+            .cert-logo { font-family: 'Fraunces', serif; font-size: 18px; color: #1B3A28; font-weight: 600; }
           </style>
         </head>
         <body>
@@ -190,15 +139,8 @@ function VolunteerDashboard() {
             <div class="cert-line"></div>
             <div class="cert-text">This is to certify that</div>
             <div class="cert-name">${name}</div>
-            <div class="cert-text">
-              has demonstrated outstanding commitment and dedication<br>
-              through their volunteer work with NGO Connect.<br>
-              We recognize their valuable contribution to the community.
-            </div>
-            <div class="cert-footer">
-              <div class="cert-date">Date: ${new Date().toLocaleDateString()}</div>
-              <div class="cert-logo">🌿 NGO Connect</div>
-            </div>
+            <div class="cert-text">has demonstrated outstanding commitment and dedication<br>through their volunteer work with NGO Connect.<br>We recognize their valuable contribution to the community.</div>
+            <div class="cert-footer"><div class="cert-date">Date: ${new Date().toLocaleDateString()}</div><div class="cert-logo">🌿 NGO Connect</div></div>
           </div>
         </body>
       </html>
@@ -237,7 +179,6 @@ function VolunteerDashboard() {
     <div className="vol-dashboard">
       {toast.show && <div className={`vol-toast ${toast.type}`}>{toast.msg}</div>}
 
-      {/* Header */}
       <div className="vol-header">
         <div className="vol-header-left">
           <div className="vol-avatar-large">{profile?.full_name?.charAt(0) || "V"}</div>
@@ -250,9 +191,8 @@ function VolunteerDashboard() {
       </div>
 
       <div className="vol-grid">
-        {/* LEFT COLUMN */}
         <div className="vol-left">
-          {/* My Applications */}
+          {/* Applications */}
           <div className="vol-panel">
             <div className="vol-panel-head">
               <h2>My Applications</h2>
@@ -286,7 +226,7 @@ function VolunteerDashboard() {
             )}
           </div>
 
-          {/* My Reports & Complaints */}
+          {/* Complaints */}
           <div className="vol-panel vol-complaints-panel">
             <div className="vol-panel-head">
               <h2>🚨 My Reports & Complaints</h2>
@@ -309,9 +249,7 @@ function VolunteerDashboard() {
                       <div className="vol-complaint-meta">
                         {c.reason} · {new Date(c.created_at).toLocaleDateString()}
                       </div>
-                      {c.description && (
-                        <div className="vol-complaint-desc">{c.description}</div>
-                      )}
+                      {c.description && <div className="vol-complaint-desc">{c.description}</div>}
                       {c.admin_notes && (
                         <div className="vol-complaint-admin-note">
                           <b>Admin Update:</b> {c.admin_notes}
@@ -325,7 +263,6 @@ function VolunteerDashboard() {
           </div>
         </div>
 
-        {/* RIGHT COLUMN */}
         <div className="vol-right">
           <div className="vol-panel vol-quick-actions">
             <h3>Quick Actions</h3>
@@ -342,7 +279,7 @@ function VolunteerDashboard() {
         </div>
       </div>
 
-      {/* 🔥 Log Hours Modal */}
+      {/* Log Hours Modal */}
       {showLogModal && (
         <div className="vol-modal-overlay" onClick={() => setShowLogModal(false)}>
           <div className="vol-modal" onClick={(e) => e.stopPropagation()}>
@@ -353,24 +290,11 @@ function VolunteerDashboard() {
             <form onSubmit={handleLogHoursSubmit} className="vol-modal-form">
               <div className="vol-form-group">
                 <label>Hours Worked *</label>
-                <input
-                  type="number"
-                  min="0.5"
-                  step="0.5"
-                  placeholder="e.g., 4"
-                  value={hours}
-                  onChange={(e) => setHours(e.target.value)}
-                  required
-                />
+                <input type="number" min="0.5" step="0.5" placeholder="e.g., 4" value={hours} onChange={(e) => setHours(e.target.value)} required />
               </div>
               <div className="vol-form-group">
                 <label>Note (optional)</label>
-                <textarea
-                  rows="3"
-                  placeholder="What did you work on?"
-                  value={logNote}
-                  onChange={(e) => setLogNote(e.target.value)}
-                />
+                <textarea rows="3" placeholder="What did you work on?" value={logNote} onChange={(e) => setLogNote(e.target.value)} />
               </div>
               <div className="vol-modal-actions">
                 <button type="button" className="vol-btn-cancel" onClick={() => setShowLogModal(false)}>Cancel</button>
@@ -381,7 +305,7 @@ function VolunteerDashboard() {
         </div>
       )}
 
-      {/* 🔥 View Application Modal */}
+      {/* View Application Modal */}
       {viewApp && (
         <div className="vol-modal-overlay" onClick={() => setViewApp(null)}>
           <div className="vol-modal vol-modal-wide" onClick={(e) => e.stopPropagation()}>
@@ -390,7 +314,6 @@ function VolunteerDashboard() {
               <button className="vol-modal-close" onClick={() => setViewApp(null)}>✕</button>
             </div>
             <div className="vol-modal-body">
-              {/* Opportunity Info */}
               <div className="vol-app-detail-section">
                 <h3>🌿 Opportunity</h3>
                 <p><strong>Title:</strong> {viewApp.opportunities?.title || "N/A"}</p>
@@ -398,20 +321,11 @@ function VolunteerDashboard() {
                 <p><strong>Location:</strong> {viewApp.opportunities?.location || "Remote"}</p>
                 <p><strong>Category:</strong> {viewApp.opportunities?.category || "General"}</p>
                 <p><strong>Type:</strong> {viewApp.opportunities?.type || "N/A"}</p>
-                {viewApp.opportunities?.description && (
-                  <p className="vol-app-detail-desc">{viewApp.opportunities.description}</p>
-                )}
+                {viewApp.opportunities?.description && <p className="vol-app-detail-desc">{viewApp.opportunities.description}</p>}
               </div>
-
-              {/* My Application Info */}
               <div className="vol-app-detail-section" style={{ marginTop: "20px", borderTop: "1px solid #E4E0D6", paddingTop: "20px" }}>
                 <h3>📝 Your Application</h3>
-                <p>
-                  <strong>Status:</strong>{" "}
-                  <span className={`vol-status s-${viewApp.status?.toLowerCase() || "pending"}`}>
-                    {viewApp.status || "Pending"}
-                  </span>
-                </p>
+                <p><strong>Status:</strong> <span className={`vol-status s-${viewApp.status?.toLowerCase() || "pending"}`}>{viewApp.status || "Pending"}</span></p>
                 <p><strong>Applied on:</strong> {new Date(viewApp.applied_at).toLocaleDateString()}</p>
                 {viewApp.experience && <p><strong>Experience:</strong> {viewApp.experience}</p>}
                 {viewApp.motivation && <p><strong>Motivation:</strong> {viewApp.motivation}</p>}
