@@ -1,36 +1,58 @@
-import { useEffect, useRef, useState } from "react";
+import { useState } from "react";
 import { Link } from "react-router-dom";
 import "./About.css";
 
-/* ===== Icons ===== */
+/* ===== SVG Icons ===== */
 const HeartIcon = () => (
-  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
 );
 const ShieldIcon = () => (
-  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
 );
 const UsersIcon = () => (
-  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
 );
 const ZapIcon = () => (
-  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
 );
 const TargetIcon = () => (
   <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>
 );
 const GlobeIcon = () => (
-  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
 );
 const AwardIcon = () => (
-  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="8" r="7"/><polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"/></svg>
+  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="8" r="7"/><polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"/></svg>
+);
+const ChevronDownIcon = () => (
+  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+);
+const ChevronUpIcon = () => (
+  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="18 15 12 9 6 15"/></svg>
+);
+const MailIcon = () => (
+  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+);
+const LinkedinIcon = () => (
+  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"/><rect x="2" y="9" width="4" height="12"/><circle cx="4" cy="4" r="2"/></svg>
+);
+const GithubIcon = () => (
+  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/></svg>
 );
 const CalendarIcon = () => (
-  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
 );
 const MapPinIcon = () => (
-  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+);
+const ArrowRightIcon = () => (
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+);
+const HandshakeIcon = () => (
+  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20.42 4.58a5.4 5.4 0 0 0-7.65 0l-.77.78-.77-.78a5.4 5.4 0 0 0-7.65 0C1.46 6.7 1.33 10.28 4 13l8 8 8-8c2.67-2.72 2.54-6.3.42-8.42z"/><path d="M12 5.36 8.87 8.5"/><path d="m15.13 8.5-3.13-3.14"/></svg>
 );
 
+/* ===== useCountUp Hook ===== */
 function useCountUp(end, duration = 2000) {
   const [count, setCount] = useState(0);
   const [started, setStarted] = useState(false);
@@ -60,6 +82,7 @@ function useCountUp(end, duration = 2000) {
   return [count, ref];
 }
 
+/* ===== Scroll Reveal ===== */
 function useReveal() {
   const ref = useRef(null);
   useEffect(() => {
@@ -92,41 +115,42 @@ const journeyMilestones = [
   {
     date: "Feb 2026",
     title: "Volunteered at HHRD Chakwal",
-    desc: "Joined Helping Hand for Relief & Development (HHRD) OSP Region Office for a 12-day Volunteer Internship Service program.",
+    desc: "Joined Helping Hand for Relief & Development (HHRD) OSP Region Office for a 12-day Volunteer Internship Service program, working directly with orphan support operations.",
     icon: "🤝",
   },
   {
     date: "Feb 2026",
     title: "Orphan Support Data Management",
-    desc: "Entered detailed records for orphan students, managed B-forms, fee slips, and ID documentation in the OSP portal.",
+    desc: "Entered detailed records for orphan students, managed B-forms, fee slips, and ID documentation in the OSP portal — ensuring accurate sponsor matching.",
     icon: "📋",
   },
   {
     date: "Feb 2026",
     title: "Creative Donor Engagement",
-    desc: "Designed artistic artwork on 200+ donor messages to strengthen the emotional connection between sponsors and children.",
+    desc: "Designed artistic artwork on 200+ donor messages to strengthen the emotional connection between sponsors and children, making every donation feel personal.",
     icon: "🎨",
   },
   {
     date: "Feb 2026",
     title: "Field Visits & Flood Relief",
-    desc: "Conducted home visits to orphan families and flood-affected households in Chakwal, witnessing ground realities firsthand.",
+    desc: "Conducted home visits to orphan families and flood-affected households in Chakwal, witnessing ground realities that later inspired NGO Connect's mission.",
     icon: "🏠",
   },
   {
     date: "Aug 2026",
     title: "Founded NGO Connect",
-    desc: "Built Pakistan's first digital bridge connecting volunteers and NGOs — turning field experience into scalable technology.",
+    desc: "Built Pakistan's first digital bridge connecting volunteers and NGOs — turning raw field experience into scalable technology for social good.",
     icon: "🚀",
   },
 ];
 
 function About() {
+  const [showDetails, setShowDetails] = useState(false);
+
   const heroRef = useReveal();
   const storyRef = useReveal();
   const statsRef = useReveal();
   const valuesRef = useReveal();
-  const journeyRef = useReveal();
   const founderRef = useReveal();
   const ctaRef = useReveal();
 
@@ -137,7 +161,7 @@ function About() {
 
   return (
     <div className="about-page">
-      {/* HERO */}
+      {/* ===== HERO ===== */}
       <section className="about-hero" ref={heroRef}>
         <div className="about-hero-content">
           <span className="about-label">ABOUT US</span>
@@ -156,7 +180,7 @@ function About() {
         </div>
       </section>
 
-      {/* STORY */}
+      {/* ===== STORY ===== */}
       <section className="about-story" ref={storyRef}>
         <div className="about-story-img">
           <img src="https://images.unsplash.com/photo-1593113598332-cd288d649433?w=600&h=500&fit=crop" alt="Community work" />
@@ -177,7 +201,7 @@ function About() {
         </div>
       </section>
 
-      {/* IMPACT STATS */}
+      {/* ===== IMPACT STATS ===== */}
       <section className="about-impact" ref={statsRef}>
         <div className="about-impact-header">
           <span className="about-label">OUR IMPACT</span>
@@ -207,7 +231,7 @@ function About() {
         </div>
       </section>
 
-      {/* VALUES */}
+      {/* ===== VALUES ===== */}
       <section className="about-values" ref={valuesRef}>
         <div className="about-values-header">
           <span className="about-label">OUR VALUES</span>
@@ -224,64 +248,147 @@ function About() {
         </div>
       </section>
 
-      {/* VOLUNTEERING JOURNEY — NEW SECTION */}
-      <section className="about-journey" ref={journeyRef}>
-        <div className="about-journey-header">
-          <span className="about-label">MY JOURNEY</span>
-          <h2>From the Field to the Screen</h2>
-          <p className="journey-subtitle">
-            Before building NGO Connect, I volunteered on the ground with HHRD Chakwal. 
-            That experience shaped every feature of this platform.
-          </p>
-        </div>
-
-        <div className="journey-timeline">
-          {journeyMilestones.map((m, i) => (
-            <div className="journey-item" key={i}>
-              <div className="journey-icon">{m.icon}</div>
-              <div className="journey-content">
-                <div className="journey-meta">
-                  <span className="journey-date"><CalendarIcon /> {m.date}</span>
-                  <span className="journey-location"><MapPinIcon /> Chakwal, Pakistan</span>
-                </div>
-                <h4>{m.title}</h4>
-                <p>{m.desc}</p>
-              </div>
-            </div>
-          ))}
-        </div>
-
-        <div className="journey-report">
-          <div className="journey-report-card">
-            <div className="journey-report-icon">📄</div>
-            <div className="journey-report-text">
-              <h4>HHRD Volunteer Internship Report</h4>
-              <p>Complete documentation of my 12-day VIS program at HHRD OSP Region Office, Chakwal — including data management, donor artwork, field visits, and healthcare program exposure.</p>
-              <span className="journey-report-badge">Feb 11 – Feb 25, 2026</span>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* FOUNDER */}
-      <section className="about-founder" ref={founderRef}>
+      {/* ===== FOUNDER COMPACT CARD ===== */}
+      <section className="about-founder-section" ref={founderRef}>
         <div className="about-founder-header">
           <span className="about-label">THE FOUNDER</span>
-          <h2>The Story Behind the Platform</h2>
+          <h2>Meet the Mind Behind NGO Connect</h2>
         </div>
-        <div className="about-founder-card">
-          <div className="founder-avatar">
-            <img src="/esha%20eman.jpg" alt="Esha Eman" />
+
+        <div className="founder-compact-card">
+          <div className="founder-compact-left">
+            <div className="founder-compact-avatar">
+              <img src="/esha%20eman.jpg" alt="Esha Eman" />
+            </div>
           </div>
-          <h3>Esha Eman</h3>
-          <p className="founder-role">Founder & CEO</p>
-          <p className="founder-bio">
-            I built NGO Connect after volunteering with HHRD Chakwal and watching passionate students struggle to find verified volunteering opportunities during the 2022 floods. What started as an internship project became a mission: to ensure no willing hand ever goes unmatched in Pakistan.
-          </p>
+          <div className="founder-compact-right">
+            <h3>Esha Eman</h3>
+            <p className="founder-compact-role">Founder & CEO</p>
+            <p className="founder-compact-bio">
+              Computer Science student, volunteer at HHRD Chakwal, and builder of NGO Connect. 
+              Passionate about using technology to solve real social problems in Pakistan.
+            </p>
+            <button 
+              className="learn-more-btn"
+              onClick={() => setShowDetails(!showDetails)}
+            >
+              {showDetails ? (
+                <>Show Less <ChevronUpIcon /></>
+              ) : (
+                <>Learn More About Me <ChevronDownIcon /></>
+              )}
+            </button>
+          </div>
+        </div>
+
+        {/* ===== EXPANDED DETAILS ===== */}
+        <div className={`founder-details ${showDetails ? 'open' : ''}`}>
+
+          {/* Who I Am */}
+          <div className="detail-block">
+            <h4 className="detail-title">Who I Am</h4>
+            <div className="detail-content">
+              <p>
+                I'm Esha Eman, a Computer Science student with a deep-rooted passion for social impact. 
+                My journey didn't start with code — it started on the ground, in the field, working directly 
+                with communities that needed help.
+              </p>
+              <p>
+                During my 12-day volunteer internship with <strong>HHRD (Helping Hand for Relief & Development)</strong> 
+                at their OSP Region Office in Chakwal, I saw the operational chaos NGOs face every day: 
+                manual data entry, disconnected volunteers, and no reliable way to match willing hands with 
+                organizations that desperately needed them.
+              </p>
+              <p>
+                That experience became the foundation of NGO Connect. I realized that technology could bridge 
+                this gap — not by replacing human connection, but by making it easier to form. This platform 
+                is my attempt to ensure that no willing volunteer ever struggles to find a cause, and no 
+                credible NGO ever lacks the support it needs.
+              </p>
+            </div>
+          </div>
+
+          {/* Journey Timeline */}
+          <div className="detail-block">
+            <h4 className="detail-title">My Volunteering Journey</h4>
+            <div className="journey-timeline">
+              {journeyMilestones.map((m, i) => (
+                <div className="journey-item" key={i}>
+                  <div className="journey-dot">{m.icon}</div>
+                  <div className="journey-content">
+                    <div className="journey-meta">
+                      <span><CalendarIcon /> {m.date}</span>
+                      <span><MapPinIcon /> Chakwal, Pakistan</span>
+                    </div>
+                    <h5>{m.title}</h5>
+                    <p>{m.desc}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* HHRD Report */}
+          <div className="detail-block">
+            <div className="hhr-report-card">
+              <div className="hhr-report-icon">📄</div>
+              <div className="hhr-report-info">
+                <h5>HHRD Volunteer Internship Report</h5>
+                <p>Complete documentation of my 12-day VIS program at HHRD OSP Region Office, Chakwal — including data management, donor artwork, field visits, and healthcare program exposure.</p>
+                <span className="hhr-badge">Feb 11 – Feb 25, 2026</span>
+              </div>
+            </div>
+          </div>
+
+          {/* Contact Me */}
+          <div className="detail-block">
+            <h4 className="detail-title">Let's Connect</h4>
+            <p className="connect-subtitle">
+              Whether you want to collaborate on a project, need development services, 
+              or have ideas about improving NGO Connect — I'm always open to meaningful conversations.
+            </p>
+            <div className="connect-grid">
+              <a href="mailto:eshaeman003@gmail.com" className="connect-card email">
+                <div className="connect-icon"><MailIcon /></div>
+                <div className="connect-info">
+                  <span className="connect-label">Email</span>
+                  <span className="connect-value">eshaeman003@gmail.com</span>
+                </div>
+              </a>
+
+              <a href="https://www.linkedin.com/in/esha-eman-2133b535a/" target="_blank" rel="noopener noreferrer" className="connect-card linkedin">
+                <div className="connect-icon"><LinkedinIcon /></div>
+                <div className="connect-info">
+                  <span className="connect-label">LinkedIn</span>
+                  <span className="connect-value">Esha Eman</span>
+                </div>
+              </a>
+
+              <a href="https://github.com/eshaeman003" target="_blank" rel="noopener noreferrer" className="connect-card github">
+                <div className="connect-icon"><GithubIcon /></div>
+                <div className="connect-info">
+                  <span className="connect-label">GitHub</span>
+                  <span className="connect-value">@eshaeman003</span>
+                </div>
+              </a>
+            </div>
+
+            <div className="collab-box">
+              <div className="collab-icon"><HandshakeIcon /></div>
+              <div className="collab-text">
+                <h5>Open for Collaboration</h5>
+                <p>
+                  Looking for partners to expand NGO Connect, volunteer opportunities with new NGOs, 
+                  or freelance development work. If you have a cause that needs tech, let's build it together.
+                </p>
+              </div>
+            </div>
+          </div>
+
         </div>
       </section>
 
-      {/* CTA */}
+      {/* ===== CTA ===== */}
       <section className="about-cta" ref={ctaRef}>
         <div className="about-cta-pattern" />
         <div className="about-cta-content">
