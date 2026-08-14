@@ -16,7 +16,7 @@
 .ngo-detail-hero-overlay {
   position: absolute;
   inset: 0;
-  background: linear-gradient(to top, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.5) 40%, rgba(0,0,0,0.2) 100%);
+  background: linear-gradient(to top, rgba(0,0,0,0.88) 0%, rgba(0,0,0,0.55) 45%, rgba(0,0,0,0.2) 100%);
 }
 
 .ngo-detail-hero-content {
@@ -96,7 +96,7 @@
   margin-bottom: 10px;
   line-height: 1.1;
   color: #ffffff !important;
-  text-shadow: 0 2px 12px rgba(0,0,0,0.4);
+  text-shadow: 0 2px 16px rgba(0,0,0,0.5), 0 1px 4px rgba(0,0,0,0.3);
 }
 
 .ngo-detail-location {
@@ -105,7 +105,7 @@
   gap: 6px;
   font-size: 1.05rem;
   color: rgba(255,255,255,0.9) !important;
-  text-shadow: 0 1px 6px rgba(0,0,0,0.3);
+  text-shadow: 0 1px 6px rgba(0,0,0,0.4);
 }
 
 .ngo-detail-location svg {
@@ -132,7 +132,7 @@
 
 /* Main Content */
 .ngo-section {
-  margin-bottom: 36px;
+  margin-bottom: 40px;
 }
 
 .ngo-section-title {
@@ -140,14 +140,14 @@
   font-size: 1.5rem;
   font-weight: 700;
   color: #1a1a1a;
-  margin-bottom: 14px;
+  margin-bottom: 16px;
   padding-bottom: 10px;
   border-bottom: 2px solid #e8e8e3;
 }
 
 .ngo-section-text {
   font-size: 1.05rem;
-  line-height: 1.8;
+  line-height: 1.85;
   color: #444;
 }
 
@@ -165,6 +165,51 @@
   font-size: 0.9rem;
   font-weight: 500;
   border: 1px solid #e0e0d8;
+  transition: all 0.2s ease;
+}
+
+.ngo-service-tag:hover {
+  background: #1a5f2a;
+  color: white;
+  border-color: #1a5f2a;
+}
+
+/* Impact Grid */
+.ngo-impact-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+}
+
+.impact-card {
+  background: white;
+  border: 1px solid #f0f0eb;
+  border-radius: 16px;
+  padding: 24px 16px;
+  text-align: center;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.04);
+}
+
+.impact-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 24px rgba(0,0,0,0.08);
+  border-color: #1a5f2a;
+}
+
+.impact-number {
+  display: block;
+  font-family: "Playfair Display", Georgia, serif;
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: #1a5f2a;
+  margin-bottom: 4px;
+}
+
+.impact-label {
+  font-size: 0.85rem;
+  color: #666;
+  font-weight: 500;
 }
 
 /* Sidebar */
