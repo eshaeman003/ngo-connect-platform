@@ -19,22 +19,17 @@ function NGODashboard() {
     setTimeout(() => setToast({ show: false, msg: "", type: "" }), 3000);
   };
 
+  // Load dashboard data (opportunities + applications)
   const loadApprovedData = async (ngoData, userId) => {
-    const [{ data: oppData }, { data: compData }] = await Promise.all([
+    const [{ data: oppData }] = await Promise.all([
       supabase
         .from("opportunities")
         .select("*")
         .eq("ngo_id", userId)
         .order("created_at", { ascending: false }),
-      supabase
-        .from("complaints")
-        .select("*")
-        .eq("reported_id", userId)
-        .order("created_at", { ascending: false }),
     ]);
 
     setOpportunities(oppData || []);
-    setComplaintsAgainstMe(compData || []);
 
     const { data: appData } = await supabase
       .from("applications")
@@ -45,6 +40,17 @@ function NGODashboard() {
     setApplications(appData || []);
   };
 
+  // 🔥 Separate complaints fetch taake poll kar sakein
+  const fetchComplaints = async (userId) => {
+    const { data } = await supabase
+      .from("complaints")
+      .select("*")
+      .eq("reported_id", userId)
+      .order("created_at", { ascending: false });
+    setComplaintsAgainstMe(data || []);
+  };
+
+  // Initial load
   useEffect(() => {
     const init = async () => {
       const { data: { user: authUser } } = await supabase.auth.getUser();
@@ -61,6 +67,7 @@ function NGODashboard() {
 
       if (ngoData?.approval_status === "approved") {
         await loadApprovedData(ngoData, authUser.id);
+        await fetchComplaints(authUser.id);
       }
 
       setLoading(false);
@@ -68,6 +75,7 @@ function NGODashboard() {
     init();
   }, [navigate]);
 
+  // POLLING: Har 3 sec mein status check jab tak approved na ho
   useEffect(() => {
     if (!user?.id || !ngo?.id || ngo.approval_status === "approved") return;
 
@@ -82,12 +90,24 @@ function NGODashboard() {
       if (data?.approval_status === "approved") {
         setNgo(data);
         await loadApprovedData(data, user.id);
+        await fetchComplaints(user.id);
         clearInterval(timer);
       }
     }, 3000);
 
     return () => clearInterval(timer);
   }, [user?.id, ngo?.id, ngo?.approval_status]);
+
+  // 🔥 POLLING: Har 5 sec mein complaints refresh (admin ne status change kiya ho toh)
+  useEffect(() => {
+    if (!user?.id || ngo?.approval_status !== "approved") return;
+
+    const interval = setInterval(() => {
+      fetchComplaints(user.id);
+    }, 5000);
+
+    return () => clearInterval(interval);
+  }, [user?.id, ngo?.approval_status]);
 
   const handleAppStatus = async (appId, status) => {
     const { error } = await supabase.from("applications").update({ status }).eq("id", appId);
@@ -134,6 +154,7 @@ function NGODashboard() {
     );
   }
 
+  // BLOCK SCREEN for pending/rejected
   if (ngo.approval_status !== "approved") {
     const isRejected = ngo.approval_status === "rejected";
     return (
@@ -169,6 +190,7 @@ function NGODashboard() {
     );
   }
 
+  // APPROVED DASHBOARD
   return (
     <div className="ngo-dashboard">
       {toast.show && <div className={`ngo-toast ${toast.type}`}>{toast.msg}</div>}
@@ -242,6 +264,7 @@ function NGODashboard() {
             )}
           </div>
 
+          {/* 🔥 Complaints — Auto-updating every 5 seconds */}
           <div className="ngo-panel" style={{ marginTop: "24px", border: "1.5px solid #FBE9E7" }}>
             <div className="ngo-panel-head">
               <h2 style={{ color: "#B24444" }}>🚨 Complaints Against Your NGO</h2>
