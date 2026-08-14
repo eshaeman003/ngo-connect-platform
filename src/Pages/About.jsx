@@ -161,7 +161,7 @@ function About() {
       {/* ===== HERO: Full-width background with overlay ===== */}
       <section className="about-hero-v2" ref={heroRef}>
         <div className="about-hero-bg">
-          <img src="https://images.unsplash.com/photo-1469571486292-0ba58a3f068b?w=1400&h=600&fit=crop" alt="Hands together" />
+          <img src="https://images.unsplash.com/photo-1509099836639-18ba1795216d?w=1400&h=600&fit=cropp" alt="Hands together" />
           <div className="about-hero-overlay" />
         </div>
         <div className="about-hero-content-v2">
