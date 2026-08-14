@@ -8,6 +8,7 @@ import VolunteerDashboard from "./Pages/VolunteerDashboard";
 import NGODashboard from "./Pages/NGODashboard";
 import NGORegister from "./Pages/NGORegister";
 import NGOProfile from "./Pages/NGOProfile";
+import NGOs from "./Pages/NGOs";
 import Opportunities from "./Pages/Opportunities";
 import OpportunityDetail from "./Pages/OpportunityDetail";
 import CreateOpportunity from "./Pages/CreateOpportunity";
@@ -15,6 +16,7 @@ import OpportunityEdit from "./Pages/OpportunityEdit";
 import VolunteerProfile from "./Pages/VolunteerProfile";
 import AdminDashboard from "./Pages/AdminDashboard";
 import ComplaintForm from "./Pages/ComplaintForm";
+import About from "./Pages/About";
 import NotFound from "./Pages/NotFound";
 
 function App() {
@@ -30,12 +32,14 @@ function App() {
         <Route path="/ngo/dashboard" element={<NGODashboard />} />
         <Route path="/ngo/register" element={<NGORegister />} />
         <Route path="/ngo/profile" element={<NGOProfile />} />
+        <Route path="/ngos" element={<NGOs />} />
         <Route path="/opportunities" element={<Opportunities />} />
         <Route path="/opportunity/:id" element={<OpportunityDetail />} />
         <Route path="/opportunity/create" element={<CreateOpportunity />} />
         <Route path="/opportunity/edit/:id" element={<OpportunityEdit />} />
         <Route path="/admin" element={<AdminDashboard />} />
         <Route path="/complaint" element={<ComplaintForm />} />
+        <Route path="/about" element={<About />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
     </BrowserRouter>
