@@ -11,8 +11,8 @@ import NGORegister from "./Pages/NGORegister";
 import NGOProfile from "./Pages/NGOProfile";
 import Opportunities from "./Pages/Opportunities";
 import OpportunityDetail from "./Pages/OpportunityDetail";
-import OpportunityCreate from "./Pages/OpportunityCreate";
-import OpportunityEdit from "./Pages/OpportunityEdit";
+import CreateOpportunity from "./Pages/CreateOpportunity";        // ← Fixed
+import EditOpportunity from "./Pages/EditOpportunity";            // ← Fixed (agar ye naam hai)
 import VolunteerProfile from "./Pages/VolunteerProfile";
 import AdminDashboard from "./Pages/AdminDashboard";
 import ComplaintForm from "./Pages/ComplaintForm";
@@ -39,14 +39,14 @@ function App() {
         {/* Opportunities */}
         <Route path="/opportunities" element={<Opportunities />} />
         <Route path="/opportunity/:id" element={<OpportunityDetail />} />
-        <Route path="/opportunity/create" element={<OpportunityCreate />} />
-        <Route path="/opportunity/edit/:id" element={<OpportunityEdit />} />
+        <Route path="/opportunity/create" element={<CreateOpportunity />} />   // ← Fixed
+        <Route path="/opportunity/edit/:id" element={<EditOpportunity />} />    // ← Fixed
         
         {/* Other */}
         <Route path="/admin" element={<AdminDashboard />} />
         <Route path="/complaint" element={<ComplaintForm />} />
         
-        {/* 404 - Catch All */}
+        {/* 404 */}
         <Route path="*" element={<NotFound />} />
       </Routes>
     </BrowserRouter>
