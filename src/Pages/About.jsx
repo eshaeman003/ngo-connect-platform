@@ -190,7 +190,7 @@ function About() {
         </div>
         <div className="about-founder-card">
           <div className="founder-avatar">
-            <img src="/esha-eman.jpg" alt="Esha Eman" />
+            <img src="/esha%20eman.jpg" alt="Esha Eman" />
           </div>
           <h3>Esha Eman</h3>
           <p className="founder-role">Founder & CEO</p>
