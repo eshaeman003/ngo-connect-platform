@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400;1,600&family=Inter:wght@400;500;600;700&display=swap');
+
 .about-page {
   background: #faf9f6;
   font-family: 'Inter', sans-serif;
@@ -26,8 +28,10 @@
   letter-spacing: 0.05em;
   text-transform: uppercase;
   margin-bottom: 16px;
+  font-family: 'Inter', sans-serif;
 }
 
+/* ===== HERO ===== */
 .about-hero {
   max-width: 1200px;
   margin: 0 auto;
@@ -42,7 +46,7 @@
 }
 
 .about-hero-content h1 {
-  font-family: 'Fraunces', serif;
+  font-family: 'Playfair Display', serif;
   font-size: 48px;
   font-weight: 700;
   line-height: 1.15;
@@ -101,6 +105,7 @@
   display: block;
   font-size: 14px;
   color: #1c1c1c;
+  font-family: 'Inter', sans-serif;
 }
 
 .about-float-card span {
@@ -113,6 +118,7 @@
   50% { transform: translateY(-8px); }
 }
 
+/* ===== STORY ===== */
 .about-story {
   max-width: 1200px;
   margin: 80px auto 0;
@@ -140,7 +146,7 @@
 }
 
 .about-story-text h2 {
-  font-family: 'Fraunces', serif;
+  font-family: 'Playfair Display', serif;
   font-size: 36px;
   font-weight: 700;
   color: #1b4332;
@@ -168,7 +174,7 @@
 }
 
 .about-story-stats strong {
-  font-family: 'Fraunces', serif;
+  font-family: 'Playfair Display', serif;
   font-size: 28px;
   color: #1b4332;
 }
@@ -179,6 +185,7 @@
   margin-top: 4px;
 }
 
+/* ===== IMPACT ===== */
 .about-impact {
   max-width: 1200px;
   margin: 100px auto 0;
@@ -191,7 +198,7 @@
 }
 
 .about-impact-header h2 {
-  font-family: 'Fraunces', serif;
+  font-family: 'Playfair Display', serif;
   font-size: 36px;
   font-weight: 700;
   color: #1c1c1c;
@@ -234,7 +241,7 @@
 .impact-icon.teal { background: #e0f2f1; color: #00695c; }
 
 .impact-card h3 {
-  font-family: 'Fraunces', serif;
+  font-family: 'Playfair Display', serif;
   font-size: 32px;
   font-weight: 700;
   color: #1b4332;
@@ -248,6 +255,7 @@
   font-weight: 500;
 }
 
+/* ===== VALUES ===== */
 .about-values {
   max-width: 1200px;
   margin: 100px auto 0;
@@ -260,7 +268,7 @@
 }
 
 .about-values-header h2 {
-  font-family: 'Fraunces', serif;
+  font-family: 'Playfair Display', serif;
   font-size: 36px;
   font-weight: 700;
   color: #1c1c1c;
@@ -303,6 +311,7 @@
   font-weight: 700;
   color: #1c1c1c;
   margin: 0 0 10px;
+  font-family: 'Inter', sans-serif;
 }
 
 .value-card p {
@@ -312,6 +321,7 @@
   margin: 0;
 }
 
+/* ===== FOUNDER ===== */
 .about-founder {
   max-width: 1200px;
   margin: 100px auto 0;
@@ -324,7 +334,7 @@
 }
 
 .about-founder-header h2 {
-  font-family: 'Fraunces', serif;
+  font-family: 'Playfair Display', serif;
   font-size: 36px;
   font-weight: 700;
   color: #1c1c1c;
@@ -332,7 +342,7 @@
 }
 
 .about-founder-card {
-  max-width: 420px;
+  max-width: 460px;
   margin: 0 auto;
   background: white;
   border-radius: 24px;
@@ -364,8 +374,8 @@
 }
 
 .about-founder-card h3 {
-  font-family: 'Fraunces', serif;
-  font-size: 24px;
+  font-family: 'Playfair Display', serif;
+  font-size: 26px;
   font-weight: 700;
   color: #1c1c1c;
   margin: 0 0 6px;
@@ -378,6 +388,7 @@
   margin: 0 0 16px;
   text-transform: uppercase;
   letter-spacing: 0.05em;
+  font-family: 'Inter', sans-serif;
 }
 
 .founder-bio {
@@ -387,6 +398,7 @@
   margin: 0;
 }
 
+/* ===== CTA ===== */
 .about-cta {
   max-width: 1200px;
   margin: 80px auto 0;
@@ -414,7 +426,7 @@
 }
 
 .about-cta h2 {
-  font-family: 'Fraunces', serif;
+  font-family: 'Playfair Display', serif;
   font-size: 40px;
   font-weight: 700;
   margin: 0 0 16px;
@@ -469,6 +481,7 @@
   border-color: white;
 }
 
+/* ===== RESPONSIVE ===== */
 @media (max-width: 1024px) {
   .about-hero {
     flex-direction: column;

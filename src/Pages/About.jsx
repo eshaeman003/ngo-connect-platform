@@ -25,7 +25,6 @@ const AwardIcon = () => (
   <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="8" r="7"/><polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"/></svg>
 );
 
-/* ===== useCountUp Hook ===== */
 function useCountUp(end, duration = 2000) {
   const [count, setCount] = useState(0);
   const [started, setStarted] = useState(false);
@@ -55,7 +54,6 @@ function useCountUp(end, duration = 2000) {
   return [count, ref];
 }
 
-/* ===== Scroll Reveal ===== */
 function useReveal() {
   const ref = useRef(null);
   useEffect(() => {
@@ -78,10 +76,10 @@ function useReveal() {
 }
 
 const values = [
-  { icon: <HeartIcon />, title: "Empathy First", desc: "Every decision we make starts with understanding the real needs of communities and volunteers." },
-  { icon: <ShieldIcon />, title: "Trust & Safety", desc: "Verified NGOs, transparent processes, and a safe environment for every volunteer." },
-  { icon: <UsersIcon />, title: "Community Driven", desc: "Built by the community, for the community. We grow when our NGOs and volunteers grow." },
-  { icon: <ZapIcon />, title: "Impact Focused", desc: "We measure success not by numbers, but by the real, lasting change we create together." },
+  { icon: <HeartIcon />, title: "Empathy First", desc: "Every decision starts with understanding what communities truly need, not what we assume they need." },
+  { icon: <ShieldIcon />, title: "Trust & Transparency", desc: "Verified NGOs, clear processes, and honest communication — because social work deserves accountability." },
+  { icon: <UsersIcon />, title: "Community Led", desc: "Built alongside volunteers and NGOs, not for them. Their feedback shapes every feature we ship." },
+  { icon: <ZapIcon />, title: "Impact Obsessed", desc: "We don't count clicks. We count lives changed, meals served, and classrooms filled." },
 ];
 
 function About() {
@@ -104,7 +102,7 @@ function About() {
         <div className="about-hero-content">
           <span className="about-label">ABOUT US</span>
           <h1>Bridging the Gap Between <span>Good Intentions</span> and <span>Real Impact</span></h1>
-          <p>NGO Connect is Pakistan's first digital bridge connecting passionate volunteers with verified NGOs. We believe everyone has something to give — and every community deserves support.</p>
+          <p>NGO Connect is Pakistan's first dedicated platform connecting passionate volunteers with verified NGOs. We believe everyone has something to give — and every community deserves reliable support.</p>
         </div>
         <div className="about-hero-visual">
           <img src="https://images.unsplash.com/photo-1559027615-cd4628902d4a?w=600&h=450&fit=crop" alt="Volunteers" />
@@ -118,19 +116,23 @@ function About() {
         </div>
       </section>
 
-      {/* STORY */}
+      {/* STORY — UPDATED CONTENT */}
       <section className="about-story" ref={storyRef}>
         <div className="about-story-img">
           <img src="https://images.unsplash.com/photo-1593113598332-cd288d649433?w=600&h=500&fit=crop" alt="Community work" />
         </div>
         <div className="about-story-text">
-          <h2>Why We Started</h2>
-          <p>In 2023, we saw thousands of young Pakistanis eager to volunteer but with no easy way to find trusted NGOs. At the same time, incredible organizations struggled to find reliable help.</p>
-          <p>NGO Connect was born to solve both problems — a single platform where volunteers discover meaningful opportunities and NGOs find passionate supporters.</p>
+          <h2>Why We Built This</h2>
+          <p>
+            In 2026, I noticed something heartbreaking: thousands of young Pakistanis wanted to volunteer for flood relief and education drives, but had no trusted way to find legitimate NGOs. Meanwhile, incredible organizations like Edhi and Saylani were drowning in manual coordination — struggling to find reliable volunteers.
+          </p>
+          <p>
+            Pakistan had no centralized digital bridge between these two groups. Volunteers relied on WhatsApp forwards. NGOs used paper registers. That gap became NGO Connect — a platform where one click connects passion with purpose.
+          </p>
           <div className="about-story-stats">
-            <div><strong>2023</strong><span>Founded</span></div>
-            <div><strong>8</strong><span>Cities Active</span></div>
-            <div><strong>100%</strong><span>Free Platform</span></div>
+            <div><strong>2026</strong><span>Founded</span></div>
+            <div><strong>8+</strong><span>Cities Active</span></div>
+            <div><strong>100%</strong><span>Free Forever</span></div>
           </div>
         </div>
       </section>
@@ -139,7 +141,7 @@ function About() {
       <section className="about-impact" ref={statsRef}>
         <div className="about-impact-header">
           <span className="about-label">OUR IMPACT</span>
-          <h2>Numbers That Tell a Story</h2>
+          <h2>Numbers That Matter</h2>
         </div>
         <div className="about-impact-grid">
           <div className="impact-card" ref={volRef}>
@@ -169,7 +171,7 @@ function About() {
       <section className="about-values" ref={valuesRef}>
         <div className="about-values-header">
           <span className="about-label">OUR VALUES</span>
-          <h2>What Drives Us Every Day</h2>
+          <h2>What We Stand For</h2>
         </div>
         <div className="about-values-grid">
           {values.map((v, i) => (
@@ -182,11 +184,11 @@ function About() {
         </div>
       </section>
 
-      {/* FOUNDER — TUMHARI PHOTO YAHAN HAI */}
+      {/* FOUNDER */}
       <section className="about-founder" ref={founderRef}>
         <div className="about-founder-header">
           <span className="about-label">THE FOUNDER</span>
-          <h2>Meet the Mind Behind NGO Connect</h2>
+          <h2>The Story Behind the Platform</h2>
         </div>
         <div className="about-founder-card">
           <div className="founder-avatar">
@@ -195,9 +197,7 @@ function About() {
           <h3>Esha Eman</h3>
           <p className="founder-role">Founder & CEO</p>
           <p className="founder-bio">
-            Passionate about leveraging technology for social good. 
-            Building NGO Connect to bridge the gap between volunteers 
-            and communities that need them most.
+            I built NGO Connect after watching passionate students struggle to find verified volunteering opportunities during the 2022 floods. What started as an internship project at Zynvex became a mission: to ensure no willing hand ever goes unmatched in Pakistan.
           </p>
         </div>
       </section>
