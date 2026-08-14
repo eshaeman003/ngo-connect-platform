@@ -19,50 +19,82 @@ function NGODashboard() {
     setTimeout(() => setToast({ show: false, msg: "", type: "" }), 3000);
   };
 
-  const loadApprovedData = async (ngoData, userId) => {
-    const [{ data: oppData }] = await Promise.all([
-      supabase.from("opportunities").select("*").eq("ngo_id", userId).order("created_at", { ascending: false }),
-    ]);
-    setOpportunities(oppData || []);
+  // 🔥 Fetch opportunities
+  const fetchOpportunities = async (userId) => {
+    console.log("[NGO] Fetching opportunities for ngo_id:", userId);
+    const { data, error } = await supabase
+      .from("opportunities")
+      .select("*")
+      .eq("ngo_id", userId)
+      .order("created_at", { ascending: false });
 
-    const { data: appData } = await supabase
-      .from("applications")
-      .select(`*, opportunities:opportunity_id (title), profiles:volunteer_id (full_name, email, phone)`)
-      .in("opportunity_id", oppData?.map((o) => o.id) || [])
-      .order("applied_at", { ascending: false });
-    setApplications(appData || []);
+    if (error) console.error("[NGO] Opportunities error:", error);
+    else console.log("[NGO] Opportunities found:", data?.length || 0, data);
+    return data || [];
   };
 
-  // 🔥 Separate complaints fetch
+  // 🔥 Fetch applications for these opportunities
+  const fetchApplications = async (oppList) => {
+    if (!oppList || oppList.length === 0) {
+      console.log("[NGO] No opportunities, skipping applications fetch");
+      setApplications([]);
+      return;
+    }
+
+    const oppIds = oppList.map((o) => o.id);
+    console.log("[NGO] Fetching applications for opportunity IDs:", oppIds);
+
+    const { data, error } = await supabase
+      .from("applications")
+      .select(`*, opportunities:opportunity_id (title), profiles:volunteer_id (full_name, email, phone)`)
+      .in("opportunity_id", oppIds)
+      .order("applied_at", { ascending: false });
+
+    if (error) {
+      console.error("[NGO] Applications error:", error);
+      return;
+    }
+
+    console.log("[NGO] Applications found:", data?.length || 0, data);
+    setApplications(data || []);
+  };
+
+  // 🔥 Fetch complaints
   const fetchComplaints = async (userId) => {
-    console.log("[NGO Poll] Fetching complaints for reported_id:", userId);
     const { data, error } = await supabase
       .from("complaints")
       .select("*")
       .eq("reported_id", userId)
       .order("created_at", { ascending: false });
 
-    if (error) {
-      console.error("[NGO Poll] Error:", error);
-      return;
-    }
-    console.log("[NGO Poll] Got:", data?.length || 0, "complaints", data);
-    setComplaintsAgainstMe(data || []);
+    if (error) console.error("[NGO] Complaints error:", error);
+    else setComplaintsAgainstMe(data || []);
   };
 
+  // Initial load
   useEffect(() => {
     const init = async () => {
       const { data: { user: authUser } } = await supabase.auth.getUser();
       if (!authUser) { navigate("/login"); return; }
       setUser(authUser);
+      console.log("[NGO] Logged in as:", authUser.id);
 
-      const { data: ngoData } = await supabase.from("ngos").select("*").eq("user_id", authUser.id).single();
+      const { data: ngoData } = await supabase
+        .from("ngos")
+        .select("*")
+        .eq("user_id", authUser.id)
+        .single();
+
       setNgo(ngoData);
+      console.log("[NGO] NGO data:", ngoData);
 
       if (ngoData?.approval_status === "approved") {
-        await loadApprovedData(ngoData, authUser.id);
+        const opps = await fetchOpportunities(authUser.id);
+        setOpportunities(opps);
+        await fetchApplications(opps);
         await fetchComplaints(authUser.id);
       }
+
       setLoading(false);
     };
     init();
@@ -73,10 +105,17 @@ function NGODashboard() {
     if (!user?.id || !ngo?.id || ngo.approval_status === "approved") return;
     const timer = setInterval(async () => {
       setCheckCount((c) => c + 1);
-      const { data } = await supabase.from("ngos").select("approval_status, name, id").eq("user_id", user.id).single();
+      const { data } = await supabase
+        .from("ngos")
+        .select("approval_status, name, id")
+        .eq("user_id", user.id)
+        .single();
+
       if (data?.approval_status === "approved") {
         setNgo(data);
-        await loadApprovedData(data, user.id);
+        const opps = await fetchOpportunities(user.id);
+        setOpportunities(opps);
+        await fetchApplications(opps);
         await fetchComplaints(user.id);
         clearInterval(timer);
       }
@@ -84,19 +123,19 @@ function NGODashboard() {
     return () => clearInterval(timer);
   }, [user?.id, ngo?.id, ngo?.approval_status]);
 
-  // 🔥 POLLING: Complaints refresh every 3 sec
+  // 🔥 POLLING: Applications + Complaints refresh every 5 sec
   useEffect(() => {
     if (!user?.id || ngo?.approval_status !== "approved") return;
-    console.log("[NGO Poll] Started for user:", user.id);
+    console.log("[NGO] Starting applications polling");
 
-    const interval = setInterval(() => {
-      fetchComplaints(user.id);
-    }, 3000);
+    const interval = setInterval(async () => {
+      const opps = await fetchOpportunities(user.id);
+      setOpportunities(opps);
+      await fetchApplications(opps);
+      await fetchComplaints(user.id);
+    }, 5000);
 
-    return () => {
-      console.log("[NGO Poll] Stopped");
-      clearInterval(interval);
-    };
+    return () => clearInterval(interval);
   }, [user?.id, ngo?.approval_status]);
 
   const handleAppStatus = async (appId, status) => {
@@ -218,7 +257,10 @@ function NGODashboard() {
           </div>
 
           <div className="ngo-panel" style={{ marginTop: "24px" }}>
-            <div className="ngo-panel-head"><h2>Applications Received</h2></div>
+            <div className="ngo-panel-head">
+              <h2>Applications Received</h2>
+              <span className="ngo-panel-meta">{applications.length} total</span>
+            </div>
             {applications.length === 0 ? (
               <div className="ngo-empty">No applications yet.</div>
             ) : (
@@ -246,7 +288,7 @@ function NGODashboard() {
             )}
           </div>
 
-          {/* 🔥 Complaints — Auto-updating */}
+          {/* Complaints */}
           <div className="ngo-panel" style={{ marginTop: "24px", border: "1.5px solid #FBE9E7" }}>
             <div className="ngo-panel-head">
               <h2 style={{ color: "#B24444" }}>🚨 Complaints Against Your NGO</h2>

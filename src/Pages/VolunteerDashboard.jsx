@@ -23,25 +23,50 @@ function VolunteerDashboard() {
     setTimeout(() => setToast({ show: false, msg: "", type: "" }), 3000);
   };
 
-  // Fetch complaints filed BY this volunteer
+  // Initial data fetch
+  const fetchData = async (userId) => {
+    try {
+      const { data: prof } = await supabase
+        .from("profiles")
+        .select("*")
+        .eq("id", userId)
+        .single();
+      setProfile(prof);
+
+      await fetchApplications(userId);
+      await fetchMyComplaints(userId);
+    } catch (err) {
+      console.error("Fetch error:", err);
+    }
+  };
+
+  // 🔥 Fetch applications (separate taake poll kar sakein)
+  const fetchApplications = async (userId) => {
+    const { data, error } = await supabase
+      .from("applications")
+      .select(`*, opportunities:opportunity_id (*)`)
+      .eq("volunteer_id", userId)
+      .order("applied_at", { ascending: false });
+
+    if (error) console.error("[Volunteer] Applications error:", error);
+    else {
+      console.log("[Volunteer] Applications:", data?.length || 0, data);
+      setApplications(data || []);
+    }
+  };
+
+  // 🔥 Fetch complaints filed BY this volunteer
   const fetchMyComplaints = async (userId) => {
-    console.log("[Volunteer Poll] Fetching complaints for:", userId);
     const { data, error } = await supabase
       .from("complaints")
       .select("*")
       .eq("reporter_id", userId)
       .order("created_at", { ascending: false });
 
-    if (error) {
-      console.error("[Volunteer Poll] Error:", error);
-      return;
-    }
-
-    console.log("[Volunteer Poll] Got:", data?.length || 0, "complaints", data);
-    setMyComplaints(data || []);
+    if (error) console.error("[Volunteer] Complaints error:", error);
+    else setMyComplaints(data || []);
   };
 
-  // Initial load
   useEffect(() => {
     const init = async () => {
       const { data: { user: authUser } } = await supabase.auth.getUser();
@@ -50,40 +75,28 @@ function VolunteerDashboard() {
         return;
       }
       setUser(authUser);
-
-      const { data: prof } = await supabase
-        .from("profiles")
-        .select("*")
-        .eq("id", authUser.id)
-        .single();
-      setProfile(prof);
-
-      const { data: apps } = await supabase
-        .from("applications")
-        .select(`*, opportunities:opportunity_id (*)`)
-        .eq("volunteer_id", authUser.id)
-        .order("applied_at", { ascending: false });
-      setApplications(apps || []);
-
-      await fetchMyComplaints(authUser.id);
+      await fetchData(authUser.id);
       setLoading(false);
     };
     init();
   }, [navigate]);
 
-  // 🔥 POLLING: Har 3 sec mein complaints refresh
+  // 🔥 POLLING: Complaints refresh every 5 sec
   useEffect(() => {
     if (!user?.id) return;
-    console.log("[Volunteer Poll] Started for user:", user.id);
-
     const interval = setInterval(() => {
       fetchMyComplaints(user.id);
-    }, 3000);
+    }, 5000);
+    return () => clearInterval(interval);
+  }, [user?.id]);
 
-    return () => {
-      console.log("[Volunteer Poll] Stopped");
-      clearInterval(interval);
-    };
+  // 🔥 POLLING: Applications refresh every 5 sec
+  useEffect(() => {
+    if (!user?.id) return;
+    const interval = setInterval(() => {
+      fetchApplications(user.id);
+    }, 5000);
+    return () => clearInterval(interval);
   }, [user?.id]);
 
   const handleCancelApp = async (appId) => {
@@ -192,7 +205,7 @@ function VolunteerDashboard() {
 
       <div className="vol-grid">
         <div className="vol-left">
-          {/* Applications */}
+          {/* My Applications */}
           <div className="vol-panel">
             <div className="vol-panel-head">
               <h2>My Applications</h2>
@@ -226,7 +239,7 @@ function VolunteerDashboard() {
             )}
           </div>
 
-          {/* Complaints */}
+          {/* My Reports & Complaints */}
           <div className="vol-panel vol-complaints-panel">
             <div className="vol-panel-head">
               <h2>🚨 My Reports & Complaints</h2>
