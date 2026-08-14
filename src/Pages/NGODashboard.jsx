@@ -19,65 +19,58 @@ function NGODashboard() {
     setTimeout(() => setToast({ show: false, msg: "", type: "" }), 3000);
   };
 
-  // 🔥 Fetch opportunities
-  const fetchOpportunities = async (userId) => {
-    console.log("[NGO] Fetching opportunities for ngo_id:", userId);
-    const { data, error } = await supabase
+  // 🔥 Fetch opportunities WITH embedded applications (RLS-safe)
+  const fetchOppsAndApps = async (userId) => {
+    console.log("[NGO] Fetching for ngo_id:", userId);
+
+    const { data: oppData, error } = await supabase
       .from("opportunities")
-      .select("*")
+      .select(`
+        *,
+        applications (
+          *,
+          profiles:volunteer_id (full_name, email, phone)
+        )
+      `)
       .eq("ngo_id", userId)
       .order("created_at", { ascending: false });
 
-    if (error) console.error("[NGO] Opportunities error:", error);
-    else console.log("[NGO] Opportunities found:", data?.length || 0, data);
-    return data || [];
-  };
-
-  // 🔥 Fetch applications for these opportunities
-  const fetchApplications = async (oppList) => {
-    if (!oppList || oppList.length === 0) {
-      console.log("[NGO] No opportunities, skipping applications fetch");
-      setApplications([]);
-      return;
-    }
-
-    const oppIds = oppList.map((o) => o.id);
-    console.log("[NGO] Fetching applications for opportunity IDs:", oppIds);
-
-    const { data, error } = await supabase
-      .from("applications")
-      .select(`*, opportunities:opportunity_id (title), profiles:volunteer_id (full_name, email, phone)`)
-      .in("opportunity_id", oppIds)
-      .order("applied_at", { ascending: false });
-
     if (error) {
-      console.error("[NGO] Applications error:", error);
+      console.error("[NGO] Error:", error);
       return;
     }
 
-    console.log("[NGO] Applications found:", data?.length || 0, data);
-    setApplications(data || []);
+    console.log("[NGO] Opportunities:", oppData?.length || 0);
+    setOpportunities(oppData || []);
+
+    // Flatten applications
+    const allApps = [];
+    (oppData || []).forEach((opp) => {
+      if (opp.applications?.length > 0) {
+        opp.applications.forEach((app) => {
+          allApps.push({ ...app, opportunities: { title: opp.title } });
+        });
+      }
+    });
+
+    console.log("[NGO] Applications:", allApps.length, allApps);
+    setApplications(allApps);
   };
 
-  // 🔥 Fetch complaints
   const fetchComplaints = async (userId) => {
-    const { data, error } = await supabase
+    const { data } = await supabase
       .from("complaints")
       .select("*")
       .eq("reported_id", userId)
       .order("created_at", { ascending: false });
-
-    if (error) console.error("[NGO] Complaints error:", error);
-    else setComplaintsAgainstMe(data || []);
+    setComplaintsAgainstMe(data || []);
   };
 
-  // Initial load
   useEffect(() => {
     const init = async () => {
       const { data: { user: authUser } } = await supabase.auth.getUser();
       if (!authUser) { navigate("/login"); return; }
       setUser(authUser);
-      console.log("[NGO] Logged in as:", authUser.id);
 
       const { data: ngoData } = await supabase
         .from("ngos")
@@ -86,21 +79,17 @@ function NGODashboard() {
         .single();
 
       setNgo(ngoData);
-      console.log("[NGO] NGO data:", ngoData);
 
       if (ngoData?.approval_status === "approved") {
-        const opps = await fetchOpportunities(authUser.id);
-        setOpportunities(opps);
-        await fetchApplications(opps);
+        await fetchOppsAndApps(authUser.id);
         await fetchComplaints(authUser.id);
       }
-
       setLoading(false);
     };
     init();
   }, [navigate]);
 
-  // Polling: NGO approval status
+  // Approval polling
   useEffect(() => {
     if (!user?.id || !ngo?.id || ngo.approval_status === "approved") return;
     const timer = setInterval(async () => {
@@ -110,12 +99,9 @@ function NGODashboard() {
         .select("approval_status, name, id")
         .eq("user_id", user.id)
         .single();
-
       if (data?.approval_status === "approved") {
         setNgo(data);
-        const opps = await fetchOpportunities(user.id);
-        setOpportunities(opps);
-        await fetchApplications(opps);
+        await fetchOppsAndApps(user.id);
         await fetchComplaints(user.id);
         clearInterval(timer);
       }
@@ -123,18 +109,13 @@ function NGODashboard() {
     return () => clearInterval(timer);
   }, [user?.id, ngo?.id, ngo?.approval_status]);
 
-  // 🔥 POLLING: Applications + Complaints refresh every 5 sec
+  // 🔥 POLLING: Refresh every 5 sec
   useEffect(() => {
     if (!user?.id || ngo?.approval_status !== "approved") return;
-    console.log("[NGO] Starting applications polling");
-
-    const interval = setInterval(async () => {
-      const opps = await fetchOpportunities(user.id);
-      setOpportunities(opps);
-      await fetchApplications(opps);
-      await fetchComplaints(user.id);
+    const interval = setInterval(() => {
+      fetchOppsAndApps(user.id);
+      fetchComplaints(user.id);
     }, 5000);
-
     return () => clearInterval(interval);
   }, [user?.id, ngo?.approval_status]);
 
@@ -288,7 +269,6 @@ function NGODashboard() {
             )}
           </div>
 
-          {/* Complaints */}
           <div className="ngo-panel" style={{ marginTop: "24px", border: "1.5px solid #FBE9E7" }}>
             <div className="ngo-panel-head">
               <h2 style={{ color: "#B24444" }}>🚨 Complaints Against Your NGO</h2>
