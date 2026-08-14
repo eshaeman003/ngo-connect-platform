@@ -1,8 +1,8 @@
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { supabase } from "../utils/supabase";
 import "./Opportunities.css";
 
-// Rich fallback data generator
 const opportunityImages = [
   "https://images.unsplash.com/photo-1559027615-cd4628902d4a?w=600&h=350&fit=crop",
   "https://images.unsplash.com/photo-1488521787991-ed7bbaae773c?w=600&h=350&fit=crop",
@@ -27,7 +27,6 @@ function enrichOpportunity(opp, index) {
   const title = opp.title || "Volunteer Opportunity";
   const lower = title.toLowerCase();
 
-  // Rich description fallback
   let description = opp.description;
   if (!description || description.length < 30) {
     const descMap = {
@@ -52,52 +51,99 @@ function enrichOpportunity(opp, index) {
     }
   }
 
-  // Requirements fallback
   let requirements = opp.requirements;
   if (!requirements || requirements.length < 10) {
     requirements = "No prior experience required. Must be 18+ years old. Commitment of 4-8 hours per week. Passion for community service is essential.";
   }
-
-  // Duration fallback
-  const duration = opp.duration || "Flexible";
-
-  // Type fallback
-  const type = opp.type || "Part-time";
-
-  // Location fallback
-  const location = opp.location || "Pakistan";
-
-  // Category fallback
-  const category = opp.category || "Community";
-
-  // Organization fallback
-  const organization = opp.organization || "Community Welfare Organization";
-
-  // Spots fallback
-  const spots = opp.spots_available || Math.floor(Math.random() * 15) + 5;
 
   return {
     ...opp,
     title,
     description,
     requirements,
-    duration,
-    type,
-    location,
-    category,
-    organization,
-    spots_available: spots,
+    duration: opp.duration || "Flexible",
+    type: opp.type || "Part-time",
+    location: opp.location || "Pakistan",
+    category: opp.category || "Community",
+    organization: opp.organization || "Community Welfare Organization",
+    spots_available: opp.spots_available || Math.floor(Math.random() * 15) + 5,
     _image: getOppImage(title, index),
   };
 }
 
+// Login Required Modal Component
+function LoginModal({ isOpen, onClose }) {
+  const navigate = useNavigate();
+  if (!isOpen) return null;
+
+  return (
+    <div className="login-modal-overlay" onClick={onClose}>
+      <div className="login-modal" onClick={(e) => e.stopPropagation()}>
+        <button className="login-modal-close" onClick={onClose}>
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+            <path d="M18 6 6 18"/><path d="m6 6 12 12"/>
+          </svg>
+        </button>
+
+        <div className="login-modal-icon">
+          <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+            <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" x2="3" y1="12" y2="12"/>
+          </svg>
+        </div>
+
+        <h2 className="login-modal-title">Login Required</h2>
+        <p className="login-modal-text">
+          You need to be logged in to apply for volunteer opportunities. Join our community and start making a difference today.
+        </p>
+
+        <div className="login-modal-actions">
+          <button 
+            className="login-modal-btn primary"
+            onClick={() => { onClose(); navigate("/login"); }}
+          >
+            Log In
+          </button>
+          <button 
+            className="login-modal-btn secondary"
+            onClick={() => { onClose(); navigate("/register"); }}
+          >
+            Create Account
+          </button>
+        </div>
+
+        <p className="login-modal-hint">
+          Don't have an account? It takes less than a minute to register.
+        </p>
+      </div>
+    </div>
+  );
+}
+
 export default function Opportunities() {
+  const navigate = useNavigate();
   const [opportunities, setOpportunities] = useState([]);
   const [filtered, setFiltered] = useState([]);
   const [search, setSearch] = useState("");
   const [category, setCategory] = useState("All");
   const [type, setType] = useState("All");
   const [loading, setLoading] = useState(true);
+  const [user, setUser] = useState(null);
+  const [showLoginModal, setShowLoginModal] = useState(false);
+
+  // Check auth state
+  useEffect(() => {
+    const getUser = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      setUser(user);
+    };
+    getUser();
+
+    const { data: listener } = supabase.auth.onAuthStateChange((_event, session) => {
+      setUser(session?.user || null);
+    });
+
+    return () => listener?.subscription?.unsubscribe();
+  }, []);
 
   useEffect(() => {
     fetchOpportunities();
@@ -139,11 +185,22 @@ export default function Opportunities() {
     setFiltered(result);
   }, [search, category, type, opportunities]);
 
+  const handleApply = (oppId) => {
+    if (!user) {
+      setShowLoginModal(true);
+      return;
+    }
+    // TODO: Navigate to application form or show success
+    alert(`Application submitted for opportunity #${oppId}! (Demo)`);
+  };
+
   const categories = ["All", "Education", "Healthcare", "Microfinance", "Environment", "Food & Shelter", "Women Empowerment", "Disaster Relief"];
   const types = ["All", "Part-time", "Full-time", "One-time", "Weekend", "Remote", "On-site"];
 
   return (
     <div className="opportunities-page">
+      <LoginModal isOpen={showLoginModal} onClose={() => setShowLoginModal(false)} />
+
       {/* Hero Banner */}
       <div className="opp-hero">
         <div className="opp-hero-content">
@@ -241,7 +298,7 @@ export default function Opportunities() {
                 <div className="opp-card-img-overlay" />
                 <div className="opp-card-spots">
                   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-                    <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+                    <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>
                   </svg>
                   {opp.spots_available} spots left
                 </div>
@@ -282,7 +339,7 @@ export default function Opportunities() {
                   <span className="req-text">{opp.requirements}</span>
                 </div>
 
-                <button className="opp-apply-btn">
+                <button className="opp-apply-btn" onClick={() => handleApply(opp.id)}>
                   Apply Now
                   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
                     <path d="M5 12h14"/><path d="m12 5 7 7-7 7"/>
