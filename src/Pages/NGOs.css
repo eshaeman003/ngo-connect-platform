@@ -1,101 +1,86 @@
-@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400;1,600&family=Inter:wght@400;500;600;700&display=swap');
-
+/* ========== NGOs PAGE ========== */
 .ngos-page {
-  background: #faf9f6;
-  font-family: 'Inter', sans-serif;
-  color: #1c1c1c;
   min-height: 100vh;
+  background: #fafaf9;
   padding-bottom: 80px;
 }
 
-/* ===== HEADER ===== */
-.ngos-header {
+/* Hero Section - Centered */
+.ngos-hero {
   text-align: center;
-  padding: 60px 28px 40px;
-  max-width: 640px;
+  padding: 60px 24px 40px;
+  max-width: 800px;
   margin: 0 auto;
 }
 
-.ngos-label {
-  display: inline-block;
-  background: #e8f5e9;
-  color: #2d6a4f;
-  padding: 6px 18px;
-  border-radius: 999px;
-  font-size: 12px;
+.ngos-hero-title {
+  font-family: "Playfair Display", Georgia, serif;
+  font-size: clamp(2.2rem, 5vw, 3.2rem);
   font-weight: 700;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  margin-bottom: 18px;
+  color: #1a1a1a;
+  margin-bottom: 12px;
+  line-height: 1.1;
 }
 
-.ngos-header h1 {
-  font-family: 'Playfair Display', serif;
-  font-size: 44px;
-  font-weight: 700;
-  color: #1b4332;
-  margin: 0 0 14px;
-  line-height: 1.15;
+.ngos-hero-subtitle {
+  font-size: 1.1rem;
+  color: #666;
+  line-height: 1.6;
+  max-width: 500px;
+  margin: 0 auto;
 }
 
-.ngos-header p {
-  font-size: 16px;
-  line-height: 1.7;
-  color: #6b7280;
-  margin: 0;
-}
-
-/* ===== CONTROLS — CENTERED ===== */
+/* Controls - Centered */
 .ngos-controls {
-  max-width: 720px;
+  max-width: 800px;
   margin: 0 auto 48px;
-  padding: 0 28px;
+  padding: 0 24px;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 20px;
+  gap: 24px;
 }
 
-/* Search */
-.ngos-search-wrap {
+/* Search Bar */
+.ngos-search-wrapper {
   position: relative;
   width: 100%;
-  max-width: 560px;
+  max-width: 600px;
 }
 
-.ngos-search-wrap svg {
+.search-icon {
   position: absolute;
   left: 20px;
   top: 50%;
   transform: translateY(-50%);
-  color: #8a8f86;
+  color: #888;
   pointer-events: none;
+  z-index: 2;
 }
 
-.ngos-search-wrap input {
+.ngos-search {
   width: 100%;
   padding: 16px 20px 16px 52px;
-  border-radius: 999px;
-  border: 1.5px solid #e5e7eb;
+  border: 2px solid #e8e8e3;
+  border-radius: 100px;
+  font-size: 1rem;
   background: white;
-  font-size: 15px;
-  font-family: 'Inter', sans-serif;
-  color: #1c1c1c;
+  color: #1a1a1a;
   outline: none;
   transition: all 0.3s ease;
   box-shadow: 0 2px 12px rgba(0,0,0,0.04);
 }
 
-.ngos-search-wrap input::placeholder {
-  color: #a0a5ab;
+.ngos-search::placeholder {
+  color: #aaa;
 }
 
-.ngos-search-wrap input:focus {
-  border-color: #2d6a4f;
-  box-shadow: 0 4px 20px rgba(45,106,79,0.12);
+.ngos-search:focus {
+  border-color: #1a5f2a;
+  box-shadow: 0 4px 20px rgba(26, 95, 42, 0.12);
 }
 
-/* Filters */
+/* Filter Pills */
 .ngos-filters {
   display: flex;
   flex-wrap: wrap;
@@ -103,94 +88,78 @@
   gap: 10px;
 }
 
-.ngos-filters button {
+.filter-pill {
   padding: 10px 22px;
-  border-radius: 999px;
-  border: 1.5px solid #e5e7eb;
+  border-radius: 100px;
+  border: 1.5px solid #e0e0d8;
   background: white;
-  color: #6b7280;
-  font-size: 13px;
-  font-weight: 600;
+  color: #555;
+  font-size: 0.9rem;
+  font-weight: 500;
   cursor: pointer;
   transition: all 0.25s ease;
-  font-family: 'Inter', sans-serif;
+  white-space: nowrap;
 }
 
-.ngos-filters button:hover {
-  border-color: #2d6a4f;
-  color: #2d6a4f;
-  background: #f7fbfa;
+.filter-pill:hover {
+  border-color: #1a5f2a;
+  color: #1a5f2a;
+  transform: translateY(-1px);
 }
 
-.ngos-filters button.active {
-  background: #1b4332;
+.filter-pill.active {
+  background: #1a5f2a;
   color: white;
-  border-color: #1b4332;
-  box-shadow: 0 4px 14px rgba(27,67,50,0.25);
+  border-color: #1a5f2a;
+  box-shadow: 0 4px 14px rgba(26, 95, 42, 0.25);
 }
 
-/* ===== GRID ===== */
+/* Grid */
 .ngos-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 28px;
   max-width: 1200px;
   margin: 0 auto;
-  padding: 0 28px;
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 24px;
+  padding: 0 24px;
 }
 
-/* ===== NGO CARD ===== */
+/* Card */
 .ngo-card {
   background: white;
   border-radius: 20px;
   overflow: hidden;
-  border: 1px solid #f0f0f0;
-  transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
-  cursor: default;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.06);
+  border: 1px solid #f0f0eb;
+  transition: all 0.35s ease;
 }
 
 .ngo-card:hover {
   transform: translateY(-6px);
-  box-shadow: 0 20px 50px rgba(0,0,0,0.1);
-  border-color: transparent;
+  box-shadow: 0 16px 40px rgba(0,0,0,0.1);
 }
 
-.ngo-card-visual {
+.ngo-card-img-wrap {
   position: relative;
-  height: 200px;
+  height: 220px;
   overflow: hidden;
 }
 
-.ngo-card-visual img {
+.ngo-card-img {
   width: 100%;
   height: 100%;
   object-fit: cover;
   transition: transform 0.5s ease;
 }
 
-.ngo-card:hover .ngo-card-visual img {
+.ngo-card:hover .ngo-card-img {
   transform: scale(1.08);
-}
-
-.ngo-card-badge {
-  position: absolute;
-  top: 14px;
-  left: 14px;
-  background: white;
-  color: #1b4332;
-  padding: 5px 14px;
-  border-radius: 999px;
-  font-size: 11px;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-  box-shadow: 0 2px 10px rgba(0,0,0,0.08);
 }
 
 .ngo-card-overlay {
   position: absolute;
   inset: 0;
-  background: rgba(27,67,50,0.6);
+  background: rgba(0,0,0,0.45);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -203,49 +172,76 @@
 }
 
 .ngo-view-btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  padding: 10px 22px;
   background: white;
-  color: #1b4332;
-  text-decoration: none;
-  border-radius: 999px;
-  font-size: 13px;
-  font-weight: 700;
-  transform: translateY(10px);
+  color: #1a1a1a;
+  border: none;
+  padding: 12px 28px;
+  border-radius: 100px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
   transition: all 0.3s ease;
-}
-
-.ngo-card:hover .ngo-view-btn {
-  transform: translateY(0);
+  box-shadow: 0 4px 16px rgba(0,0,0,0.15);
 }
 
 .ngo-view-btn:hover {
-  background: #1b4332;
+  background: #1a5f2a;
   color: white;
+  transform: scale(1.05);
+}
+
+.ngo-verified-badge {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  background: rgba(255,255,255,0.95);
+  backdrop-filter: blur(10px);
+  color: #1a5f2a;
+  padding: 6px 12px;
+  border-radius: 100px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
 }
 
 .ngo-card-body {
   padding: 22px;
 }
 
-.ngo-card-body h3 {
-  font-family: 'Playfair Display', serif;
-  font-size: 18px;
+.ngo-card-category {
+  display: inline-block;
+  background: #f0f0eb;
+  color: #1a5f2a;
+  padding: 5px 14px;
+  border-radius: 100px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 12px;
+}
+
+.ngo-card-title {
+  font-family: "Playfair Display", Georgia, serif;
+  font-size: 1.25rem;
   font-weight: 700;
-  color: #1c1c1c;
-  margin: 0 0 8px;
+  color: #1a1a1a;
+  margin-bottom: 8px;
+  line-height: 1.3;
 }
 
 .ngo-card-desc {
-  font-size: 13px;
+  font-size: 0.92rem;
+  color: #666;
   line-height: 1.6;
-  color: #6b7280;
-  margin: 0 0 14px;
+  margin-bottom: 14px;
   display: -webkit-box;
-  line-clamp: 2;
+  -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
+  line-clamp: 2;
   overflow: hidden;
 }
 
@@ -253,110 +249,92 @@
   display: flex;
   align-items: center;
   gap: 6px;
-  font-size: 13px;
-  color: #8a8f86;
-  font-weight: 500;
+  color: #888;
+  font-size: 0.88rem;
 }
 
-.ngo-card-meta svg {
-  color: #2d6a4f;
+.ngo-location {
+  display: flex;
+  align-items: center;
+  gap: 5px;
 }
 
-/* ===== SKELETON ===== */
+/* Skeleton */
 .ngo-skeleton {
   background: white;
   border-radius: 20px;
   overflow: hidden;
-  border: 1px solid #f0f0f0;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.06);
+  border: 1px solid #f0f0eb;
 }
 
-.sk-img {
-  height: 200px;
-  background: linear-gradient(90deg, #f0f0f0 25%, #e8e8e8 50%, #f0f0f0 75%);
+.skeleton-img {
+  height: 220px;
+  background: linear-gradient(90deg, #f0f0eb 25%, #e8e8e3 50%, #f0f0eb 75%);
   background-size: 200% 100%;
   animation: shimmer 1.5s infinite;
 }
 
-.sk-body {
-  padding: 22px;
-}
-
-.sk-line {
-  height: 12px;
-  background: linear-gradient(90deg, #f0f0f0 25%, #e8e8e8 50%, #f0f0f0 75%);
+.skeleton-text {
+  height: 16px;
+  margin: 16px 22px 0;
+  background: linear-gradient(90deg, #f0f0eb 25%, #e8e8e3 50%, #f0f0eb 75%);
   background-size: 200% 100%;
   animation: shimmer 1.5s infinite;
-  border-radius: 6px;
-  margin-bottom: 10px;
+  border-radius: 4px;
 }
 
-.sk-line.short { width: 50%; }
-.sk-line.mid { width: 75%; }
+.skeleton-text.short {
+  width: 60%;
+  margin-bottom: 22px;
+}
 
 @keyframes shimmer {
   0% { background-position: 200% 0; }
   100% { background-position: -200% 0; }
 }
 
-/* ===== EMPTY STATE ===== */
+/* Empty State */
 .ngos-empty {
-  grid-column: 1 / -1;
   text-align: center;
   padding: 80px 24px;
-}
-
-.empty-icon {
-  font-size: 56px;
-  margin-bottom: 16px;
+  color: #888;
 }
 
 .ngos-empty h3 {
-  font-family: 'Playfair Display', serif;
-  font-size: 24px;
-  font-weight: 700;
-  color: #1c1c1c;
-  margin: 0 0 8px;
+  font-family: "Playfair Display", Georgia, serif;
+  font-size: 1.5rem;
+  color: #1a1a1a;
+  margin: 16px 0 8px;
 }
 
 .ngos-empty p {
-  font-size: 15px;
-  color: #8a8f86;
-  margin: 0;
+  font-size: 1rem;
 }
 
-/* ===== RESPONSIVE ===== */
-@media (max-width: 1024px) {
-  .ngos-grid {
-    grid-template-columns: repeat(3, 1fr);
+/* Responsive */
+@media (max-width: 640px) {
+  .ngos-hero {
+    padding: 40px 20px 28px;
   }
-}
 
-@media (max-width: 768px) {
-  .ngos-header h1 {
-    font-size: 32px;
+  .ngos-controls {
+    padding: 0 16px;
+    margin-bottom: 32px;
   }
-  .ngos-grid {
-    grid-template-columns: repeat(2, 1fr);
-    gap: 16px;
-  }
-  .ngo-card-visual {
-    height: 160px;
-  }
-}
 
-@media (max-width: 480px) {
   .ngos-grid {
     grid-template-columns: 1fr;
+    padding: 0 16px;
+    gap: 20px;
   }
+
   .ngos-filters {
     gap: 8px;
   }
-  .ngos-filters button {
+
+  .filter-pill {
     padding: 8px 16px;
-    font-size: 12px;
-  }
-  .ngos-search-wrap input {
-    padding: 14px 18px 14px 48px;
-    font-size: 14px;
+    font-size: 0.85rem;
   }
 }
