@@ -24,6 +24,12 @@ const GlobeIcon = () => (
 const AwardIcon = () => (
   <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="8" r="7"/><polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"/></svg>
 );
+const CalendarIcon = () => (
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+);
+const MapPinIcon = () => (
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+);
 
 function useCountUp(end, duration = 2000) {
   const [count, setCount] = useState(0);
@@ -82,11 +88,45 @@ const values = [
   { icon: <ZapIcon />, title: "Impact Obsessed", desc: "We don't count clicks. We count lives changed, meals served, and classrooms filled." },
 ];
 
+const journeyMilestones = [
+  {
+    date: "Feb 2026",
+    title: "Volunteered at HHRD Chakwal",
+    desc: "Joined Helping Hand for Relief & Development (HHRD) OSP Region Office for a 12-day Volunteer Internship Service program.",
+    icon: "🤝",
+  },
+  {
+    date: "Feb 2026",
+    title: "Orphan Support Data Management",
+    desc: "Entered detailed records for orphan students, managed B-forms, fee slips, and ID documentation in the OSP portal.",
+    icon: "📋",
+  },
+  {
+    date: "Feb 2026",
+    title: "Creative Donor Engagement",
+    desc: "Designed artistic artwork on 200+ donor messages to strengthen the emotional connection between sponsors and children.",
+    icon: "🎨",
+  },
+  {
+    date: "Feb 2026",
+    title: "Field Visits & Flood Relief",
+    desc: "Conducted home visits to orphan families and flood-affected households in Chakwal, witnessing ground realities firsthand.",
+    icon: "🏠",
+  },
+  {
+    date: "Aug 2026",
+    title: "Founded NGO Connect",
+    desc: "Built Pakistan's first digital bridge connecting volunteers and NGOs — turning field experience into scalable technology.",
+    icon: "🚀",
+  },
+];
+
 function About() {
   const heroRef = useReveal();
   const storyRef = useReveal();
   const statsRef = useReveal();
   const valuesRef = useReveal();
+  const journeyRef = useReveal();
   const founderRef = useReveal();
   const ctaRef = useReveal();
 
@@ -116,7 +156,7 @@ function About() {
         </div>
       </section>
 
-      {/* STORY — UPDATED CONTENT */}
+      {/* STORY */}
       <section className="about-story" ref={storyRef}>
         <div className="about-story-img">
           <img src="https://images.unsplash.com/photo-1593113598332-cd288d649433?w=600&h=500&fit=crop" alt="Community work" />
@@ -184,6 +224,45 @@ function About() {
         </div>
       </section>
 
+      {/* VOLUNTEERING JOURNEY — NEW SECTION */}
+      <section className="about-journey" ref={journeyRef}>
+        <div className="about-journey-header">
+          <span className="about-label">MY JOURNEY</span>
+          <h2>From the Field to the Screen</h2>
+          <p className="journey-subtitle">
+            Before building NGO Connect, I volunteered on the ground with HHRD Chakwal. 
+            That experience shaped every feature of this platform.
+          </p>
+        </div>
+
+        <div className="journey-timeline">
+          {journeyMilestones.map((m, i) => (
+            <div className="journey-item" key={i}>
+              <div className="journey-icon">{m.icon}</div>
+              <div className="journey-content">
+                <div className="journey-meta">
+                  <span className="journey-date"><CalendarIcon /> {m.date}</span>
+                  <span className="journey-location"><MapPinIcon /> Chakwal, Pakistan</span>
+                </div>
+                <h4>{m.title}</h4>
+                <p>{m.desc}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        <div className="journey-report">
+          <div className="journey-report-card">
+            <div className="journey-report-icon">📄</div>
+            <div className="journey-report-text">
+              <h4>HHRD Volunteer Internship Report</h4>
+              <p>Complete documentation of my 12-day VIS program at HHRD OSP Region Office, Chakwal — including data management, donor artwork, field visits, and healthcare program exposure.</p>
+              <span className="journey-report-badge">Feb 11 – Feb 25, 2026</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* FOUNDER */}
       <section className="about-founder" ref={founderRef}>
         <div className="about-founder-header">
@@ -197,7 +276,7 @@ function About() {
           <h3>Esha Eman</h3>
           <p className="founder-role">Founder & CEO</p>
           <p className="founder-bio">
-            I built NGO Connect after watching passionate students struggle to find verified volunteering opportunities during the 2022 floods. What started as an internship project at Zynvex became a mission: to ensure no willing hand ever goes unmatched in Pakistan.
+            I built NGO Connect after volunteering with HHRD Chakwal and watching passionate students struggle to find verified volunteering opportunities during the 2022 floods. What started as an internship project became a mission: to ensure no willing hand ever goes unmatched in Pakistan.
           </p>
         </div>
       </section>
