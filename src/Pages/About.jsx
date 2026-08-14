@@ -15,9 +15,6 @@ const UsersIcon = () => (
 const ZapIcon = () => (
   <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
 );
-const TargetIcon = () => (
-  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>
-);
 const GlobeIcon = () => (
   <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
 );
@@ -47,6 +44,9 @@ const MapPinIcon = () => (
 );
 const HandshakeIcon = () => (
   <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20.42 4.58a5.4 5.4 0 0 0-7.65 0l-.77.78-.77-.78a5.4 5.4 0 0 0-7.65 0C1.46 6.7 1.33 10.28 4 13l8 8 8-8c2.67-2.72 2.54-6.3.42-8.42z"/><path d="M12 5.36 8.87 8.5"/><path d="m15.13 8.5-3.13-3.14"/></svg>
+);
+const QuoteIcon = () => (
+  <svg width="32" height="32" viewBox="0 0 24 24" fill="#2d6a4f" opacity="0.2"><path d="M3 21c3 0 7-1 7-8V5c0-1.25-.756-2.017-2-2H4c-1.25 0-2 .75-2 1.972V11c0 1.25.75 2 2 2 1 0 1 0 1 1v1c0 1-1 2-2 2s-1 .008-1 1.031V21zM15 21c3 0 7-1 7-8V5c0-1.25-.757-2.017-2-2h-4c-1.25 0-2 .75-2 1.972V11c0 1.25.75 2 2 2h.75c0 2.25.25 4-2.75 4v3c0 1 0 1 1 1z"/></svg>
 );
 
 /* ===== useCountUp Hook ===== */
@@ -158,70 +158,64 @@ function About() {
 
   return (
     <div className="about-page">
-      {/* ===== HERO ===== */}
-      <section className="about-hero" ref={heroRef}>
-        <div className="about-hero-content">
-          <span className="about-label">ABOUT US</span>
-          <h1>Bridging the Gap Between <span>Good Intentions</span> and <span>Real Impact</span></h1>
+      {/* ===== HERO: Full-width background with overlay ===== */}
+      <section className="about-hero-v2" ref={heroRef}>
+        <div className="about-hero-bg">
+          <img src="https://images.unsplash.com/photo-1469571486292-0ba58a3f068b?w=1400&h=600&fit=crop" alt="Hands together" />
+          <div className="about-hero-overlay" />
+        </div>
+        <div className="about-hero-content-v2">
+          <span className="about-label light">ABOUT US</span>
+          <h1>Bridging the Gap Between <em>Good Intentions</em> and <em>Real Impact</em></h1>
           <p>NGO Connect is Pakistan's first dedicated platform connecting passionate volunteers with verified NGOs. We believe everyone has something to give — and every community deserves reliable support.</p>
         </div>
-        <div className="about-hero-visual">
-          <img src="https://images.unsplash.com/photo-1559027615-cd4628902d4a?w=600&h=450&fit=crop" alt="Volunteers" />
-          <div className="about-float-card">
-            <TargetIcon />
-            <div>
-              <strong>Our Mission</strong>
-              <span>Empower communities</span>
-            </div>
-          </div>
+      </section>
+
+      {/* ===== STORY: Editorial layout with quote ===== */}
+      <section className="about-story-v2" ref={storyRef}>
+        <div className="story-quote-block">
+          <QuoteIcon />
+          <blockquote>
+            In 2026, I noticed something heartbreaking: thousands of young Pakistanis wanted to volunteer for flood relief and education drives, but had no trusted way to find legitimate NGOs.
+          </blockquote>
+        </div>
+        <div className="story-body">
+          <p>
+            Meanwhile, incredible organizations like Edhi and Saylani were drowning in manual coordination — struggling to find reliable volunteers. Pakistan had no centralized digital bridge between these two groups. Volunteers relied on WhatsApp forwards. NGOs used paper registers.
+          </p>
+          <p className="story-highlight">
+            That gap became NGO Connect — a platform where one click connects passion with purpose.
+          </p>
+        </div>
+        <div className="story-image-full">
+          <img src="https://images.unsplash.com/photo-1488521787991-ed7bbaae773c?w=1200&h=500&fit=crop" alt="Community support" />
+        </div>
+        <div className="story-meta-bar">
+          <div><strong>2026</strong><span>Founded</span></div>
+          <div><strong>8+</strong><span>Cities Active</span></div>
+          <div><strong>100%</strong><span>Free Forever</span></div>
         </div>
       </section>
 
-      {/* ===== STORY ===== */}
-      <section className="about-story" ref={storyRef}>
-        <div className="about-story-img">
-          <img src="https://images.unsplash.com/photo-1593113598332-cd288d649433?w=600&h=500&fit=crop" alt="Community work" />
-        </div>
-        <div className="about-story-text">
-          <h2>Why We Built This</h2>
-          <p>
-            In 2026, I noticed something heartbreaking: thousands of young Pakistanis wanted to volunteer for flood relief and education drives, but had no trusted way to find legitimate NGOs. Meanwhile, incredible organizations like Edhi and Saylani were drowning in manual coordination — struggling to find reliable volunteers.
-          </p>
-          <p>
-            Pakistan had no centralized digital bridge between these two groups. Volunteers relied on WhatsApp forwards. NGOs used paper registers. That gap became NGO Connect — a platform where one click connects passion with purpose.
-          </p>
-          <div className="about-story-stats">
-            <div><strong>2026</strong><span>Founded</span></div>
-            <div><strong>8+</strong><span>Cities Active</span></div>
-            <div><strong>100%</strong><span>Free Forever</span></div>
-          </div>
-        </div>
-      </section>
-
-      {/* ===== IMPACT STATS ===== */}
-      <section className="about-impact" ref={statsRef}>
-        <div className="about-impact-header">
-          <span className="about-label">OUR IMPACT</span>
-          <h2>Numbers That Matter</h2>
-        </div>
-        <div className="about-impact-grid">
-          <div className="impact-card" ref={volRef}>
-            <div className="impact-icon green"><UsersIcon /></div>
+      {/* ===== IMPACT STATS: Horizontal bar ===== */}
+      <section className="about-impact-v2" ref={statsRef}>
+        <div className="impact-bar">
+          <div className="impact-bar-item" ref={volRef}>
             <h3>{volCount.toLocaleString()}+</h3>
             <p>Active Volunteers</p>
           </div>
-          <div className="impact-card" ref={ngoRef}>
-            <div className="impact-icon dark"><ShieldIcon /></div>
+          <div className="impact-divider" />
+          <div className="impact-bar-item" ref={ngoRef}>
             <h3>{ngoCount}+</h3>
             <p>Partner NGOs</p>
           </div>
-          <div className="impact-card" ref={hrRef}>
-            <div className="impact-icon gold"><AwardIcon /></div>
+          <div className="impact-divider" />
+          <div className="impact-bar-item" ref={hrRef}>
             <h3>{hrCount.toLocaleString()}+</h3>
             <p>Hours Served</p>
           </div>
-          <div className="impact-card" ref={cityRef}>
-            <div className="impact-icon teal"><GlobeIcon /></div>
+          <div className="impact-divider" />
+          <div className="impact-bar-item" ref={cityRef}>
             <h3>{cityCount}+</h3>
             <p>Cities Covered</p>
           </div>
