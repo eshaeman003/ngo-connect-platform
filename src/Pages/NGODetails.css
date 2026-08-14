@@ -1,270 +1,364 @@
 .ngo-detail-page {
   min-height: 100vh;
-  background: #f5f5f0;
-  padding: 2rem 1rem;
+  background: #fafaf9;
 }
 
-.ngo-detail-loading,
-.ngo-detail-notfound {
-  min-height: 60vh;
+/* Hero */
+.ngo-detail-hero {
+  position: relative;
+  height: 420px;
+  background-size: cover;
+  background-position: center;
   display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  text-align: center;
+  align-items: flex-end;
 }
 
-.ngo-detail-notfound h1 {
-  color: #1b3a28;
-  font-size: 2rem;
-  margin-bottom: 1.5rem;
+.ngo-detail-hero-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to top, rgba(0,0,0,0.75) 0%, rgba(0,0,0,0.3) 50%, rgba(0,0,0,0.1) 100%);
 }
 
-.ngo-detail-container {
-  max-width: 800px;
+.ngo-detail-hero-content {
+  position: relative;
+  z-index: 1;
+  max-width: 1200px;
+  width: 100%;
   margin: 0 auto;
+  padding: 40px 24px;
+  color: white;
 }
 
-.ngo-detail-back {
-  background: white;
-  border: 1.5px solid #e0e0e0;
-  color: #555;
-  padding: 0.6rem 1.2rem;
-  border-radius: 10px;
+.ngo-back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(255,255,255,0.15);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255,255,255,0.2);
+  color: white;
+  padding: 8px 16px;
+  border-radius: 100px;
+  font-size: 0.85rem;
   cursor: pointer;
-  margin-bottom: 1.5rem;
-  font-size: 0.9rem;
-  transition: all 0.3s;
+  margin-bottom: 20px;
+  transition: all 0.3s ease;
 }
 
-.ngo-detail-back:hover {
-  border-color: #4a7c59;
-  color: #4a7c59;
+.ngo-back-link:hover {
+  background: rgba(255,255,255,0.25);
 }
 
-.ngo-detail-card {
-  background: white;
-  border-radius: 20px;
-  padding: 2.5rem;
-  border: 1px solid #eaeaea;
-  text-align: center;
-  margin-bottom: 2rem;
-  box-shadow: 0 4px 20px rgba(0,0,0,0.06);
-}
-
-.ngo-detail-avatar {
-  width: 80px;
-  height: 80px;
-  background: linear-gradient(135deg, #e8f5e9, #c8e6c9);
-  color: #1b3a28;
-  border-radius: 50%;
+.ngo-hero-tags {
   display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 2rem;
-  font-weight: 700;
-  margin: 0 auto 1.2rem;
-}
-
-.ngo-detail-card h1 {
-  color: #1b3a28;
-  font-size: 1.8rem;
-  margin-bottom: 0.5rem;
-  font-family: 'Georgia', serif;
-}
-
-.ngo-detail-cat {
-  display: inline-block;
-  background: #e8f5e9;
-  color: #2e7d32;
-  padding: 0.3rem 0.9rem;
-  border-radius: 20px;
-  font-size: 0.8rem;
-  font-weight: 600;
-  margin-bottom: 1.2rem;
-}
-
-/* Contact Info */
-.ngo-detail-contact {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-  align-items: center;
-  margin-bottom: 1.2rem;
-  padding: 1.2rem;
-  background: #fafafa;
-  border-radius: 14px;
-  border: 1px solid #f0f0f0;
-}
-
-.ngo-contact-row {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  color: #333;
-  font-size: 0.95rem;
-  font-weight: 500;
-}
-
-.ngo-contact-row.muted {
-  color: #aaa;
-}
-
-.ngo-contact-icon {
-  font-size: 1.1rem;
-  width: 24px;
-  text-align: center;
-}
-
-.ngo-contact-text {
-  word-break: break-all;
-}
-
-/* Action Buttons */
-.ngo-detail-actions {
-  display: flex;
-  gap: 0.7rem;
-  justify-content: center;
-  margin-bottom: 1.5rem;
+  gap: 10px;
+  margin-bottom: 14px;
   flex-wrap: wrap;
 }
 
-.ngo-action-btn {
+.ngo-hero-category {
+  background: #1a5f2a;
+  color: white;
+  padding: 5px 14px;
+  border-radius: 100px;
+  font-size: 0.8rem;
+  font-weight: 500;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+}
+
+.ngo-hero-verified {
   display: inline-flex;
   align-items: center;
-  gap: 0.4rem;
-  padding: 0.65rem 1.3rem;
-  border-radius: 10px;
+  gap: 5px;
+  background: rgba(255,255,255,0.15);
+  backdrop-filter: blur(10px);
+  padding: 5px 14px;
+  border-radius: 100px;
+  font-size: 0.8rem;
+  font-weight: 500;
+}
+
+.ngo-detail-name {
+  font-family: "Playfair Display", Georgia, serif;
+  font-size: clamp(2rem, 5vw, 3.2rem);
+  font-weight: 700;
+  margin-bottom: 10px;
+  line-height: 1.1;
+}
+
+.ngo-detail-location {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 1rem;
+  opacity: 0.9;
+}
+
+/* Container */
+.ngo-detail-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 48px 24px;
+  display: grid;
+  grid-template-columns: 1fr 380px;
+  gap: 48px;
+}
+
+@media (max-width: 900px) {
+  .ngo-detail-container {
+    grid-template-columns: 1fr;
+    gap: 32px;
+    padding: 32px 20px;
+  }
+}
+
+/* Main Content */
+.ngo-section {
+  margin-bottom: 36px;
+}
+
+.ngo-section-title {
+  font-family: "Playfair Display", Georgia, serif;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #1a1a1a;
+  margin-bottom: 14px;
+  padding-bottom: 10px;
+  border-bottom: 2px solid #e8e8e3;
+}
+
+.ngo-section-text {
+  font-size: 1.05rem;
+  line-height: 1.8;
+  color: #444;
+}
+
+.ngo-services-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.ngo-service-tag {
+  background: #f0f0eb;
+  color: #1a5f2a;
+  padding: 8px 18px;
+  border-radius: 100px;
   font-size: 0.9rem;
-  font-weight: 600;
-  text-decoration: none;
-  cursor: pointer;
-  transition: all 0.25s ease;
-  border: none;
+  font-weight: 500;
+  border: 1px solid #e0e0d8;
 }
 
-.ngo-action-btn.call {
-  background: #e8f5e9;
-  color: #2e7d32;
+/* Sidebar */
+.ngo-detail-sidebar {
+  position: sticky;
+  top: 24px;
+  height: fit-content;
 }
 
-.ngo-action-btn.call:hover {
-  background: #2e7d32;
-  color: white;
-  transform: translateY(-2px);
-}
-
-.ngo-action-btn.email {
-  background: #e3f2fd;
-  color: #1565c0;
-}
-
-.ngo-action-btn.email:hover {
-  background: #1565c0;
-  color: white;
-  transform: translateY(-2px);
-}
-
-.ngo-action-btn.whatsapp {
-  background: #e8f5e9;
-  color: #1b8f41;
-}
-
-.ngo-action-btn.whatsapp:hover {
-  background: #25d366;
-  color: white;
-  transform: translateY(-2px);
-}
-
-.ngo-detail-desc {
-  text-align: left;
-  padding-top: 1.5rem;
-  border-top: 1.5px solid #f0f0f0;
-}
-
-.ngo-detail-desc h3 {
-  color: #1b3a28;
-  margin-bottom: 0.7rem;
-  font-size: 1.15rem;
-}
-
-.ngo-detail-desc p {
-  color: #555;
-  line-height: 1.7;
-}
-
-.ngo-detail-opp-section {
+.ngo-contact-card {
   background: white;
   border-radius: 20px;
-  padding: 2rem;
-  border: 1px solid #eaeaea;
+  padding: 28px;
+  box-shadow: 0 4px 24px rgba(0,0,0,0.06);
+  border: 1px solid #f0f0eb;
 }
 
-.ngo-detail-opp-section h2 {
-  color: #1b3a28;
-  margin-bottom: 1.2rem;
-  font-size: 1.3rem;
+.contact-card-title {
+  font-family: "Playfair Display", Georgia, serif;
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: #1a1a1a;
+  margin-bottom: 18px;
 }
 
-.ngo-detail-noopp {
-  color: #888;
-  text-align: center;
-  padding: 2rem;
+.contact-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  padding: 14px 0;
+  border-bottom: 1px solid #f5f5f0;
+  text-decoration: none;
+  color: inherit;
+  transition: background 0.2s;
+  border-radius: 8px;
+  margin: 0 -8px;
+  padding-left: 8px;
+  padding-right: 8px;
 }
 
-.ngo-detail-opp-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-  gap: 1rem;
+.contact-item:hover {
+  background: #fafaf9;
 }
 
-.ngo-detail-opp-card {
-  background: #fafafa;
+.contact-item.no-link {
+  cursor: default;
+}
+
+.contact-item.no-link:hover {
+  background: transparent;
+}
+
+.contact-icon-wrap {
+  width: 40px;
+  height: 40px;
   border-radius: 12px;
-  padding: 1.2rem;
-  border: 1.5px solid #f0f0f0;
-  cursor: pointer;
-  transition: all 0.25s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
 }
 
-.ngo-detail-opp-card:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 8px 20px rgba(0,0,0,0.08);
-  border-color: #d4edda;
+.contact-icon-wrap.email { background: #e8f5e9; color: #2e7d32; }
+.contact-icon-wrap.phone { background: #e3f2fd; color: #1565c0; }
+.contact-icon-wrap.web { background: #fff3e0; color: #ef6c00; }
+.contact-icon-wrap.address { background: #fce4ec; color: #c2185b; }
+
+.contact-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
 }
 
-.ngo-detail-opp-card h4 {
-  color: #1b3a28;
-  margin-bottom: 0.4rem;
-  font-size: 1.05rem;
-}
-
-.ngo-detail-opp-loc {
-  color: #666;
-  font-size: 0.85rem;
-  margin-bottom: 0.5rem;
-}
-
-.ngo-detail-opp-desc {
-  color: #777;
-  font-size: 0.85rem;
-  line-height: 1.5;
-  margin-bottom: 0.8rem;
-}
-
-.ngo-detail-opp-type {
-  background: #e7f3ff;
-  color: #004085;
-  padding: 0.25rem 0.6rem;
-  border-radius: 12px;
+.contact-label {
   font-size: 0.75rem;
+  color: #888;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
   font-weight: 600;
 }
 
-@media (max-width: 600px) {
-  .ngo-detail-card { padding: 1.5rem; }
-  .ngo-detail-card h1 { font-size: 1.4rem; }
-  .ngo-detail-opp-grid { grid-template-columns: 1fr; }
-  .ngo-detail-actions { flex-direction: column; align-items: center; }
-  .ngo-action-btn { width: 100%; justify-content: center; }
+.contact-value {
+  font-size: 0.95rem;
+  color: #1a1a1a;
+  font-weight: 500;
+  word-break: break-word;
+}
+
+.contact-divider {
+  height: 1px;
+  background: #f0f0eb;
+  margin: 20px 0;
+}
+
+.contact-invite {
+  font-size: 0.9rem;
+  color: #666;
+  line-height: 1.6;
+  margin-bottom: 16px;
+}
+
+.contact-cta-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  background: #1a5f2a;
+  color: white;
+  padding: 14px 20px;
+  border-radius: 12px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  text-decoration: none;
+  transition: all 0.3s ease;
+  border: none;
+  cursor: pointer;
+}
+
+.contact-cta-btn:hover {
+  background: #144a21;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(26, 95, 42, 0.25);
+}
+
+/* Not Found */
+.ngo-not-found {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 70vh;
+  text-align: center;
+  padding: 40px;
+  color: #666;
+}
+
+.ngo-not-found h2 {
+  font-family: "Playfair Display", Georgia, serif;
+  font-size: 2rem;
+  color: #1a1a1a;
+  margin: 20px 0 10px;
+}
+
+.ngo-not-found p {
+  margin-bottom: 24px;
+  font-size: 1rem;
+}
+
+.back-btn {
+  background: #1a5f2a;
+  color: white;
+  border: none;
+  padding: 12px 28px;
+  border-radius: 100px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.back-btn:hover {
+  background: #144a21;
+  transform: translateY(-2px);
+}
+
+/* Skeleton */
+.ngo-detail-skeleton {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 24px;
+}
+
+.detail-skeleton-hero {
+  height: 420px;
+  background: linear-gradient(90deg, #f0f0eb 25%, #e8e8e3 50%, #f0f0eb 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+  border-radius: 0 0 20px 20px;
+}
+
+.detail-skeleton-content {
+  padding: 48px 0;
+}
+
+.detail-skeleton-title {
+  height: 40px;
+  width: 60%;
+  background: linear-gradient(90deg, #f0f0eb 25%, #e8e8e3 50%, #f0f0eb 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+  border-radius: 8px;
+  margin-bottom: 20px;
+}
+
+.detail-skeleton-line {
+  height: 16px;
+  width: 100%;
+  background: linear-gradient(90deg, #f0f0eb 25%, #e8e8e3 50%, #f0f0eb 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+  border-radius: 4px;
+  margin-bottom: 12px;
+}
+
+.detail-skeleton-line.short {
+  width: 70%;
+}
+
+@keyframes shimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
 }

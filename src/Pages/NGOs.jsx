@@ -1,71 +1,94 @@
 import { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
-import { supabase } from "../utils/supabase";
+import { useNavigate } from "react-router-dom";
+import { supabase } from "../supabaseClient";
 import "./NGOs.css";
 
-const SearchIcon = () => (
-  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-);
-const MapPinIcon = () => (
-  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
-);
-const ArrowRightIcon = () => (
-  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
-);
-
-const categories = ["All", "General", "Healthcare", "Education", "Microfinance", "Health"];
-
-const staticNgos = [
-  { id: 1, name: "Community Welfare", category: "General", city: "Islamabad", description: "Working for the upliftment of underprivileged communities through education and healthcare initiatives.", image: "https://images.unsplash.com/photo-1488521787991-ed7bbaae773c?w=600&h=400&fit=crop" },
-  { id: 2, name: "Edhi Foundation", category: "Healthcare", city: "Karachi", description: "Pakistan's largest welfare organization providing emergency services, healthcare, and shelter.", image: "https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?w=600&h=400&fit=crop" },
-  { id: 3, name: "Saylani Welfare", category: "Education", city: "Karachi", description: "Providing free meals, education, and healthcare to thousands of deserving families daily.", image: "https://images.unsplash.com/photo-1503676260728-1c00da094a0b?w=600&h=400&fit=crop" },
-  { id: 4, name: "Akhuwat Foundation", category: "Microfinance", city: "Lahore", description: "Interest-free microfinance and education programs empowering low-income families.", image: "https://images.unsplash.com/photo-1532629345422-7515f3d16bb6?w=600&h=400&fit=crop" },
-  { id: 5, name: "Al-Khidmat Foundation", category: "General", city: "Lahore", description: "Humanitarian services including disaster relief, healthcare, and orphan care across Pakistan.", image: "https://images.unsplash.com/photo-1593113598332-cd288d649433?w=600&h=400&fit=crop" },
-  { id: 6, name: "Chhipa Welfare", category: "Healthcare", city: "Karachi", description: "Emergency ambulance services and welfare programs for the needy.", image: "https://images.unsplash.com/photo-1576091160550-2173dba999ef?w=600&h=400&fit=crop" },
-  { id: 7, name: "TCF Pakistan", category: "Education", city: "Karachi", description: "The Citizens Foundation building schools in underserved communities across Pakistan.", image: "https://images.unsplash.com/photo-1497633762265-9d179a990aa6?w=600&h=400&fit=crop" },
-  { id: 8, name: "Shaukat Khanum", category: "Health", city: "Lahore", description: "State-of-the-art cancer hospital providing free treatment to underprivileged patients.", image: "https://images.unsplash.com/photo-1584515933487-779824d29309?w=600&h=400&fit=crop" },
+// Curated unique NGO images - deterministic assignment based on NGO name
+const ngoImages = [
+  "https://images.unsplash.com/photo-1488521787991-ed7bbaae773c?w=600&h=400&fit=crop",
+  "https://images.unsplash.com/photo-1509099836639-18ba1795216d?w=600&h=400&fit=crop",
+  "https://images.unsplash.com/photo-1593113598332-cd288d649433?w=600&h=400&fit=crop",
+  "https://images.unsplash.com/photo-1531206715517-5c0ba140b2b8?w=600&h=400&fit=crop",
+  "https://images.unsplash.com/photo-1559027615-cd4628902d4a?w=600&h=400&fit=crop",
+  "https://images.unsplash.com/photo-1469571486292-0ba58a3f068b?w=600&h=400&fit=crop",
+  "https://images.unsplash.com/photo-1582213782179-e0d53f98f2ca?w=600&h=400&fit=crop",
+  "https://images.unsplash.com/photo-1577896851231-70ef18881754?w=600&h=400&fit=crop",
+  "https://images.unsplash.com/photo-1542810634-71277d95dcbb?w=600&h=400&fit=crop",
+  "https://images.unsplash.com/photo-1497486751825-1233686d5d80?w=600&h=400&fit=crop",
+  "https://images.unsplash.com/photo-1517486808906-6ca8b3f04846?w=600&h=400&fit=crop",
+  "https://images.unsplash.com/photo-1524069290683-0457abfe42c3?w=600&h=400&fit=crop",
+  "https://images.unsplash.com/photo-1560252829-804f1aedf1be?w=600&h=400&fit=crop",
+  "https://images.unsplash.com/photo-1532629345422-7515f3d16bb6?w=600&h=400&fit=crop",
+  "https://images.unsplash.com/photo-1609234656388-0ff363383899?w=600&h=400&fit=crop",
 ];
 
-function NGOs() {
-  const [ngos, setNgos] = useState(staticNgos);
-  const [loading, setLoading] = useState(false);
+function getNgoImage(ngoName, index) {
+  // Deterministic image selection based on NGO name length + index
+  const hash = ngoName.split("").reduce((acc, char) => acc + char.charCodeAt(0), 0);
+  return ngoImages[(hash + index) % ngoImages.length];
+}
+
+export default function NGOs() {
+  const [ngos, setNgos] = useState([]);
+  const [filtered, setFiltered] = useState([]);
   const [search, setSearch] = useState("");
-  const [activeCategory, setActiveCategory] = useState("All");
+  const [category, setCategory] = useState("All");
+  const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
 
   useEffect(() => {
-    const fetchNgos = async () => {
-      setLoading(true);
-      const { data } = await supabase.from("ngos").select("*").eq("approval_status", "approved");
-      if (data && data.length > 0) setNgos(data);
-      setLoading(false);
-    };
-    fetchNgos();
+    fetchNGOs();
   }, []);
 
-  const filtered = ngos.filter((n) => {
-    const matchesSearch =
-      (n.name || "").toLowerCase().includes(search.toLowerCase()) ||
-      (n.city || "").toLowerCase().includes(search.toLowerCase());
-    const matchesCategory = activeCategory === "All" || (n.category || "") === activeCategory;
-    return matchesSearch && matchesCategory;
-  });
+  async function fetchNGOs() {
+    setLoading(true);
+    const { data, error } = await supabase.from("ngos").select("*");
+    if (!error && data) {
+      setNgos(data);
+      setFiltered(data);
+    }
+    setLoading(false);
+  }
+
+  useEffect(() => {
+    let result = ngos;
+    if (category !== "All") {
+      result = result.filter((n) =>
+        (n.category || "").toLowerCase().includes(category.toLowerCase())
+      );
+    }
+    if (search.trim()) {
+      const q = search.toLowerCase();
+      result = result.filter(
+        (n) =>
+          (n.name || "").toLowerCase().includes(q) ||
+          (n.description || "").toLowerCase().includes(q) ||
+          (n.location || "").toLowerCase().includes(q)
+      );
+    }
+    setFiltered(result);
+  }, [search, category, ngos]);
+
+  const categories = ["All", "Education", "Health", "Environment", "Food", "Shelter", "Women Empowerment", "Child Welfare", "Disaster Relief"];
 
   return (
     <div className="ngos-page">
-      {/* Header */}
-      <div className="ngos-header">
-        <span className="ngos-label">OUR PARTNERS</span>
-        <h1>Our Partner NGOs</h1>
-        <p>Discover organizations making real change across Pakistan. Connect, volunteer, and contribute to causes that matter.</p>
+      <div className="ngos-hero">
+        <h1 className="ngos-hero-title">Discover NGOs</h1>
+        <p className="ngos-hero-subtitle">
+          Find and connect with verified organizations making real impact
+        </p>
       </div>
 
-      {/* Search & Filters — Centered */}
       <div className="ngos-controls">
-        <div className="ngos-search-wrap">
-          <SearchIcon />
+        <div className="ngos-search-wrapper">
+          <svg className="search-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+          </svg>
           <input
             type="text"
-            placeholder="Search by name or city..."
+            className="ngos-search"
+            placeholder="Search by name, cause, or location..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
           />
@@ -75,8 +98,8 @@ function NGOs() {
           {categories.map((cat) => (
             <button
               key={cat}
-              className={activeCategory === cat ? "active" : ""}
-              onClick={() => setActiveCategory(cat)}
+              className={`filter-pill ${category === cat ? "active" : ""}`}
+              onClick={() => setCategory(cat)}
             >
               {cat}
             </button>
@@ -84,50 +107,69 @@ function NGOs() {
         </div>
       </div>
 
-      {/* Grid */}
-      <div className="ngos-grid">
-        {loading ? (
-          Array.from({ length: 4 }).map((_, i) => (
-            <div className="ngo-skeleton" key={i}>
-              <div className="sk-img" />
-              <div className="sk-body">
-                <div className="sk-line short" />
-                <div className="sk-line" />
-                <div className="sk-line mid" />
-              </div>
+      {loading ? (
+        <div className="ngos-grid">
+          {[1, 2, 3, 4, 5, 6].map((i) => (
+            <div key={i} className="ngo-skeleton">
+              <div className="skeleton-img" />
+              <div className="skeleton-text" />
+              <div className="skeleton-text short" />
             </div>
-          ))
-        ) : filtered.length === 0 ? (
-          <div className="ngos-empty">
-            <div className="empty-icon">🔍</div>
-            <h3>No NGOs found</h3>
-            <p>Try adjusting your search or filter.</p>
-          </div>
-        ) : (
-          filtered.map((ngo) => (
-            <div className="ngo-card" key={ngo.id}>
-              <div className="ngo-card-visual">
-                <img src={ngo.image || "https://images.unsplash.com/photo-1488521787991-ed7bbaae773c?w=600&h=400&fit=crop"} alt={ngo.name} loading="lazy" />
-                <span className="ngo-card-badge">{ngo.category || "General"}</span>
+          ))}
+        </div>
+      ) : filtered.length === 0 ? (
+        <div className="ngos-empty">
+          <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+            <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+          </svg>
+          <h3>No NGOs found</h3>
+          <p>Try adjusting your search or filters</p>
+        </div>
+      ) : (
+        <div className="ngos-grid">
+          {filtered.map((ngo, idx) => (
+            <div key={ngo.id} className="ngo-card">
+              <div className="ngo-card-img-wrap">
+                <img
+                  src={getNgoImage(ngo.name || "NGO", idx)}
+                  alt={ngo.name}
+                  className="ngo-card-img"
+                  loading="lazy"
+                />
                 <div className="ngo-card-overlay">
-                  <Link to={`/ngos/${ngo.id}`} className="ngo-view-btn">
-                    View Profile <ArrowRightIcon />
-                  </Link>
+                  <button
+                    className="ngo-view-btn"
+                    onClick={() => navigate(`/ngos/${ngo.id}`)}
+                  >
+                    View Profile
+                  </button>
                 </div>
+                {ngo.verified && (
+                  <span className="ngo-verified-badge">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3">
+                      <polyline points="20 6 9 17 4 12"/>
+                    </svg>
+                    Verified
+                  </span>
+                )}
               </div>
               <div className="ngo-card-body">
-                <h3>{ngo.name}</h3>
-                <p className="ngo-card-desc">{ngo.description || "Dedicated to serving the community through impactful programs and volunteer support."}</p>
+                <span className="ngo-card-category">{ngo.category || "General"}</span>
+                <h3 className="ngo-card-title">{ngo.name}</h3>
+                <p className="ngo-card-desc">{ngo.description || "Making a positive impact in the community."}</p>
                 <div className="ngo-card-meta">
-                  <span><MapPinIcon /> {ngo.city || "Pakistan"}</span>
+                  <span className="ngo-location">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                      <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/>
+                    </svg>
+                    {ngo.location || "Pakistan"}
+                  </span>
                 </div>
               </div>
             </div>
-          ))
-        )}
-      </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 }
-
-export default NGOs;
