@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { supabase } from "../supabaseClient";
+import { supabase } from "../utils/supabase";
 import "./NGOs.css";
 
 // Curated unique NGO images - deterministic assignment based on NGO name
@@ -23,7 +23,6 @@ const ngoImages = [
 ];
 
 function getNgoImage(ngoName, index) {
-  // Deterministic image selection based on NGO name length + index
   const hash = ngoName.split("").reduce((acc, char) => acc + char.charCodeAt(0), 0);
   return ngoImages[(hash + index) % ngoImages.length];
 }

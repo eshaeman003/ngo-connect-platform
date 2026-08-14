@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
-import { useParams, useNavigate, Link } from "react-router-dom";
-import { supabase } from "../supabaseClient";
+import { useParams, useNavigate } from "react-router-dom";
+import { supabase } from "../utils/supabase";
 import "./NGODetails.css";
 
 const ngoImages = [
