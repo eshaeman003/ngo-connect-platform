@@ -3,28 +3,6 @@ import { useNavigate } from "react-router-dom";
 import { supabase } from "../utils/supabase";
 import "./Opportunities.css";
 
-// NGO/Social service related images
-const ngoImages = [
-  "https://images.unsplash.com/photo-1488521787991-ed7bbaae773c?w=400&h=250&fit=crop",
-  "https://images.unsplash.com/photo-1593113598332-cd288d649433?w=400&h=250&fit=crop",
-  "https://images.unsplash.com/photo-1559027615-cd4628902d4a?w=400&h=250&fit=crop",
-  "https://images.unsplash.com/photo-1469571486292-0ba58a3f068b?w=400&h=250&fit=crop",
-  "https://images.unsplash.com/photo-1532629345422-7515f3d16bb6?w=400&h=250&fit=crop",
-  "https://images.unsplash.com/photo-1582213782179-e0d53f98f2ca?w=400&h=250&fit=crop",
-  "https://images.unsplash.com/photo-1509099836639-18ba1795216d?w=400&h=250&fit=crop",
-  "https://images.unsplash.com/photo-1517486808906-6ca8b3f04846?w=400&h=250&fit=crop",
-];
-
-function getImageForOpportunity(id, category) {
-  // Deterministic image selection based on id
-  let hash = 0;
-  for (let i = 0; i < id.length; i++) {
-    hash = id.charCodeAt(i) + ((hash << 5) - hash);
-  }
-  const index = Math.abs(hash) % ngoImages.length;
-  return ngoImages[index];
-}
-
 function Opportunities() {
   const navigate = useNavigate();
   const [opportunities, setOpportunities] = useState([]);
@@ -33,9 +11,8 @@ function Opportunities() {
   const [categoryFilter, setCategoryFilter] = useState("All");
   const [typeFilter, setTypeFilter] = useState("All");
   const [loading, setLoading] = useState(true);
-  const [visibleCards, setVisibleCards] = useState({});
 
-  // Report modal state
+  // Report modal
   const [reportModal, setReportModal] = useState({
     open: false,
     opportunity: null,
@@ -44,7 +21,7 @@ function Opportunities() {
     submitting: false,
   });
 
-  // Login modal state
+  // Login modal
   const [showLoginModal, setShowLoginModal] = useState(false);
 
   useEffect(() => {
@@ -58,15 +35,6 @@ function Opportunities() {
 
       const { data: { user } } = await supabase.auth.getUser();
       setUser(user);
-
-      // Staggered fade-in animation for cards
-      if (data) {
-        data.forEach((_, index) => {
-          setTimeout(() => {
-            setVisibleCards((prev) => ({ ...prev, [index]: true }));
-          }, index * 100);
-        });
-      }
     };
     fetchData();
 
@@ -150,15 +118,13 @@ function Opportunities() {
 
   return (
     <div className="opportunities-page">
-      {/* ===== HERO ===== */}
+      {/* Hero */}
       <div className="opp-hero">
-        <div className="opp-hero-content">
-          <h1>Volunteer Opportunities</h1>
-          <p>Discover meaningful ways to contribute to your community</p>
-        </div>
+        <h1>Volunteer Opportunities</h1>
+        <p>Discover meaningful ways to contribute to your community</p>
       </div>
 
-      {/* ===== SEARCH & FILTERS ===== */}
+      {/* Search & Filters */}
       <div className="opp-toolbar">
         <div className="opp-search">
           <span className="search-icon">🔍</span>
@@ -202,19 +168,14 @@ function Opportunities() {
         </div>
       </div>
 
-      {/* ===== CARDS GRID ===== */}
+      {/* Cards */}
       <div className="opp-grid">
-        {filtered.map((opp, index) => (
-          <div
-            className={`opp-card ${visibleCards[index] ? "visible" : ""}`}
-            key={opp.id}
-            style={{ transitionDelay: `${index * 80}ms` }}
-          >
+        {filtered.map((opp) => (
+          <div className="opp-card" key={opp.id}>
             <div className="opp-image">
               <img
-                src={getImageForOpportunity(opp.id, opp.category)}
+                src={`https://picsum.photos/seed/${opp.id}/400/250`}
                 alt={opp.title}
-                loading="lazy"
               />
               <div className="opp-image-overlay" />
               <span className="opp-spots">Open</span>
@@ -243,7 +204,7 @@ function Opportunities() {
                 <p>{opp.requirements || "No specific requirements, open to all volunteers"}</p>
               </div>
 
-              {/* ===== APPLY + REPORT BUTTONS ===== */}
+              {/* Apply + Report buttons */}
               <div className="opp-actions">
                 <button className="btn-apply" onClick={() => handleApply(opp.id)}>
                   Apply Now <span className="arrow">→</span>
@@ -261,7 +222,7 @@ function Opportunities() {
         <div className="opp-empty">No opportunities found.</div>
       )}
 
-      {/* ===== LOGIN MODAL ===== */}
+      {/* Cute Login Modal */}
       {showLoginModal && (
         <div className="modal-overlay" onClick={() => setShowLoginModal(false)}>
           <div className="login-modal" onClick={(e) => e.stopPropagation()}>
@@ -283,16 +244,14 @@ function Opportunities() {
         </div>
       )}
 
-      {/* ===== REPORT MODAL ===== */}
+      {/* Report Modal */}
       {reportModal.open && (
         <div className="modal-overlay" onClick={closeReport}>
           <div className="report-modal" onClick={(e) => e.stopPropagation()}>
             <button className="modal-close" onClick={closeReport}>
               ✕
             </button>
-            <div className="modal-icon" style={{ background: "#fef3c7", color: "#92400e" }}>
-              🚩
-            </div>
+            <div className="modal-icon report-icon">🚩</div>
             <h2>Report Opportunity</h2>
             <p className="report-opp-title">"{reportModal.opportunity?.title}"</p>
 
