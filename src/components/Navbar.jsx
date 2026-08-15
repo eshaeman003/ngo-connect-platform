@@ -1,74 +1,68 @@
 import { useState, useEffect } from "react";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { supabase } from "../utils/supabase";
 import "./Navbar.css";
 
-const MenuIcon = () => (
-  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
-);
-const XIcon = () => (
-  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-);
-
 function Navbar() {
-  const [scrolled, setScrolled] = useState(false);
-  const [mobileOpen, setMobileOpen] = useState(false);
-  const location = useLocation();
+  const [user, setUser] = useState(null);
+  const [menuOpen, setMenuOpen] = useState(false);
+  const navigate = useNavigate();
 
   useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 20);
-    window.addEventListener("scroll", onScroll);
-    return () => window.removeEventListener("scroll", onScroll);
+    const getUser = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      setUser(user);
+    };
+    getUser();
+
+    const { data: listener } = supabase.auth.onAuthStateChange((_event, session) => {
+      setUser(session?.user || null);
+    });
+
+    return () => {
+      listener?.subscription?.unsubscribe();
+    };
   }, []);
 
-  useEffect(() => setMobileOpen(false), [location]);
-
-  const links = [
-    { to: "/", label: "Home" },
-    { to: "/opportunities", label: "Opportunities" },
-    { to: "/ngos", label: "NGOs" },
-    { to: "/about", label: "About" },
-  ];
+  const handleLogout = async () => {
+    await supabase.auth.signOut();
+    setUser(null);
+    navigate("/");
+  };
 
   return (
-    <nav className={`navbar ${scrolled ? "scrolled" : ""}`}>
-      <div className="navbar-inner">
-        <Link to="/" className="navbar-logo">
-          <span className="logo-icon">🌿</span>
-          <span className="logo-text">NGO Connect</span>
-        </Link>
-
-        <div className="navbar-links">
-          {links.map((l) => (
-            <Link key={l.to} to={l.to} className={`nav-link ${location.pathname === l.to ? "active" : ""}`}>
-              {l.label}
-              {location.pathname === l.to && <span className="nav-dot" />}
-            </Link>
-          ))}
-        </div>
-
-        <div className="navbar-cta">
-          <Link to="/login" className="nav-btn-ghost">Log In</Link>
-          <Link to="/register" className="nav-btn-primary">Get Started</Link>
-        </div>
-
-        <button className="navbar-hamburger" onClick={() => setMobileOpen(!mobileOpen)}>
-          {mobileOpen ? <XIcon /> : <MenuIcon />}
-        </button>
+    <nav className="navbar">
+      <div className="nav-brand">
+        <Link to="/" onClick={() => setMenuOpen(false)}>NGO Connect</Link>
       </div>
 
-      {mobileOpen && (
-        <div className="navbar-mobile">
-          {links.map((l) => (
-            <Link key={l.to} to={l.to} className={`nav-link-mobile ${location.pathname === l.to ? "active" : ""}`}>
-              {l.label}
+      <div className={`nav-links ${menuOpen ? "active" : ""}`}>
+        <Link to="/" onClick={() => setMenuOpen(false)}>Home</Link>
+        <Link to="/ngos" onClick={() => setMenuOpen(false)}>NGOs</Link>
+        <Link to="/opportunities" onClick={() => setMenuOpen(false)}>Opportunities</Link>
+        <Link to="/about" onClick={() => setMenuOpen(false)}>About</Link>
+        <Link to="/complaint" onClick={() => setMenuOpen(false)}>Complaints</Link>
+        
+        {user ? (
+          <>
+            <Link to="/admin" onClick={() => setMenuOpen(false)}>Dashboard</Link>
+            <button className="nav-logout-btn" onClick={handleLogout}>
+              Logout
+            </button>
+          </>
+        ) : (
+          <>
+            <Link to="/login" onClick={() => setMenuOpen(false)}>Login</Link>
+            <Link to="/register" className="nav-register-btn" onClick={() => setMenuOpen(false)}>
+              Register
             </Link>
-          ))}
-          <div className="navbar-mobile-cta">
-            <Link to="/login" className="nav-btn-ghost-mobile">Log In</Link>
-            <Link to="/register" className="nav-btn-primary-mobile">Get Started</Link>
-          </div>
-        </div>
-      )}
+          </>
+        )}
+      </div>
+
+      <button className="hamburger" onClick={() => setMenuOpen(!menuOpen)}>
+        ☰
+      </button>
     </nav>
   );
 }

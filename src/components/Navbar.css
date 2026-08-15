@@ -184,3 +184,25 @@
     display: block;
   }
 }
+.nav-logout-btn {
+  background: #dc2626;
+  color: white;
+  border: none;
+  padding: 8px 20px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: all 0.3s ease;
+}
+
+.nav-logout-btn:hover {
+  background: #b91c1c;
+  transform: translateY(-1px);
+}
+
+.nav-register-btn {
+  background: #1a5f2a;
+  color: white !important;
+  padding: 8px 20px;
+  border-radius: 8px;
+}
