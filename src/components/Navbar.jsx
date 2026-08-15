@@ -33,7 +33,6 @@ function Navbar() {
   return (
     <nav className="navbar">
       <div className="nav-brand">
-        <Link to="/" onClick={() => setMenuOpen(false)}>NGO Connect</Link>
       </div>
 
       <div className={`nav-links ${menuOpen ? "active" : ""}`}>
