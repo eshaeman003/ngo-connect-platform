@@ -105,24 +105,30 @@ const NgoSkeleton = () => (
 const testimonials = [
   {
     id: 1,
-    name: "Ayesha Khan",
+    name: "Ayesha K.",
     role: "Volunteer",
-    text: "NGO Connect completely changed how I give back. I found a teaching opportunity within days and have already logged 40+ hours.",
-    avatar: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100&h=100&fit=crop&crop=face",
+    initials: "AK",
+    bgColor: "#e8f5e9",
+    color: "#1a5f2a",
+    text: "NGO Connect made it so easy to find teaching opportunities near me. Within days I was volunteering at a local school and have already completed 40+ hours. The best platform for anyone who wants to give back!",
   },
   {
     id: 2,
-    name: "Bilal Ahmed",
-    role: "NGO Coordinator",
-    text: "We found 15 passionate volunteers in just one week. The platform bridges the gap between NGOs and real help seamlessly.",
-    avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&h=100&fit=crop&crop=face",
+    name: "Bilal A.",
+    role: "Student Volunteer",
+    initials: "BA",
+    bgColor: "#e3f2fd",
+    color: "#1565c0",
+    text: "As a university student, I wanted to volunteer but never knew where to start. NGO Connect matched me with the perfect opportunity in just one week. The application process is smooth and transparent.",
   },
   {
     id: 3,
-    name: "Sara Malik",
-    role: "Student Volunteer",
-    text: "The application process is smooth, and getting real-time notifications when I'm approved feels amazing. Highly recommend!",
-    avatar: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=100&h=100&fit=crop&crop=face",
+    name: "Sara M.",
+    role: "First-time Volunteer",
+    initials: "SM",
+    bgColor: "#fce4ec",
+    color: "#c2185b",
+    text: "I was nervous about volunteering for the first time, but this platform made everything so simple. From browsing opportunities to getting approved — every step felt seamless. Highly recommend!",
   },
 ];
 
@@ -323,7 +329,7 @@ function Home() {
         </div>
       </section>
 
-      {/* ===== TESTIMONIALS ===== */}
+      {/* ===== TESTIMONIALS (FIXED) ===== */}
       <section className="testimonials-section" ref={testRef}>
         <span className="section-label">TESTIMONIALS</span>
         <h2 className="section-title">What Our Community Says</h2>
@@ -333,7 +339,12 @@ function Home() {
               <QuoteIcon />
               <p className="testimonial-text">"{t.text}"</p>
               <div className="testimonial-author">
-                <img src={t.avatar} alt={t.name} className="testimonial-avatar" />
+                <div 
+                  className="testimonial-avatar"
+                  style={{ background: t.bgColor, color: t.color }}
+                >
+                  {t.initials}
+                </div>
                 <div>
                   <div className="testimonial-name">{t.name}</div>
                   <div className="testimonial-role">{t.role}</div>

@@ -462,7 +462,7 @@
   display: -webkit-box;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
-  line-clamp: 2;          /* ← Yeh add karo */
+  line-clamp: 2;
   overflow: hidden;
 }
 
@@ -552,8 +552,6 @@
   font-size: 15px;
   font-weight: 500;
 }
-
-/* ===== TESTIMONIALS ===== */
 .testimonials-section {
   max-width: 1200px;
   margin: 0 auto;
@@ -574,18 +572,44 @@
   padding: 32px;
   text-align: left;
   border: 1px solid #f0f0f0;
-  transition: all 0.3s ease;
+  transition: all 0.35s ease;
   position: relative;
+  overflow: hidden;
+}
+
+.testimonial-card::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, #1b4332, #4ade80);
+  opacity: 0;
+  transition: opacity 0.3s ease;
 }
 
 .testimonial-card:hover {
-  box-shadow: 0 12px 40px rgba(0,0,0,0.06);
-  transform: translateY(-4px);
+  box-shadow: 0 16px 48px rgba(0,0,0,0.08);
+  transform: translateY(-6px);
+}
+
+.testimonial-card:hover::before {
+  opacity: 1;
+}
+
+.testimonial-card > svg {
+  margin-bottom: 16px;
+  transition: color 0.3s ease;
+}
+
+.testimonial-card:hover > svg {
+  opacity: 0.3;
 }
 
 .testimonial-text {
   font-size: 15px;
-  line-height: 1.7;
+  line-height: 1.75;
   color: #4b5563;
   margin: 16px 0 24px;
   font-style: italic;
@@ -595,13 +619,23 @@
   display: flex;
   align-items: center;
   gap: 14px;
+  padding-top: 20px;
+  border-top: 1px solid #f0f0f0;
 }
 
+/* CHANGED: from img to div with initials */
 .testimonial-avatar {
   width: 48px;
   height: 48px;
   border-radius: 50%;
-  object-fit: cover;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.9rem;
+  font-weight: 700;
+  flex-shrink: 0;
+  border: 2px solid white;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
 }
 
 .testimonial-name {
