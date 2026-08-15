@@ -1,4 +1,3 @@
-import NGODetails from "./Pages/NGODetails";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Navbar from "./components/Navbar";
 
@@ -6,15 +5,16 @@ import Home from "./Pages/Home";
 import Login from "./Pages/Login";
 import Register from "./Pages/Register";
 import VolunteerDashboard from "./Pages/VolunteerDashboard";
+import VolunteerProfile from "./Pages/VolunteerProfile";
 import NGODashboard from "./Pages/NGODashboard";
 import NGORegister from "./Pages/NGORegister";
 import NGOProfile from "./Pages/NGOProfile";
 import NGOs from "./Pages/NGOs";
+import NGODetails from "./Pages/NGODetails";
 import Opportunities from "./Pages/Opportunities";
 import OpportunityDetail from "./Pages/OpportunityDetail";
 import CreateOpportunity from "./Pages/CreateOpportunity";
 import OpportunityEdit from "./Pages/OpportunityEdit";
-import VolunteerProfile from "./Pages/VolunteerProfile";
 import AdminDashboard from "./Pages/AdminDashboard";
 import AdminComplaints from "./Pages/AdminComplaints";
 import ApplyPage from "./Pages/ApplyPage";
