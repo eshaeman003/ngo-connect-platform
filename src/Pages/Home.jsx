@@ -22,7 +22,22 @@ const StarIcon = () => (
   <svg width="16" height="16" viewBox="0 0 24 24" fill="#B8792A" stroke="#B8792A" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
 );
 const QuoteIcon = () => (
-  <svg width="32" height="32" viewBox="0 0 24 24" fill="#2d6a4f" opacity="0.15"><path d="M3 21c3 0 7-1 7-8V5c0-1.25-.756-2.017-2-2H4c-1.25 0-2 .75-2 1.972V11c0 1.25.75 2 2 2 1 0 1 0 1 1v1c0 1-1 2-2 2s-1 .008-1 1.031V21zM15 21c3 0 7-1 7-8V5c0-1.25-.757-2.017-2-2h-4c-1.25 0-2 .75-2 1.972V11c0 1.25.75 2 2 2h.75c0 2.25.25 4-2.75 4v3c0 1 0 1 1 1z"/></svg>
+  <svg width="32" height="32" viewBox="0 0 24 24" fill="#2d6a4f" opacity="0.12"><path d="M3 21c3 0 7-1 7-8V5c0-1.25-.756-2.017-2-2H4c-1.25 0-2 .75-2 1.972V11c0 1.25.75 2 2 2 1 0 1 0 1 1v1c0 1-1 2-2 2s-1 .008-1 1.031V21zM15 21c3 0 7-1 7-8V5c0-1.25-.757-2.017-2-2h-4c-1.25 0-2 .75-2 1.972V11c0 1.25.75 2 2 2h.75c0 2.25.25 4-2.75 4v3c0 1 0 1 1 1z"/></svg>
+);
+const UserIcon = () => (
+  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+);
+const SearchIcon = () => (
+  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+);
+const RocketIcon = () => (
+  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 0 0-2.91-.09z"/><path d="m12 15-3-3a22 22 0 0 1 2-3.95A12.88 12.88 0 0 1 22 2c0 2.72-.78 7.5-6 11a22.35 22.35 0 0 1-4 2z"/><path d="M9 12H4s.55-3.03 2-4c1.62-1.08 5 0 5 0"/><path d="M12 15v5s3.03-.55 4-2c1.08-1.62 0-5 0-5"/></svg>
+);
+const BuildingIcon = () => (
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M3 21h18"/><path d="M5 21V7l8-4 8 4v14"/><path d="M9 21v-6h6v6"/></svg>
+);
+const ChevronRightIcon = () => (
+  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="m9 18 6-6-6-6"/></svg>
 );
 
 /* ===== useCountUp Hook ===== */
@@ -33,11 +48,7 @@ function useCountUp(end, duration = 2000) {
 
   useEffect(() => {
     const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting && !started) {
-          setStarted(true);
-        }
-      },
+      ([entry]) => { if (entry.isIntersecting && !started) setStarted(true); },
       { threshold: 0.5 }
     );
     if (ref.current) observer.observe(ref.current);
@@ -187,7 +198,6 @@ function Home() {
   const [ngoCount, ngoRef] = useCountUp(50);
   const [hrCount, hrRef] = useCountUp(10000);
 
-  // Simulate API loading
   useEffect(() => {
     const t1 = setTimeout(() => { setNgos(staticNgos); setLoadingNgos(false); }, 800);
     const t2 = setTimeout(() => { setOpportunities(staticOpps); setLoadingOpps(false); }, 1200);
@@ -237,19 +247,23 @@ function Home() {
         </div>
       </section>
 
-      {/* ===== STATS ===== */}
-      <section className="stats-section" ref={statsRef}>
-        <div className="stat-item" ref={volRef}>
-          <h3>{volCount.toLocaleString()}+</h3>
-          <p>Active Volunteers</p>
-        </div>
-        <div className="stat-item" ref={ngoRef}>
-          <h3>{ngoCount}+</h3>
-          <p>Partner NGOs</p>
-        </div>
-        <div className="stat-item" ref={hrRef}>
-          <h3>{hrCount.toLocaleString()}+</h3>
-          <p>Hours Served</p>
+      {/* ===== STATS BAR ===== */}
+      <section className="stats-bar" ref={statsRef}>
+        <div className="stats-bar-inner">
+          <div className="stat-bar-item" ref={volRef}>
+            <div className="stat-bar-number">{volCount.toLocaleString()}+</div>
+            <div className="stat-bar-label">Active Volunteers</div>
+          </div>
+          <div className="stat-bar-divider" />
+          <div className="stat-bar-item" ref={ngoRef}>
+            <div className="stat-bar-number">{ngoCount}+</div>
+            <div className="stat-bar-label">Partner NGOs</div>
+          </div>
+          <div className="stat-bar-divider" />
+          <div className="stat-bar-item" ref={hrRef}>
+            <div className="stat-bar-number">{hrCount.toLocaleString()}+</div>
+            <div className="stat-bar-label">Hours Served</div>
+          </div>
         </div>
       </section>
 
@@ -259,15 +273,13 @@ function Home() {
         <h2 className="section-title">Three Steps to Make a Difference</h2>
         <div className="steps-grid">
           {[
-            { icon: "👤", title: "Create Your Profile", desc: "Sign up as a volunteer or NGO. Tell us about your skills, passions, and availability.", num: "01" },
-            { icon: "🔍", title: "Discover Opportunities", desc: "Browse through hundreds of volunteering opportunities that match your interests.", num: "02" },
-            { icon: "🚀", title: "Start Volunteering", desc: "Apply, get approved, and begin your journey of creating positive change.", num: "03" },
+            { icon: <UserIcon />, title: "Create Your Profile", desc: "Sign up as a volunteer or NGO. Tell us about your skills, passions, and availability.", num: "01" },
+            { icon: <SearchIcon />, title: "Discover Opportunities", desc: "Browse through hundreds of volunteering opportunities that match your interests.", num: "02" },
+            { icon: <RocketIcon />, title: "Start Volunteering", desc: "Apply, get approved, and begin your journey of creating positive change.", num: "03" },
           ].map((step, i) => (
             <div className="step-card" key={i}>
-              <div className="step-header">
-                <div className="step-icon">{step.icon}</div>
-                <span className="step-number">{step.num}</span>
-              </div>
+              <div className="step-icon-wrap">{step.icon}</div>
+              <span className="step-number">{step.num}</span>
               <h4>{step.title}</h4>
               <p>{step.desc}</p>
             </div>
@@ -276,9 +288,12 @@ function Home() {
       </section>
 
       {/* ===== NGOs ===== */}
-      <section className="ngos-section alt-bg" ref={ngosRef}>
-        <span className="section-label">OUR PARTNERS</span>
-        <h2 className="section-title">NGOs Making Real Impact</h2>
+      <section className="ngos-section" ref={ngosRef}>
+        <div className="ngos-section-header">
+          <span className="section-label">OUR PARTNERS</span>
+          <h2 className="section-title">NGOs Making Real Impact</h2>
+          <p className="section-subtitle">Trusted organizations working tirelessly for a better Pakistan</p>
+        </div>
         <div className="ngos-grid">
           {loadingNgos ? (
             Array.from({ length: 4 }).map((_, i) => <NgoSkeleton key={i} />)
@@ -289,19 +304,31 @@ function Home() {
               <Link to={`/ngos/${ngo.id}`} key={ngo.id} className="ngo-home-card">
                 <div className="ngo-home-img-wrap">
                   <img src={ngo.image} alt={ngo.name} loading="lazy" />
+                  <div className="ngo-home-img-overlay" />
                 </div>
-                <h4>{ngo.name}</h4>
-                <span className="ngo-home-category">{ngo.category}</span>
-                <div className="ngo-home-location"><MapPinIcon /> {ngo.city}</div>
+                <div className="ngo-home-body">
+                  <span className="ngo-home-category">{ngo.category}</span>
+                  <h4>{ngo.name}</h4>
+                  <div className="ngo-home-location"><MapPinIcon /> {ngo.city}</div>
+                </div>
               </Link>
             ))
           )}
+        </div>
+        <div className="section-cta">
+          <Link to="/ngos" className="section-cta-link">
+            View All NGOs <ChevronRightIcon />
+          </Link>
         </div>
       </section>
 
       {/* ===== FEATURED OPPORTUNITIES ===== */}
       <section className="opp-section" ref={oppRef}>
-        <h2 className="section-title center">Featured Opportunities</h2>
+        <div className="opp-section-header">
+          <span className="section-label">FEATURED</span>
+          <h2 className="section-title">Opportunities Waiting for You</h2>
+          <p className="section-subtitle">Handpicked volunteer roles that need passionate people like you</p>
+        </div>
         <div className="opp-grid">
           {loadingOpps ? (
             Array.from({ length: 3 }).map((_, i) => <OppSkeleton key={i} />)
@@ -312,27 +339,39 @@ function Home() {
               <div key={opp.id} className="opp-home-card">
                 <div className="opp-home-visual">
                   <img src={opp.image} alt={opp.title} loading="lazy" />
-                  <span className="opp-home-category">{opp.category}</span>
+                  <div className="opp-home-img-overlay" />
+                  <span className="opp-home-type">{opp.type}</span>
                 </div>
                 <div className="opp-home-body">
+                  <span className="opp-home-category">{opp.category}</span>
                   <h4>{opp.title}</h4>
                   <p>{opp.description}</p>
                   <div className="opp-home-meta">
                     <span><MapPinIcon /> {opp.location}</span>
                     <span><ClockIcon /> {opp.type}</span>
                   </div>
-                  <Link to="/opportunities" className="opp-home-link">Apply Now <ArrowRightIcon /></Link>
+                  <Link to="/opportunities" className="opp-home-link">
+                    Apply Now <ArrowRightIcon />
+                  </Link>
                 </div>
               </div>
             ))
           )}
         </div>
+        <div className="section-cta">
+          <Link to="/opportunities" className="section-cta-link">
+            Browse All Opportunities <ChevronRightIcon />
+          </Link>
+        </div>
       </section>
 
-      {/* ===== TESTIMONIALS (FIXED) ===== */}
+      {/* ===== TESTIMONIALS ===== */}
       <section className="testimonials-section" ref={testRef}>
-        <span className="section-label">TESTIMONIALS</span>
-        <h2 className="section-title">What Our Community Says</h2>
+        <div className="testimonials-header">
+          <span className="section-label">TESTIMONIALS</span>
+          <h2 className="section-title">What Our Community Says</h2>
+          <p className="section-subtitle">Real stories from real volunteers making a difference</p>
+        </div>
         <div className="testimonials-grid">
           {testimonials.map((t) => (
             <div key={t.id} className="testimonial-card">
@@ -361,14 +400,16 @@ function Home() {
       {/* ===== CTA ===== */}
       <section className="cta-section" ref={ctaRef}>
         <div className="cta-pattern" />
-        <h2>Ready to Make a Difference?</h2>
-        <p>
-          Whether you're an NGO seeking passionate volunteers or an individual
-          wanting to give back, NGO Connect is your bridge to meaningful impact.
-        </p>
-        <div className="cta-buttons">
-          <Link to="/register" className="btn-white">Get Started</Link>
-          <Link to="/ngos" className="btn-transparent">Explore NGOs</Link>
+        <div className="cta-content">
+          <h2>Ready to Make a Difference?</h2>
+          <p>
+            Whether you're an NGO seeking passionate volunteers or an individual
+            wanting to give back, NGO Connect is your bridge to meaningful impact.
+          </p>
+          <div className="cta-buttons">
+            <Link to="/register" className="btn-white">Get Started</Link>
+            <Link to="/ngos" className="btn-transparent">Explore NGOs</Link>
+          </div>
         </div>
       </section>
     </div>
