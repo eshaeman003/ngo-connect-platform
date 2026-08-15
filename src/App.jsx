@@ -17,7 +17,6 @@ import OpportunityEdit from "./Pages/OpportunityEdit";
 import VolunteerProfile from "./Pages/VolunteerProfile";
 import AdminDashboard from "./Pages/AdminDashboard";
 import AdminComplaints from "./Pages/AdminComplaints";
-import ComplaintForm from "./Pages/ComplaintForm";
 import ApplyPage from "./Pages/ApplyPage";
 import About from "./Pages/About";
 import NotFound from "./Pages/NotFound";
@@ -44,7 +43,6 @@ function App() {
         <Route path="/opportunity/edit/:id" element={<OpportunityEdit />} />
         <Route path="/admin" element={<AdminDashboard />} />
         <Route path="/admin/complaints" element={<AdminComplaints />} />
-        <Route path="/complaint" element={<ComplaintForm />} />
         <Route path="/about" element={<About />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
