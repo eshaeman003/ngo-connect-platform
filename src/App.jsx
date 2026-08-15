@@ -29,10 +29,10 @@ function App() {
         <Route path="/" element={<Home />} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
+        <Route path="/register/ngo" element={<NGORegister />} />
         <Route path="/volunteer/dashboard" element={<VolunteerDashboard />} />
         <Route path="/volunteer/profile" element={<VolunteerProfile />} />
         <Route path="/ngo/dashboard" element={<NGODashboard />} />
-        <Route path="/ngo/register" element={<NGORegister />} />
         <Route path="/ngo/profile" element={<NGOProfile />} />
         <Route path="/ngos" element={<NGOs />} />
         <Route path="/ngos/:id" element={<NGODetails />} />
