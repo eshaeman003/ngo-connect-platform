@@ -12,7 +12,7 @@ function Opportunities() {
   const [typeFilter, setTypeFilter] = useState("All");
   const [loading, setLoading] = useState(true);
 
-  // Report modal state
+  // Report modal
   const [reportModal, setReportModal] = useState({
     open: false,
     opportunity: null,
@@ -21,12 +21,15 @@ function Opportunities() {
     submitting: false,
   });
 
-  // Login modal state
+  // Login modal
   const [showLoginModal, setShowLoginModal] = useState(false);
 
   useEffect(() => {
     const fetchData = async () => {
-      const { data } = await supabase.from("opportunities").select("*").order("created_at", { ascending: false });
+      const { data } = await supabase
+        .from("opportunities")
+        .select("*")
+        .order("created_at", { ascending: false });
       setOpportunities(data || []);
       setLoading(false);
 
@@ -65,7 +68,13 @@ function Opportunities() {
   };
 
   const closeReport = () => {
-    setReportModal({ open: false, opportunity: null, reason: "Misconduct", description: "", submitting: false });
+    setReportModal({
+      open: false,
+      opportunity: null,
+      reason: "Misconduct",
+      description: "",
+      submitting: false,
+    });
   };
 
   const submitReport = async () => {
@@ -85,9 +94,9 @@ function Opportunities() {
 
     setReportModal((m) => ({ ...m, submitting: false }));
     if (error) {
-      alert("Error submitting report: " + error.message);
+      alert("Error: " + error.message);
     } else {
-      alert("Report submitted successfully! Admin will review it.");
+      alert("Report submitted! Admin will review it.");
       closeReport();
     }
   };
@@ -96,7 +105,10 @@ function Opportunities() {
   const types = ["All", ...new Set(opportunities.map((o) => o.type).filter(Boolean))];
 
   const filtered = opportunities.filter((o) => {
-    const matchesSearch = !search || o.title?.toLowerCase().includes(search.toLowerCase()) || o.ngo_name?.toLowerCase().includes(search.toLowerCase());
+    const matchesSearch =
+      !search ||
+      o.title?.toLowerCase().includes(search.toLowerCase()) ||
+      o.ngo_name?.toLowerCase().includes(search.toLowerCase());
     const matchesCat = categoryFilter === "All" || o.category === categoryFilter;
     const matchesType = typeFilter === "All" || o.type === typeFilter;
     return matchesSearch && matchesCat && matchesType;
@@ -106,24 +118,36 @@ function Opportunities() {
 
   return (
     <div className="opportunities-page">
-      {/* Hero */}
+      {/* ===== HERO ===== */}
       <div className="opp-hero">
         <h1>Volunteer Opportunities</h1>
         <p>Discover meaningful ways to contribute to your community</p>
       </div>
 
-      {/* Search & Filters */}
+      {/* ===== SEARCH & FILTERS ===== */}
       <div className="opp-toolbar">
         <div className="opp-search">
-          <span>🔍</span>
-          <input type="text" placeholder="Search opportunities..." value={search} onChange={(e) => setSearch(e.target.value)} />
+          <span className="search-icon">🔍</span>
+          <input
+            type="text"
+            placeholder="Search opportunities..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+          />
         </div>
+
         <div className="opp-filters">
           <div className="filter-group">
             <label>Category</label>
             <div className="filter-pills">
               {categories.map((c) => (
-                <button key={c} className={categoryFilter === c ? "active" : ""} onClick={() => setCategoryFilter(c)}>{c}</button>
+                <button
+                  key={c}
+                  className={categoryFilter === c ? "active" : ""}
+                  onClick={() => setCategoryFilter(c)}
+                >
+                  {c}
+                </button>
               ))}
             </div>
           </div>
@@ -131,33 +155,56 @@ function Opportunities() {
             <label>Type</label>
             <div className="filter-pills">
               {types.map((t) => (
-                <button key={t} className={typeFilter === t ? "active" : ""} onClick={() => setTypeFilter(t)}>{t}</button>
+                <button
+                  key={t}
+                  className={typeFilter === t ? "active" : ""}
+                  onClick={() => setTypeFilter(t)}
+                >
+                  {t}
+                </button>
               ))}
             </div>
           </div>
         </div>
       </div>
 
-      {/* Cards Grid */}
+      {/* ===== CARDS GRID ===== */}
       <div className="opp-grid">
         {filtered.map((opp) => (
           <div className="opp-card" key={opp.id}>
             <div className="opp-image">
-              <img src={`https://picsum.photos/seed/${opp.id}/400/250`} alt={opp.title} />
+              <img
+                src={`https://picsum.photos/seed/${opp.id}/400/250`}
+                alt={opp.title}
+              />
               <div className="opp-image-overlay" />
               <span className="opp-spots">Open</span>
               <span className="opp-type-badge">{opp.type || "Volunteer"}</span>
             </div>
+
             <div className="opp-body">
               <div className="opp-tags">
                 <span className="tag-cat">{opp.category || "General"}</span>
               </div>
+
               <h3>{opp.title || "Untitled Opportunity"}</h3>
-              <p className="opp-desc">{opp.description || "No description available."}</p>
+
+              <p className="opp-desc">
+                {opp.description || "No description available."}
+              </p>
+
               <div className="opp-meta">
                 <span>📍 {opp.location || "Remote"}</span>
+                <span>📅 {opp.duration || "Flexible"}</span>
                 <span>🏢 {opp.ngo_name || "NGO"}</span>
               </div>
+
+              <div className="opp-requirements">
+                <strong>Requirements:</strong>
+                <p>{opp.requirements || "No specific requirements, open to all volunteers"}</p>
+              </div>
+
+              {/* ===== APPLY + REPORT BUTTONS ===== */}
               <div className="opp-actions">
                 <button className="btn-apply" onClick={() => handleApply(opp.id)}>
                   Apply Now →
@@ -171,36 +218,53 @@ function Opportunities() {
         ))}
       </div>
 
-      {filtered.length === 0 && <div className="opp-empty">No opportunities found.</div>}
+      {filtered.length === 0 && (
+        <div className="opp-empty">No opportunities found.</div>
+      )}
 
-      {/* Login Modal */}
+      {/* ===== LOGIN MODAL ===== */}
       {showLoginModal && (
         <div className="modal-overlay" onClick={() => setShowLoginModal(false)}>
           <div className="login-modal" onClick={(e) => e.stopPropagation()}>
-            <button className="modal-close" onClick={() => setShowLoginModal(false)}>✕</button>
+            <button className="modal-close" onClick={() => setShowLoginModal(false)}>
+              ✕
+            </button>
             <div className="modal-icon">🔒</div>
             <h2>Login Required</h2>
             <p>You need to be logged in to apply or report opportunities.</p>
             <div className="modal-buttons">
-              <button className="btn-primary" onClick={() => navigate("/login")}>Log In</button>
-              <button className="btn-outline" onClick={() => navigate("/register")}>Create Account</button>
+              <button className="btn-primary" onClick={() => navigate("/login")}>
+                Log In
+              </button>
+              <button className="btn-outline" onClick={() => navigate("/register")}>
+                Create Account
+              </button>
             </div>
           </div>
         </div>
       )}
 
-      {/* Report Modal */}
+      {/* ===== REPORT MODAL ===== */}
       {reportModal.open && (
         <div className="modal-overlay" onClick={closeReport}>
           <div className="report-modal" onClick={(e) => e.stopPropagation()}>
-            <button className="modal-close" onClick={closeReport}>✕</button>
-            <div className="modal-icon" style={{ background: "#fef3c7", color: "#92400e" }}>🚩</div>
+            <button className="modal-close" onClick={closeReport}>
+              ✕
+            </button>
+            <div className="modal-icon" style={{ background: "#fef3c7", color: "#92400e" }}>
+              🚩
+            </div>
             <h2>Report Opportunity</h2>
             <p className="report-opp-title">"{reportModal.opportunity?.title}"</p>
-            
+
             <div className="form-group">
               <label>Reason</label>
-              <select value={reportModal.reason} onChange={(e) => setReportModal({ ...reportModal, reason: e.target.value })}>
+              <select
+                value={reportModal.reason}
+                onChange={(e) =>
+                  setReportModal({ ...reportModal, reason: e.target.value })
+                }
+              >
                 <option>Misconduct</option>
                 <option>Fraud</option>
                 <option>Harassment</option>
@@ -215,15 +279,26 @@ function Opportunities() {
                 rows="4"
                 placeholder="Explain why you're reporting this opportunity..."
                 value={reportModal.description}
-                onChange={(e) => setReportModal({ ...reportModal, description: e.target.value })}
+                onChange={(e) =>
+                  setReportModal({ ...reportModal, description: e.target.value })
+                }
               />
             </div>
 
-            <p className="report-anon">🔒 Your identity will be hidden from the NGO. Only admin can see your report.</p>
+            <p className="report-anon">
+              🔒 Your identity is hidden from the NGO. Only admin can see your
+              report.
+            </p>
 
             <div className="modal-buttons">
-              <button className="btn-cancel" onClick={closeReport}>Cancel</button>
-              <button className="btn-report-submit" onClick={submitReport} disabled={reportModal.submitting}>
+              <button className="btn-cancel" onClick={closeReport}>
+                Cancel
+              </button>
+              <button
+                className="btn-report-submit"
+                onClick={submitReport}
+                disabled={reportModal.submitting}
+              >
                 {reportModal.submitting ? "Submitting..." : "Submit Report"}
               </button>
             </div>

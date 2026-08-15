@@ -18,6 +18,7 @@ import VolunteerProfile from "./Pages/VolunteerProfile";
 import AdminDashboard from "./Pages/AdminDashboard";
 import AdminComplaints from "./Pages/AdminComplaints";
 import ComplaintForm from "./Pages/ComplaintForm";
+import ApplyPage from "./Pages/ApplyPage";
 import About from "./Pages/About";
 import NotFound from "./Pages/NotFound";
 
@@ -37,6 +38,7 @@ function App() {
         <Route path="/ngos" element={<NGOs />} />
         <Route path="/ngos/:id" element={<NGODetails />} />
         <Route path="/opportunities" element={<Opportunities />} />
+        <Route path="/apply/:id" element={<ApplyPage />} />
         <Route path="/opportunity/:id" element={<OpportunityDetail />} />
         <Route path="/opportunity/create" element={<CreateOpportunity />} />
         <Route path="/opportunity/edit/:id" element={<OpportunityEdit />} />
