@@ -33,6 +33,7 @@ function Navbar() {
   return (
     <nav className="navbar">
       <div className="nav-brand">
+        <Link to="/" onClick={() => setMenuOpen(false)}>NGO Connect</Link>
       </div>
 
       <div className={`nav-links ${menuOpen ? "active" : ""}`}>
@@ -40,7 +41,6 @@ function Navbar() {
         <Link to="/ngos" onClick={() => setMenuOpen(false)}>NGOs</Link>
         <Link to="/opportunities" onClick={() => setMenuOpen(false)}>Opportunities</Link>
         <Link to="/about" onClick={() => setMenuOpen(false)}>About</Link>
-        <Link to="/complaint" onClick={() => setMenuOpen(false)}>Complaints</Link>
         
         {user ? (
           <>
