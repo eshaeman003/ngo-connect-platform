@@ -31,7 +31,7 @@ function Navbar() {
     navigate("/");
   };
 
-  const isActive = (path) => location.pathname === path ? "active" : "";
+  const isActive = (path) => location.pathname === path;
 
   return (
     <nav className="navbar">
@@ -40,26 +40,68 @@ function Navbar() {
       </div>
 
       <div className={`nav-links ${menuOpen ? "active" : ""}`}>
-        <Link to="/" className={isActive("/")} onClick={() => setMenuOpen(false)}>Home</Link>
-        <Link to="/ngos" className={isActive("/ngos")} onClick={() => setMenuOpen(false)}>NGOs</Link>
-        <Link to="/opportunities" className={isActive("/opportunities")} onClick={() => setMenuOpen(false)}>Opportunities</Link>
-        <Link to="/about" className={isActive("/about")} onClick={() => setMenuOpen(false)}>About</Link>
-        
-        {user ? (
-          <>
-            <Link to="/admin" className={isActive("/admin")} onClick={() => setMenuOpen(false)}>Dashboard</Link>
-            <button className="nav-logout-btn" onClick={handleLogout}>
-              Logout
-            </button>
-          </>
-        ) : (
-          <>
-            <Link to="/login" className={isActive("/login")} onClick={() => setMenuOpen(false)}>Login</Link>
-            <Link to="/register" className={`nav-register-btn ${isActive("/register")}`} onClick={() => setMenuOpen(false)}>
-              Register
-            </Link>
-          </>
-        )}
+        <div className="nav-pill-container">
+          <Link 
+            to="/" 
+            className={`nav-pill ${isActive("/") ? "active" : ""}`} 
+            onClick={() => setMenuOpen(false)}
+          >
+            Home
+          </Link>
+          <Link 
+            to="/ngos" 
+            className={`nav-pill ${isActive("/ngos") ? "active" : ""}`} 
+            onClick={() => setMenuOpen(false)}
+          >
+            NGOs
+          </Link>
+          <Link 
+            to="/opportunities" 
+            className={`nav-pill ${isActive("/opportunities") ? "active" : ""}`} 
+            onClick={() => setMenuOpen(false)}
+          >
+            Opportunities
+          </Link>
+          <Link 
+            to="/about" 
+            className={`nav-pill ${isActive("/about") ? "active" : ""}`} 
+            onClick={() => setMenuOpen(false)}
+          >
+            About
+          </Link>
+          
+          {user ? (
+            <>
+              <Link 
+                to="/admin" 
+                className={`nav-pill ${isActive("/admin") ? "active" : ""}`} 
+                onClick={() => setMenuOpen(false)}
+              >
+                Dashboard
+              </Link>
+              <button className="nav-pill nav-pill-btn logout-pill" onClick={handleLogout}>
+                Logout
+              </button>
+            </>
+          ) : (
+            <>
+              <Link 
+                to="/login" 
+                className={`nav-pill ${isActive("/login") ? "active" : ""}`} 
+                onClick={() => setMenuOpen(false)}
+              >
+                Login
+              </Link>
+              <Link 
+                to="/register" 
+                className={`nav-pill register-pill ${isActive("/register") ? "active" : ""}`} 
+                onClick={() => setMenuOpen(false)}
+              >
+                Register
+              </Link>
+            </>
+          )}
+        </div>
       </div>
 
       <button className="hamburger" onClick={() => setMenuOpen(!menuOpen)}>

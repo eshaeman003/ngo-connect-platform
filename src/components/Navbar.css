@@ -3,10 +3,8 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0 40px;
-  height: 72px;
+  padding: 16px 40px;
   background: white;
-  border-bottom: 1px solid #e5e7eb;
   position: sticky;
   top: 0;
   z-index: 1000;
@@ -20,101 +18,74 @@
   text-decoration: none;
 }
 
-/* ===== LINKS ===== */
+/* ===== PILL CONTAINER ===== */
 .nav-links {
   display: flex;
   align-items: center;
-  gap: 32px;
 }
 
-.nav-links a {
+.nav-pill-container {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: #f8faf8;
+  padding: 6px;
+  border-radius: 16px;
+  border: 1px solid #e8efe8;
+}
+
+/* ===== PILLS ===== */
+.nav-pill {
   text-decoration: none;
-  color: #374151;
-  font-weight: 700; /* BOLD */
-  font-size: 0.95rem;
+  color: #6b7280;
+  font-weight: 600;
+  font-size: 0.9rem;
+  padding: 10px 20px;
+  border-radius: 12px;
+  transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
   white-space: nowrap;
   font-family: 'Playfair Display', 'Fraunces', serif;
-  position: relative;
-  padding: 8px 0;
-  transition: color 0.3s ease;
-}
-
-/* Underline animation on hover */
-.nav-links a::after {
-  content: '';
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  width: 0;
-  height: 2.5px;
-  background: #1a5f2a;
-  transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-  border-radius: 2px;
-}
-
-.nav-links a:hover {
-  color: #1a5f2a;
-}
-
-.nav-links a:hover::after {
-  width: 100%;
-}
-
-/* Active page link */
-.nav-links a.active {
-  color: #1a5f2a;
-}
-
-.nav-links a.active::after {
-  width: 100%;
-}
-
-/* ===== BUTTONS ===== */
-.nav-logout-btn {
-  background: #dc2626;
-  color: white;
   border: none;
-  padding: 10px 22px;
-  border-radius: 10px;
+  background: transparent;
   cursor: pointer;
-  font-weight: 700;
-  font-size: 0.9rem;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  font-family: 'Playfair Display', 'Fraunces', serif;
   position: relative;
-  overflow: hidden;
 }
 
-.nav-logout-btn:hover {
-  background: #b91c1c;
-  transform: translateY(-2px);
-  box-shadow: 0 6px 16px rgba(220, 38, 38, 0.25);
+/* Hover state */
+.nav-pill:hover:not(.active) {
+  background: rgba(26, 95, 42, 0.08);
+  color: #1a5f2a;
 }
 
-.nav-logout-btn:active {
-  transform: translateY(0);
-}
-
-.nav-register-btn {
+/* Active state — filled pill like the image */
+.nav-pill.active {
   background: #1a5f2a;
-  color: white !important;
-  padding: 10px 22px;
-  border-radius: 10px;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  font-family: 'Playfair Display', 'Fraunces', serif;
-  font-weight: 700;
-  position: relative;
-  overflow: hidden;
+  color: white;
+  box-shadow: 0 4px 12px rgba(26, 95, 42, 0.2);
 }
 
-.nav-register-btn:hover {
-  background: #144a21;
-  transform: translateY(-2px);
+/* Register pill — always filled even when inactive */
+.register-pill {
+  background: #1a5f2a;
+  color: white;
+}
+
+.register-pill:hover {
+  background: #144a21 !important;
+  transform: translateY(-1px);
   box-shadow: 0 6px 16px rgba(26, 95, 42, 0.25);
 }
 
-.nav-register-btn:active {
-  transform: translateY(0);
+/* Logout pill */
+.logout-pill {
+  background: #dc2626;
+  color: white;
+}
+
+.logout-pill:hover {
+  background: #b91c1c !important;
+  transform: translateY(-1px);
+  box-shadow: 0 6px 16px rgba(220, 38, 38, 0.25);
 }
 
 /* ===== HAMBURGER ===== */
@@ -130,7 +101,7 @@
 /* ===== MOBILE ===== */
 @media (max-width: 900px) {
   .navbar {
-    padding: 0 20px;
+    padding: 16px 20px;
   }
 
   .hamburger {
@@ -143,9 +114,6 @@
     left: 0;
     right: 0;
     background: white;
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 4px;
     padding: 20px;
     border-bottom: 1px solid #e5e7eb;
     box-shadow: 0 10px 30px rgba(0,0,0,0.08);
@@ -163,27 +131,19 @@
     pointer-events: all;
   }
 
-  .nav-links a,
-  .nav-links button {
+  .nav-pill-container {
+    flex-direction: column;
     width: 100%;
-    padding: 14px 16px;
-    border-radius: 10px;
-    font-size: 1.1rem;
+    background: transparent;
+    border: none;
+    padding: 0;
+    gap: 8px;
   }
 
-  .nav-links a::after {
-    display: none; /* Hide underline on mobile, use background instead */
-  }
-
-  .nav-links a:hover {
-    background: #f0fdf4;
-    color: #1a5f2a;
-  }
-
-  .nav-logout-btn,
-  .nav-register-btn {
+  .nav-pill {
     width: 100%;
     text-align: center;
-    margin-top: 8px;
+    padding: 14px;
+    font-size: 1rem;
   }
 }
