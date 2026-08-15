@@ -33,6 +33,19 @@ function AdminComplaints() {
     };
 
     fetchComplaints();
+
+    // Real-time subscription
+    const channel = supabase
+      .channel("complaints-realtime")
+      .on("postgres_changes", { event: "INSERT", schema: "public", table: "complaints" }, (payload) => {
+        setComplaints((prev) => [payload.new, ...prev]);
+        showToast("🚨 New complaint received!", "error");
+      })
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
   }, [navigate]);
 
   const showToast = (msg, type = "success") => {
@@ -62,8 +75,7 @@ function AdminComplaints() {
     return (
       c.reason?.toLowerCase().includes(term) ||
       c.description?.toLowerCase().includes(term) ||
-      c.reporter?.full_name?.toLowerCase().includes(term) ||
-      c.reported_id?.toLowerCase().includes(term)
+      c.reporter?.full_name?.toLowerCase().includes(term)
     );
   });
 
@@ -76,7 +88,7 @@ function AdminComplaints() {
       <div className="admin-header">
         <div className="admin-eyebrow">Admin · Complaint Management</div>
         <h1>Complaints & Reports</h1>
-        <p>Review and manage user-submitted complaints</p>
+        <p>Review and manage user-submitted complaints & opportunity reports</p>
       </div>
 
       <div className="admin-toolbar">
@@ -105,68 +117,60 @@ function AdminComplaints() {
               <thead>
                 <tr>
                   <th>Reporter</th>
-                  <th>Reported User</th>
                   <th>Reason</th>
-                  <th>Description</th>
+                  <th>Details</th>
                   <th>Status</th>
                   <th>Date</th>
                   <th>Actions</th>
                 </tr>
               </thead>
               <tbody>
-                {filtered.map((c) => (
-                  <tr key={c.id}>
-                    <td>
-                      <div className="ngo-name">{c.reporter?.full_name || "Unknown"}</div>
-                      <div className="ngo-sub">{c.reporter?.email || "No email"}</div>
-                    </td>
-                    <td>
-                      <code style={{ background: "#f3f4f6", padding: "4px 8px", borderRadius: "6px", fontSize: "0.85rem" }}>
-                        {c.reported_id?.slice(0, 12)}...
-                      </code>
-                    </td>
-                    <td>
-                      <span className={`badge ${
-                        c.reason === "Misconduct" ? "b-health" :
-                        c.reason === "Fraud" ? "b-reject" :
-                        c.reason === "Harassment" ? "b-gold" : "b-general"
-                      }`}>
-                        {c.reason}
-                      </span>
-                    </td>
-                    <td>
-                      <div style={{ maxWidth: "280px", fontSize: "0.9rem", color: "#4b5563" }}>
-                        {c.description?.length > 80 ? c.description.slice(0, 80) + "..." : c.description}
-                      </div>
-                    </td>
-                    <td>
-                      <span className={`status-pill s-${(c.status || "pending").toLowerCase()}`}>
-                        {c.status || "Pending"}
-                      </span>
-                    </td>
-                    <td>{new Date(c.created_at).toLocaleDateString()}</td>
-                    <td>
-                      <div className="row-actions">
-                        {c.status !== "resolved" && (
-                          <button
-                            className="btn btn-approve"
-                            onClick={() => handleStatusUpdate(c.id, "resolved")}
-                          >
-                            ✓ Resolve
-                          </button>
-                        )}
-                        {c.status !== "pending" && (
-                          <button
-                            className="btn btn-view"
-                            onClick={() => handleStatusUpdate(c.id, "pending")}
-                          >
-                            ↩ Reopen
-                          </button>
-                        )}
-                      </div>
-                    </td>
-                  </tr>
-                ))}
+                {filtered.map((c) => {
+                  const isOppReport = c.description?.includes("Reported Opportunity:");
+                  return (
+                    <tr key={c.id} className={isOppReport ? "highlight-row" : ""}>
+                      <td>
+                        <div className="ngo-name">{c.reporter?.full_name || "Anonymous"}</div>
+                        <div className="ngo-sub">{c.reporter?.email || "Hidden for privacy"}</div>
+                      </td>
+                      <td>
+                        <span className={`badge ${
+                          c.reason === "Misconduct" ? "b-health" :
+                          c.reason === "Fraud" ? "b-reject" :
+                          c.reason === "Harassment" ? "b-gold" : "b-general"
+                        }`}>
+                          {c.reason}
+                        </span>
+                        {isOppReport && <span className="opp-report-badge">📢 Opportunity</span>}
+                      </td>
+                      <td>
+                        <div style={{ maxWidth: "320px", fontSize: "0.9rem", color: "#4b5563", lineHeight: 1.5 }}>
+                          {c.description?.length > 120 ? c.description.slice(0, 120) + "..." : c.description}
+                        </div>
+                      </td>
+                      <td>
+                        <span className={`status-pill s-${(c.status || "pending").toLowerCase()}`}>
+                          {c.status || "Pending"}
+                        </span>
+                      </td>
+                      <td>{new Date(c.created_at).toLocaleDateString()}</td>
+                      <td>
+                        <div className="row-actions">
+                          {c.status !== "resolved" && (
+                            <button className="btn btn-approve" onClick={() => handleStatusUpdate(c.id, "resolved")}>
+                              ✓ Resolve
+                            </button>
+                          )}
+                          {c.status !== "pending" && (
+                            <button className="btn btn-view" onClick={() => handleStatusUpdate(c.id, "pending")}>
+                              ↩ Reopen
+                            </button>
+                          )}
+                        </div>
+                      </td>
+                    </tr>
+                  );
+                })}
               </tbody>
             </table>
           </div>

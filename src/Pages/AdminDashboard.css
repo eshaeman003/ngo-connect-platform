@@ -681,3 +681,21 @@
     max-width: 100%;
   }
 }
+.highlight-row {
+  background: #fffbeb !important;
+}
+
+.highlight-row:hover {
+  background: #fef3c7 !important;
+}
+
+.opp-report-badge {
+  display: inline-block;
+  margin-left: 8px;
+  background: #dbeafe;
+  color: #1e40af;
+  padding: 2px 8px;
+  border-radius: 6px;
+  font-size: 0.75rem;
+  font-weight: 600;
+}

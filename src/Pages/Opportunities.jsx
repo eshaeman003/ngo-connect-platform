@@ -3,353 +3,235 @@ import { useNavigate } from "react-router-dom";
 import { supabase } from "../utils/supabase";
 import "./Opportunities.css";
 
-const opportunityImages = [
-  "https://images.unsplash.com/photo-1559027615-cd4628902d4a?w=600&h=350&fit=crop",
-  "https://images.unsplash.com/photo-1488521787991-ed7bbaae773c?w=600&h=350&fit=crop",
-  "https://images.unsplash.com/photo-1593113598332-cd288d649433?w=600&h=350&fit=crop",
-  "https://images.unsplash.com/photo-1531206715517-5c0ba140b2b8?w=600&h=350&fit=crop",
-  "https://images.unsplash.com/photo-1509099836639-18ba1795216d?w=600&h=350&fit=crop",
-  "https://images.unsplash.com/photo-1469571486292-0ba58a3f068b?w=600&h=350&fit=crop",
-  "https://images.unsplash.com/photo-1582213782179-e0d53f98f2ca?w=600&h=350&fit=crop",
-  "https://images.unsplash.com/photo-1577896851231-70ef18881754?w=600&h=350&fit=crop",
-  "https://images.unsplash.com/photo-1542810634-71277d95dcbb?w=600&h=350&fit=crop",
-  "https://images.unsplash.com/photo-1517486808906-6ca8b3f04846?w=600&h=350&fit=crop",
-  "https://images.unsplash.com/photo-1524069290683-0457abfe42c3?w=600&h=350&fit=crop",
-  "https://images.unsplash.com/photo-1560252829-804f1aedf1be?w=600&h=350&fit=crop",
-];
-
-function getOppImage(title, index) {
-  const hash = (title || "").split("").reduce((acc, char) => acc + char.charCodeAt(0), 0);
-  return opportunityImages[(hash + index) % opportunityImages.length];
-}
-
-function enrichOpportunity(opp, index) {
-  const title = opp.title || "Volunteer Opportunity";
-  const lower = title.toLowerCase();
-
-  let description = opp.description;
-  if (!description || description.length < 30) {
-    const descMap = {
-      "teach": "Join us in making education accessible to underprivileged communities. Your time and skills can transform lives and create lasting change.",
-      "blood": "Help us save lives by volunteering at our blood donation camps. Every drop counts and your support can make a critical difference.",
-      "drive": "Empower women through mobility and independence. Teach driving skills that open doors to new opportunities and freedom.",
-      "orphan": "Bring joy to orphaned children through care, companionship, and support. Your kindness can light up a child's world.",
-      "food": "Help distribute meals to those in need. Be part of a mission that ensures no one goes to bed hungry.",
-      "health": "Support healthcare initiatives that provide free medical care to underserved communities. Every hand helps heal.",
-      "environment": "Contribute to a greener planet through tree planting, clean-up drives, and environmental awareness campaigns.",
-      "digital": "Bridge the digital divide by teaching essential tech skills. Empower communities with knowledge for the modern world.",
-      "sign": "Make communication accessible for everyone. Teach sign language and create inclusive spaces for the hearing impaired.",
-      "finance": "Build financial literacy in youth and communities. Help people make informed decisions for a secure future.",
-    };
-
-    let matched = false;
-    for (const key of Object.keys(descMap)) {
-      if (lower.includes(key)) { description = descMap[key]; matched = true; break; }
-    }
-    if (!matched) {
-      description = `We are looking for passionate volunteers to join our ${opp.category || "community"} initiative. Your contribution will directly impact lives and create meaningful change in ${opp.location || "our community"}.`;
-    }
-  }
-
-  let requirements = opp.requirements;
-  if (!requirements || requirements.length < 10) {
-    requirements = "No prior experience required. Must be 18+ years old. Commitment of 4-8 hours per week. Passion for community service is essential.";
-  }
-
-  return {
-    ...opp,
-    title,
-    description,
-    requirements,
-    duration: opp.duration || "Flexible",
-    type: opp.type || "Part-time",
-    location: opp.location || "Pakistan",
-    category: opp.category || "Community",
-    organization: opp.organization || "Community Welfare Organization",
-    spots_available: opp.spots_available || Math.floor(Math.random() * 15) + 5,
-    _image: getOppImage(title, index),
-  };
-}
-
-// Login Required Modal Component
-function LoginModal({ isOpen, onClose }) {
-  const navigate = useNavigate();
-  if (!isOpen) return null;
-
-  return (
-    <div className="login-modal-overlay" onClick={onClose}>
-      <div className="login-modal" onClick={(e) => e.stopPropagation()}>
-        <button className="login-modal-close" onClick={onClose}>
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-            <path d="M18 6 6 18"/><path d="m6 6 12 12"/>
-          </svg>
-        </button>
-
-        <div className="login-modal-icon">
-          <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
-            <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" x2="3" y1="12" y2="12"/>
-          </svg>
-        </div>
-
-        <h2 className="login-modal-title">Login Required</h2>
-        <p className="login-modal-text">
-          You need to be logged in to apply for volunteer opportunities. Join our community and start making a difference today.
-        </p>
-
-        <div className="login-modal-actions">
-          <button 
-            className="login-modal-btn primary"
-            onClick={() => { onClose(); navigate("/login"); }}
-          >
-            Log In
-          </button>
-          <button 
-            className="login-modal-btn secondary"
-            onClick={() => { onClose(); navigate("/register"); }}
-          >
-            Create Account
-          </button>
-        </div>
-
-        <p className="login-modal-hint">
-          Don't have an account? It takes less than a minute to register.
-        </p>
-      </div>
-    </div>
-  );
-}
-
-export default function Opportunities() {
+function Opportunities() {
   const navigate = useNavigate();
   const [opportunities, setOpportunities] = useState([]);
-  const [filtered, setFiltered] = useState([]);
-  const [search, setSearch] = useState("");
-  const [category, setCategory] = useState("All");
-  const [type, setType] = useState("All");
-  const [loading, setLoading] = useState(true);
   const [user, setUser] = useState(null);
+  const [search, setSearch] = useState("");
+  const [categoryFilter, setCategoryFilter] = useState("All");
+  const [typeFilter, setTypeFilter] = useState("All");
+  const [loading, setLoading] = useState(true);
+
+  // Report modal state
+  const [reportModal, setReportModal] = useState({
+    open: false,
+    opportunity: null,
+    reason: "Misconduct",
+    description: "",
+    submitting: false,
+  });
+
+  // Login modal state
   const [showLoginModal, setShowLoginModal] = useState(false);
 
-  // Check auth state
   useEffect(() => {
-    const getUser = async () => {
+    const fetchData = async () => {
+      const { data } = await supabase.from("opportunities").select("*").order("created_at", { ascending: false });
+      setOpportunities(data || []);
+      setLoading(false);
+
       const { data: { user } } = await supabase.auth.getUser();
       setUser(user);
     };
-    getUser();
+    fetchData();
 
     const { data: listener } = supabase.auth.onAuthStateChange((_event, session) => {
       setUser(session?.user || null);
     });
-
     return () => listener?.subscription?.unsubscribe();
   }, []);
-
-  useEffect(() => {
-    fetchOpportunities();
-  }, []);
-
-  async function fetchOpportunities() {
-    setLoading(true);
-    const { data, error } = await supabase.from("opportunities").select("*");
-    if (!error && data) {
-      const enriched = data.map((opp, idx) => enrichOpportunity(opp, idx));
-      setOpportunities(enriched);
-      setFiltered(enriched);
-    }
-    setLoading(false);
-  }
-
-  useEffect(() => {
-    let result = opportunities;
-    if (category !== "All") {
-      result = result.filter((o) =>
-        (o.category || "").toLowerCase().includes(category.toLowerCase())
-      );
-    }
-    if (type !== "All") {
-      result = result.filter((o) =>
-        (o.type || "").toLowerCase().includes(type.toLowerCase())
-      );
-    }
-    if (search.trim()) {
-      const q = search.toLowerCase();
-      result = result.filter(
-        (o) =>
-          (o.title || "").toLowerCase().includes(q) ||
-          (o.description || "").toLowerCase().includes(q) ||
-          (o.location || "").toLowerCase().includes(q) ||
-          (o.organization || "").toLowerCase().includes(q)
-      );
-    }
-    setFiltered(result);
-  }, [search, category, type, opportunities]);
 
   const handleApply = (oppId) => {
     if (!user) {
       setShowLoginModal(true);
       return;
     }
-    // TODO: Navigate to application form or show success
-    alert(`Application submitted for opportunity #${oppId}! (Demo)`);
+    navigate(`/apply/${oppId}`);
   };
 
-  const categories = ["All", "Education", "Healthcare", "Microfinance", "Environment", "Food & Shelter", "Women Empowerment", "Disaster Relief"];
-  const types = ["All", "Part-time", "Full-time", "One-time", "Weekend", "Remote", "On-site"];
+  const openReport = (opp, e) => {
+    e.stopPropagation();
+    if (!user) {
+      setShowLoginModal(true);
+      return;
+    }
+    setReportModal({
+      open: true,
+      opportunity: opp,
+      reason: "Misconduct",
+      description: "",
+      submitting: false,
+    });
+  };
+
+  const closeReport = () => {
+    setReportModal({ open: false, opportunity: null, reason: "Misconduct", description: "", submitting: false });
+  };
+
+  const submitReport = async () => {
+    if (!reportModal.description.trim()) {
+      alert("Please describe the issue.");
+      return;
+    }
+    setReportModal((m) => ({ ...m, submitting: true }));
+
+    const { error } = await supabase.from("complaints").insert({
+      reporter_id: user.id,
+      reported_id: reportModal.opportunity.ngo_id || reportModal.opportunity.id,
+      reason: reportModal.reason,
+      description: `[Reported Opportunity: "${reportModal.opportunity.title}" by ${reportModal.opportunity.ngo_name || "NGO"}]\n\n${reportModal.description}`,
+      status: "pending",
+    });
+
+    setReportModal((m) => ({ ...m, submitting: false }));
+    if (error) {
+      alert("Error submitting report: " + error.message);
+    } else {
+      alert("Report submitted successfully! Admin will review it.");
+      closeReport();
+    }
+  };
+
+  const categories = ["All", ...new Set(opportunities.map((o) => o.category).filter(Boolean))];
+  const types = ["All", ...new Set(opportunities.map((o) => o.type).filter(Boolean))];
+
+  const filtered = opportunities.filter((o) => {
+    const matchesSearch = !search || o.title?.toLowerCase().includes(search.toLowerCase()) || o.ngo_name?.toLowerCase().includes(search.toLowerCase());
+    const matchesCat = categoryFilter === "All" || o.category === categoryFilter;
+    const matchesType = typeFilter === "All" || o.type === typeFilter;
+    return matchesSearch && matchesCat && matchesType;
+  });
+
+  if (loading) return <div className="opp-loading">Loading opportunities...</div>;
 
   return (
     <div className="opportunities-page">
-      <LoginModal isOpen={showLoginModal} onClose={() => setShowLoginModal(false)} />
-
-      {/* Hero Banner */}
+      {/* Hero */}
       <div className="opp-hero">
-        <div className="opp-hero-content">
-          <h1 className="opp-hero-title">Volunteer Opportunities</h1>
-          <p className="opp-hero-subtitle">
-            Find meaningful ways to contribute to your community and make a real difference
-          </p>
-        </div>
+        <h1>Volunteer Opportunities</h1>
+        <p>Discover meaningful ways to contribute to your community</p>
       </div>
 
-      {/* Controls */}
-      <div className="opp-controls">
-        <div className="opp-search-wrapper">
-          <svg className="opp-search-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-            <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
-          </svg>
-          <input
-            type="text"
-            className="opp-search"
-            placeholder="Search opportunities by title, cause, or location..."
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-          />
+      {/* Search & Filters */}
+      <div className="opp-toolbar">
+        <div className="opp-search">
+          <span>🔍</span>
+          <input type="text" placeholder="Search opportunities..." value={search} onChange={(e) => setSearch(e.target.value)} />
         </div>
-
-        <div className="opp-filters-row">
-          <div className="opp-filter-group">
-            <span className="opp-filter-label">Category</span>
-            <div className="opp-pills">
-              {categories.map((cat) => (
-                <button
-                  key={cat}
-                  className={`opp-pill ${category === cat ? "active" : ""}`}
-                  onClick={() => setCategory(cat)}
-                >
-                  {cat}
-                </button>
+        <div className="opp-filters">
+          <div className="filter-group">
+            <label>Category</label>
+            <div className="filter-pills">
+              {categories.map((c) => (
+                <button key={c} className={categoryFilter === c ? "active" : ""} onClick={() => setCategoryFilter(c)}>{c}</button>
               ))}
             </div>
           </div>
-
-          <div className="opp-filter-group">
-            <span className="opp-filter-label">Type</span>
-            <div className="opp-pills">
+          <div className="filter-group">
+            <label>Type</label>
+            <div className="filter-pills">
               {types.map((t) => (
-                <button
-                  key={t}
-                  className={`opp-pill ${type === t ? "active" : ""}`}
-                  onClick={() => setType(t)}
-                >
-                  {t}
-                </button>
+                <button key={t} className={typeFilter === t ? "active" : ""} onClick={() => setTypeFilter(t)}>{t}</button>
               ))}
             </div>
           </div>
         </div>
       </div>
 
-      {/* Results Count */}
-      <div className="opp-results-bar">
-        <span className="opp-results-count">
-          {filtered.length} {filtered.length === 1 ? "opportunity" : "opportunities"} found
-        </span>
-      </div>
-
-      {/* Grid */}
-      {loading ? (
-        <div className="opp-grid">
-          {[1, 2, 3, 4, 5, 6].map((i) => (
-            <div key={i} className="opp-skeleton">
-              <div className="opp-skeleton-img" />
-              <div className="opp-skeleton-body">
-                <div className="opp-skeleton-tags" />
-                <div className="opp-skeleton-title" />
-                <div className="opp-skeleton-text" />
-                <div className="opp-skeleton-text short" />
-              </div>
+      {/* Cards Grid */}
+      <div className="opp-grid">
+        {filtered.map((opp) => (
+          <div className="opp-card" key={opp.id}>
+            <div className="opp-image">
+              <img src={`https://picsum.photos/seed/${opp.id}/400/250`} alt={opp.title} />
+              <div className="opp-image-overlay" />
+              <span className="opp-spots">Open</span>
+              <span className="opp-type-badge">{opp.type || "Volunteer"}</span>
             </div>
-          ))}
-        </div>
-      ) : filtered.length === 0 ? (
-        <div className="opp-empty">
-          <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
-            <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
-          </svg>
-          <h3>No opportunities found</h3>
-          <p>Try adjusting your search or filters</p>
-        </div>
-      ) : (
-        <div className="opp-grid">
-          {filtered.map((opp) => (
-            <div key={opp.id} className="opp-card">
-              <div className="opp-card-img-wrap">
-                <img src={opp._image} alt={opp.title} className="opp-card-img" loading="lazy" />
-                <div className="opp-card-img-overlay" />
-                <div className="opp-card-spots">
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-                    <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>
-                  </svg>
-                  {opp.spots_available} spots left
-                </div>
+            <div className="opp-body">
+              <div className="opp-tags">
+                <span className="tag-cat">{opp.category || "General"}</span>
               </div>
-
-              <div className="opp-card-body">
-                <div className="opp-card-tags">
-                  <span className="opp-tag category">{opp.category}</span>
-                  <span className="opp-tag type">{opp.type}</span>
-                </div>
-
-                <h3 className="opp-card-title">{opp.title}</h3>
-                <p className="opp-card-desc">{opp.description}</p>
-
-                <div className="opp-card-meta">
-                  <span className="opp-meta-item">
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                      <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/>
-                    </svg>
-                    {opp.location}
-                  </span>
-                  <span className="opp-meta-item">
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                      <rect width="18" height="18" x="3" y="4" rx="2" ry="2"/><line x1="16" x2="16" y1="2" y2="6"/><line x1="8" x2="8" y1="2" y2="6"/><line x1="3" x2="21" y1="10" y2="10"/>
-                    </svg>
-                    {opp.duration}
-                  </span>
-                  <span className="opp-meta-item">
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                      <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>
-                    </svg>
-                    {opp.organization}
-                  </span>
-                </div>
-
-                <div className="opp-card-requirements">
-                  <span className="req-label">Requirements:</span>
-                  <span className="req-text">{opp.requirements}</span>
-                </div>
-
-                <button className="opp-apply-btn" onClick={() => handleApply(opp.id)}>
-                  Apply Now
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-                    <path d="M5 12h14"/><path d="m12 5 7 7-7 7"/>
-                  </svg>
+              <h3>{opp.title || "Untitled Opportunity"}</h3>
+              <p className="opp-desc">{opp.description || "No description available."}</p>
+              <div className="opp-meta">
+                <span>📍 {opp.location || "Remote"}</span>
+                <span>🏢 {opp.ngo_name || "NGO"}</span>
+              </div>
+              <div className="opp-actions">
+                <button className="btn-apply" onClick={() => handleApply(opp.id)}>
+                  Apply Now →
+                </button>
+                <button className="btn-report" onClick={(e) => openReport(opp, e)} title="Report this opportunity">
+                  🚩 Report
                 </button>
               </div>
             </div>
-          ))}
+          </div>
+        ))}
+      </div>
+
+      {filtered.length === 0 && <div className="opp-empty">No opportunities found.</div>}
+
+      {/* Login Modal */}
+      {showLoginModal && (
+        <div className="modal-overlay" onClick={() => setShowLoginModal(false)}>
+          <div className="login-modal" onClick={(e) => e.stopPropagation()}>
+            <button className="modal-close" onClick={() => setShowLoginModal(false)}>✕</button>
+            <div className="modal-icon">🔒</div>
+            <h2>Login Required</h2>
+            <p>You need to be logged in to apply or report opportunities.</p>
+            <div className="modal-buttons">
+              <button className="btn-primary" onClick={() => navigate("/login")}>Log In</button>
+              <button className="btn-outline" onClick={() => navigate("/register")}>Create Account</button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Report Modal */}
+      {reportModal.open && (
+        <div className="modal-overlay" onClick={closeReport}>
+          <div className="report-modal" onClick={(e) => e.stopPropagation()}>
+            <button className="modal-close" onClick={closeReport}>✕</button>
+            <div className="modal-icon" style={{ background: "#fef3c7", color: "#92400e" }}>🚩</div>
+            <h2>Report Opportunity</h2>
+            <p className="report-opp-title">"{reportModal.opportunity?.title}"</p>
+            
+            <div className="form-group">
+              <label>Reason</label>
+              <select value={reportModal.reason} onChange={(e) => setReportModal({ ...reportModal, reason: e.target.value })}>
+                <option>Misconduct</option>
+                <option>Fraud</option>
+                <option>Harassment</option>
+                <option>Fake Posting</option>
+                <option>Other</option>
+              </select>
+            </div>
+
+            <div className="form-group">
+              <label>Description *</label>
+              <textarea
+                rows="4"
+                placeholder="Explain why you're reporting this opportunity..."
+                value={reportModal.description}
+                onChange={(e) => setReportModal({ ...reportModal, description: e.target.value })}
+              />
+            </div>
+
+            <p className="report-anon">🔒 Your identity will be hidden from the NGO. Only admin can see your report.</p>
+
+            <div className="modal-buttons">
+              <button className="btn-cancel" onClick={closeReport}>Cancel</button>
+              <button className="btn-report-submit" onClick={submitReport} disabled={reportModal.submitting}>
+                {reportModal.submitting ? "Submitting..." : "Submit Report"}
+              </button>
+            </div>
+          </div>
         </div>
       )}
     </div>
   );
 }
+
+export default Opportunities;
