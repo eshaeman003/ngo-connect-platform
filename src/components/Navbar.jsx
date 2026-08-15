@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import { supabase } from "../utils/supabase";
 import "./Navbar.css";
 
@@ -7,6 +7,7 @@ function Navbar() {
   const [user, setUser] = useState(null);
   const [menuOpen, setMenuOpen] = useState(false);
   const navigate = useNavigate();
+  const location = useLocation();
 
   useEffect(() => {
     const getUser = async () => {
@@ -30,6 +31,8 @@ function Navbar() {
     navigate("/");
   };
 
+  const isActive = (path) => location.pathname === path ? "active" : "";
+
   return (
     <nav className="navbar">
       <div className="nav-brand">
@@ -37,22 +40,22 @@ function Navbar() {
       </div>
 
       <div className={`nav-links ${menuOpen ? "active" : ""}`}>
-        <Link to="/" onClick={() => setMenuOpen(false)}>Home</Link>
-        <Link to="/ngos" onClick={() => setMenuOpen(false)}>NGOs</Link>
-        <Link to="/opportunities" onClick={() => setMenuOpen(false)}>Opportunities</Link>
-        <Link to="/about" onClick={() => setMenuOpen(false)}>About</Link>
+        <Link to="/" className={isActive("/")} onClick={() => setMenuOpen(false)}>Home</Link>
+        <Link to="/ngos" className={isActive("/ngos")} onClick={() => setMenuOpen(false)}>NGOs</Link>
+        <Link to="/opportunities" className={isActive("/opportunities")} onClick={() => setMenuOpen(false)}>Opportunities</Link>
+        <Link to="/about" className={isActive("/about")} onClick={() => setMenuOpen(false)}>About</Link>
         
         {user ? (
           <>
-            <Link to="/admin" onClick={() => setMenuOpen(false)}>Dashboard</Link>
+            <Link to="/admin" className={isActive("/admin")} onClick={() => setMenuOpen(false)}>Dashboard</Link>
             <button className="nav-logout-btn" onClick={handleLogout}>
               Logout
             </button>
           </>
         ) : (
           <>
-            <Link to="/login" onClick={() => setMenuOpen(false)}>Login</Link>
-            <Link to="/register" className="nav-register-btn" onClick={() => setMenuOpen(false)}>
+            <Link to="/login" className={isActive("/login")} onClick={() => setMenuOpen(false)}>Login</Link>
+            <Link to="/register" className={`nav-register-btn ${isActive("/register")}`} onClick={() => setMenuOpen(false)}>
               Register
             </Link>
           </>
