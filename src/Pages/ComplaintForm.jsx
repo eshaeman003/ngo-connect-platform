@@ -42,30 +42,50 @@ function ComplaintForm() {
 
   return (
     <div className="complaint-page">
-      <div className="complaint-card">
-        <h1>File a Complaint</h1>
-        <form onSubmit={handleSubmit}>
-          <div className="form-group">
-            <label>Reported User ID *</label>
-            <input name="reported_id" value={form.reported_id} onChange={handleChange} required placeholder="Paste the user ID here" />
-          </div>
-          <div className="form-group">
-            <label>Reason</label>
-            <select name="reason" value={form.reason} onChange={handleChange}>
-              <option>Misconduct</option>
-              <option>Fraud</option>
-              <option>Harassment</option>
-              <option>Other</option>
-            </select>
-          </div>
-          <div className="form-group">
-            <label>Description *</label>
-            <textarea name="description" value={form.description} onChange={handleChange} required rows="5" placeholder="Describe the issue in detail..." />
-          </div>
-          <button type="submit" className="btn-submit" disabled={loading}>
-            {loading ? "Submitting..." : "Submit Complaint"}
-          </button>
-        </form>
+      <div className="complaint-hero">
+        <h1>Complaints & Feedback</h1>
+        <p>We value your feedback. Let us know how we can improve.</p>
+      </div>
+
+      <div className="complaint-container">
+        <div className="complaint-card">
+          <h2>File a Complaint</h2>
+          <form onSubmit={handleSubmit}>
+            <div className="form-group">
+              <label>Reported User ID *</label>
+              <input 
+                name="reported_id" 
+                value={form.reported_id} 
+                onChange={handleChange} 
+                required 
+                placeholder="Paste the user ID here" 
+              />
+            </div>
+            <div className="form-group">
+              <label>Reason</label>
+              <select name="reason" value={form.reason} onChange={handleChange}>
+                <option>Misconduct</option>
+                <option>Fraud</option>
+                <option>Harassment</option>
+                <option>Other</option>
+              </select>
+            </div>
+            <div className="form-group">
+              <label>Description *</label>
+              <textarea 
+                name="description" 
+                value={form.description} 
+                onChange={handleChange} 
+                required 
+                rows="5" 
+                placeholder="Describe the issue in detail..." 
+              />
+            </div>
+            <button type="submit" className="btn-submit" disabled={loading}>
+              {loading ? "Submitting..." : "Submit Complaint"}
+            </button>
+          </form>
+        </div>
       </div>
     </div>
   );
