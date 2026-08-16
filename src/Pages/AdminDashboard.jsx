@@ -112,6 +112,7 @@ function AdminDashboard() {
     else if (action === "approveApp") await handleApproveApp(item.id, true);
     else if (action === "rejectApp") await handleRejectApp(item.id, true);
     else if (action === "deleteOpp") await handleDeleteOpportunity(item.id, item.title, true);
+    else if (action === "deleteNgo") await handleDeleteNGO(item.id, item.name, true);
     else if (action === "suspend") await handleSuspend(item.id, item.suspended, item.full_name, true);
     closeConfirm();
   };
@@ -137,6 +138,25 @@ function AdminDashboard() {
       setStats((s) => ({ ...s, pendingApprovals: Math.max(0, s.pendingApprovals - 1) }));
       showToast("✕ NGO rejected.");
       logActivity("Rejected NGO", ngos.find((n) => n.id === id)?.name || "NGO", reason);
+    }
+  };
+
+  const handleDeleteNGO = async (id, name, skipConfirm = false) => {
+    if (!skipConfirm) { openConfirm("deleteNgo", { id, name }); return; }
+    const deleted = ngos.find((n) => n.id === id);
+    const { error } = await supabase.from("ngos").delete().eq("id", id);
+    if (error) showToast("Error deleting NGO", "error");
+    else {
+      setNgos((prev) => prev.filter((n) => n.id !== id));
+      if (deleted?.approval_status === "approved") {
+        setStats((s) => ({ ...s, approvedNGOs: Math.max(0, s.approvedNGOs - 1) }));
+      } else if (deleted?.approval_status === "pending") {
+        setStats((s) => ({ ...s, pendingApprovals: Math.max(0, s.pendingApprovals - 1) }));
+      } else if (deleted?.approval_status === "rejected") {
+        // rejected count is derived, no stat to update
+      }
+      showToast(`🗑 ${name || "NGO"} deleted.`);
+      logActivity("Deleted NGO", name || "NGO");
     }
   };
 
@@ -398,6 +418,7 @@ function AdminDashboard() {
                               <button className="btn btn-view" onClick={() => openModal(ngo, "ngo")}>👁 View</button>
                               {status === "pending" && <><button className="btn btn-approve" onClick={() => handleApprove(ngo.id)}>✓ Approve</button><button className="btn btn-reject" onClick={() => handleReject(ngo.id)}>✕ Reject</button></>}
                               {status === "rejected" && <button className="btn btn-approve" onClick={() => handleApprove(ngo.id)}>↩ Re-approve</button>}
+                              <button className="btn btn-reject" onClick={() => handleDeleteNGO(ngo.id, ngo.name)}>🗑 Delete</button>
                             </div>
                           </td>
                         </tr>
@@ -654,6 +675,7 @@ function AdminDashboard() {
               <h3>
                 {confirmModal.action === "approve" && "Approve NGO"}
                 {confirmModal.action === "reject" && "Reject NGO"}
+                {confirmModal.action === "deleteNgo" && "Delete NGO"}
                 {confirmModal.action === "approveApp" && "Approve Application"}
                 {confirmModal.action === "rejectApp" && "Reject Application"}
                 {confirmModal.action === "deleteOpp" && "Delete Opportunity"}
@@ -665,6 +687,7 @@ function AdminDashboard() {
               <p className="confirm-text">
                 {confirmModal.action === "approve" && <>Are you sure you want to approve <strong>{confirmModal.item?.name}</strong>?</>}
                 {confirmModal.action === "reject" && <>Are you sure you want to reject <strong>{confirmModal.item?.name}</strong>?</>}
+                {confirmModal.action === "deleteNgo" && <>Delete NGO <strong>{confirmModal.item?.name}</strong>? This cannot be undone.</>}
                 {confirmModal.action === "approveApp" && <>Approve application from <strong>{confirmModal.item?.profiles?.full_name || "this volunteer"}</strong>?</>}
                 {confirmModal.action === "rejectApp" && <>Reject application from <strong>{confirmModal.item?.profiles?.full_name || "this volunteer"}</strong>?</>}
                 {confirmModal.action === "deleteOpp" && <>Delete opportunity <strong>{confirmModal.item?.title}</strong>? This cannot be undone.</>}
@@ -686,11 +709,12 @@ function AdminDashboard() {
             <div className="modal-footer">
               <button className="btn btn-secondary" onClick={closeConfirm}>Cancel</button>
               <button
-                className={`btn ${confirmModal.action.includes("reject") || confirmModal.action === "deleteOpp" || confirmModal.action === "suspend" && !confirmModal.item?.suspended ? "btn-reject" : "btn-approve"}`}
+                className={`btn ${confirmModal.action.includes("reject") || confirmModal.action === "deleteOpp" || confirmModal.action === "deleteNgo" || (confirmModal.action === "suspend" && !confirmModal.item?.suspended) ? "btn-reject" : "btn-approve"}`}
                 onClick={executeConfirm}
               >
                 {confirmModal.action === "approve" && "Yes, Approve"}
                 {confirmModal.action === "reject" && "Yes, Reject"}
+                {confirmModal.action === "deleteNgo" && "Yes, Delete"}
                 {confirmModal.action === "approveApp" && "Yes, Approve"}
                 {confirmModal.action === "rejectApp" && "Yes, Reject"}
                 {confirmModal.action === "deleteOpp" && "Yes, Delete"}
