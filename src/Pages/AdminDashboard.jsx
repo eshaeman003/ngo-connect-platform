@@ -23,22 +23,13 @@ function AdminDashboard() {
   const [showModal, setShowModal] = useState(false);
   const [modalType, setModalType] = useState(null);
 
-  // Confirmation modal
   const [confirmModal, setConfirmModal] = useState({ open: false, action: "", item: null, reason: "" });
-
-  // Bulk selection
   const [selectedIds, setSelectedIds] = useState(new Set());
   const [bulkActionLoading, setBulkActionLoading] = useState(false);
-
-  // Pagination
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 20;
-
-  // Filters
   const [filters, setFilters] = useState({ category: "All", location: "All", dateFrom: "", dateTo: "" });
   const [sortConfig, setSortConfig] = useState({ key: null, direction: "asc" });
-
-  // Real-time flash
   const [flashStat, setFlashStat] = useState(null);
 
   useEffect(() => {
@@ -77,11 +68,9 @@ function AdminDashboard() {
       setOpportunities(oppData || []);
       setLoading(false);
     };
-
     fetchAll();
   }, [navigate]);
 
-  // Real-time subscription for new NGOs
   useEffect(() => {
     const channel = supabase
       .channel("admin-realtime")
@@ -99,7 +88,6 @@ function AdminDashboard() {
         setTimeout(() => setFlashStat(null), 2000);
       })
       .subscribe();
-
     return () => { supabase.removeChannel(channel); };
   }, []);
 
@@ -109,36 +97,22 @@ function AdminDashboard() {
   }, []);
 
   const logActivity = useCallback((action, target, detail = "") => {
-    const entry = {
-      id: Date.now(),
-      action,
-      target,
-      detail,
-      timestamp: new Date().toISOString(),
-    };
+    const entry = { id: Date.now(), action, target, detail, timestamp: new Date().toISOString() };
     setActivityLog((prev) => [entry, ...prev].slice(0, 100));
   }, []);
 
-  // Confirmation flow
-  const openConfirm = (action, item) => {
-    setConfirmModal({ open: true, action, item, reason: "" });
-  };
-
-  const closeConfirm = () => {
-    setConfirmModal({ open: false, action: "", item: null, reason: "" });
-  };
+  const openConfirm = (action, item) => setConfirmModal({ open: true, action, item, reason: "" });
+  const closeConfirm = () => setConfirmModal({ open: false, action: "", item: null, reason: "" });
 
   const executeConfirm = async () => {
     const { action, item, reason } = confirmModal;
     if (!item) return;
-
     if (action === "approve") await handleApprove(item.id, true);
     else if (action === "reject") await handleReject(item.id, reason, true);
     else if (action === "approveApp") await handleApproveApp(item.id, true);
     else if (action === "rejectApp") await handleRejectApp(item.id, true);
     else if (action === "deleteOpp") await handleDeleteOpportunity(item.id, item.title, true);
     else if (action === "suspend") await handleSuspend(item.id, item.suspended, item.full_name, true);
-
     closeConfirm();
   };
 
@@ -155,13 +129,7 @@ function AdminDashboard() {
   };
 
   const handleReject = async (id, reason = "", skipConfirm = false) => {
-    if (!skipConfirm) {
-      const item = ngos.find((n) => n.id === id);
-      if (!reason && !confirmModal.open) {
-        openConfirm("reject", item);
-        return;
-      }
-    }
+    if (!skipConfirm) { openConfirm("reject", ngos.find((n) => n.id === id)); return; }
     const { error } = await supabase.from("ngos").update({ approval_status: "rejected", rejection_reason: reason }).eq("id", id);
     if (error) showToast("Error rejecting NGO", "error");
     else {
@@ -195,14 +163,13 @@ function AdminDashboard() {
   };
 
   const handleSuspend = async (userId, currentStatus, name, skipConfirm = false) => {
-    const action = currentStatus ? "unsuspend" : "suspend";
     if (!skipConfirm) { openConfirm("suspend", { id: userId, suspended: currentStatus, full_name: name }); return; }
     const { error } = await supabase.from("profiles").update({ suspended: !currentStatus }).eq("id", userId);
     if (error) showToast(`Error: ${error.message}`, "error");
     else {
       setVolunteers((prev) => prev.map((v) => v.id === userId ? { ...v, suspended: !currentStatus } : v));
-      showToast(`${name || "User"} ${action === "suspend" ? "suspended" : "unsuspended"}`);
-      logActivity(`${action === "suspend" ? "Suspended" : "Unsuspended"} User`, name || "User");
+      showToast(`${name || "User"} ${!currentStatus ? "suspended" : "unsuspended"}`);
+      logActivity(`${!currentStatus ? "Suspended" : "Unsuspended"} User`, name || "User");
     }
   };
 
@@ -218,26 +185,11 @@ function AdminDashboard() {
     }
   };
 
-  const openModal = (item, type) => {
-    setSelectedItem(item);
-    setModalType(type);
-    setShowModal(true);
-  };
+  const openModal = (item, type) => { setSelectedItem(item); setModalType(type); setShowModal(true); };
+  const closeModal = () => { setShowModal(false); setSelectedItem(null); setModalType(null); };
 
-  const closeModal = () => {
-    setShowModal(false);
-    setSelectedItem(null);
-    setModalType(null);
-  };
-
-  // Bulk actions
   const toggleSelect = (id) => {
-    setSelectedIds((prev) => {
-      const next = new Set(prev);
-      if (next.has(id)) next.delete(id);
-      else next.add(id);
-      return next;
-    });
+    setSelectedIds((prev) => { const next = new Set(prev); if (next.has(id)) next.delete(id); else next.add(id); return next; });
   };
 
   const toggleSelectAll = (list) => {
@@ -271,27 +223,13 @@ function AdminDashboard() {
     logActivity("Bulk Rejected NGOs", `${ids.length} NGOs`);
   };
 
-  // Sorting
-  const handleSort = (key) => {
-    setSortConfig((prev) => ({
-      key,
-      direction: prev.key === key && prev.direction === "asc" ? "desc" : "asc",
-    }));
-  };
-
+  const handleSort = (key) => setSortConfig((prev) => ({ key, direction: prev.key === key && prev.direction === "asc" ? "desc" : "asc" }));
   const sortList = (list, keyFn) => {
     if (!sortConfig.key) return list;
     const dir = sortConfig.direction === "asc" ? 1 : -1;
-    return [...list].sort((a, b) => {
-      const av = keyFn(a, sortConfig.key);
-      const bv = keyFn(b, sortConfig.key);
-      if (av < bv) return -1 * dir;
-      if (av > bv) return 1 * dir;
-      return 0;
-    });
+    return [...list].sort((a, b) => { const av = keyFn(a, sortConfig.key); const bv = keyFn(b, sortConfig.key); return av < bv ? -1 * dir : av > bv ? 1 * dir : 0; });
   };
 
-  // Export CSV
   const exportCSV = (data, filename) => {
     if (!data.length) return;
     const headers = Object.keys(data[0]).join(",");
@@ -300,66 +238,29 @@ function AdminDashboard() {
     const blob = new Blob([csv], { type: "text/csv" });
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
-    a.href = url;
-    a.download = `${filename}.csv`;
-    a.click();
-    URL.revokeObjectURL(url);
+    a.href = url; a.download = `${filename}.csv`; a.click(); URL.revokeObjectURL(url);
     showToast(`📥 ${filename}.csv downloaded`);
   };
 
-  // Filtering
+  const applyNGOFilters = (list) => list.filter((ngo) => {
+    const matchesSearch = !search || ngo.name?.toLowerCase().includes(search.toLowerCase()) || ngo.location?.toLowerCase().includes(search.toLowerCase());
+    const matchesCat = filters.category === "All" || (ngo.category || "").toLowerCase().includes(filters.category.toLowerCase());
+    const matchesLoc = filters.location === "All" || (ngo.location || "").toLowerCase().includes(filters.location.toLowerCase());
+    const matchesDate = (!filters.dateFrom || new Date(ngo.created_at) >= new Date(filters.dateFrom)) && (!filters.dateTo || new Date(ngo.created_at) <= new Date(filters.dateTo));
+    return matchesSearch && matchesCat && matchesLoc && matchesDate;
+  });
+
   const pendingNGOs = ngos.filter((n) => (n.approval_status || "pending") === "pending");
   const approvedNGOsList = ngos.filter((n) => n.approval_status === "approved");
   const rejectedNGOsList = ngos.filter((n) => n.approval_status === "rejected");
+  const currentNGOList = activeTab === "ngos" ? applyNGOFilters(pendingNGOs) : activeTab === "approved" ? applyNGOFilters(approvedNGOsList) : activeTab === "rejected" ? applyNGOFilters(rejectedNGOsList) : [];
+  const sortedNGOList = sortList(currentNGOList, (item, key) => { if (key === "name") return item.name || ""; if (key === "category") return item.category || ""; if (key === "location") return item.location || ""; if (key === "date") return item.created_at || ""; return ""; });
 
-  const applyNGOFilters = (list) => {
-    return list.filter((ngo) => {
-      if (!search && filters.category === "All" && filters.location === "All" && !filters.dateFrom && !filters.dateTo) return true;
-      const matchesSearch = !search || ngo.name?.toLowerCase().includes(search.toLowerCase()) || ngo.location?.toLowerCase().includes(search.toLowerCase());
-      const matchesCat = filters.category === "All" || (ngo.category || "").toLowerCase().includes(filters.category.toLowerCase());
-      const matchesLoc = filters.location === "All" || (ngo.location || "").toLowerCase().includes(filters.location.toLowerCase());
-      const matchesDate = (!filters.dateFrom || new Date(ngo.created_at) >= new Date(filters.dateFrom)) &&
-                          (!filters.dateTo || new Date(ngo.created_at) <= new Date(filters.dateTo));
-      return matchesSearch && matchesCat && matchesLoc && matchesDate;
-    });
-  };
+  const filteredApps = applications.filter((app) => !search || app.opportunities?.title?.toLowerCase().includes(search.toLowerCase()) || app.profiles?.full_name?.toLowerCase().includes(search.toLowerCase()));
+  const filteredVols = volunteers.filter((v) => !search || v.full_name?.toLowerCase().includes(search.toLowerCase()) || v.email?.toLowerCase().includes(search.toLowerCase()));
+  const filteredOpps = opportunities.filter((o) => !search || o.title?.toLowerCase().includes(search.toLowerCase()) || (o.ngos?.name || "").toLowerCase().includes(search.toLowerCase()));
 
-  const searchedPending = applyNGOFilters(pendingNGOs);
-  const searchedApproved = applyNGOFilters(approvedNGOsList);
-  const searchedRejected = applyNGOFilters(rejectedNGOsList);
-
-  const currentNGOList = activeTab === "ngos" ? searchedPending : activeTab === "approved" ? searchedApproved : searchedRejected;
-  const sortedNGOList = sortList(currentNGOList, (item, key) => {
-    if (key === "name") return item.name || "";
-    if (key === "category") return item.category || "";
-    if (key === "location") return item.location || "";
-    if (key === "date") return item.created_at || "";
-    return "";
-  });
-
-  const filteredApps = applications.filter((app) => {
-    if (!search) return true;
-    const opp = app.opportunities || {};
-    const prof = app.profiles || {};
-    return opp.title?.toLowerCase().includes(search.toLowerCase()) || prof.full_name?.toLowerCase().includes(search.toLowerCase());
-  });
-
-  const filteredVols = volunteers.filter((v) => {
-    if (!search) return true;
-    return v.full_name?.toLowerCase().includes(search.toLowerCase()) || v.email?.toLowerCase().includes(search.toLowerCase());
-  });
-
-  const filteredOpps = opportunities.filter((o) => {
-    if (!search) return true;
-    return o.title?.toLowerCase().includes(search.toLowerCase()) || (o.ngos?.name || "").toLowerCase().includes(search.toLowerCase());
-  });
-
-  // Pagination
-  const paginate = (list) => {
-    const start = (currentPage - 1) * itemsPerPage;
-    return list.slice(start, start + itemsPerPage);
-  };
-
+  const paginate = (list) => { const start = (currentPage - 1) * itemsPerPage; return list.slice(start, start + itemsPerPage); };
   const totalPages = (list) => Math.ceil(list.length / itemsPerPage) || 1;
 
   const getCategoryBadge = (cat) => {
@@ -391,10 +292,7 @@ function AdminDashboard() {
     { key: "activity", label: "Activity Log", count: activityLog.length },
   ];
 
-  const currentList = activeTab === "ngos" || activeTab === "approved" || activeTab === "rejected" ? sortedNGOList :
-                      activeTab === "opportunities" ? filteredOpps :
-                      activeTab === "applications" ? filteredApps :
-                      activeTab === "volunteers" ? filteredVols : [];
+  const currentList = activeTab === "ngos" || activeTab === "approved" || activeTab === "rejected" ? sortedNGOList : activeTab === "opportunities" ? filteredOpps : activeTab === "applications" ? filteredApps : activeTab === "volunteers" ? filteredVols : [];
   const currentPaged = paginate(currentList);
 
   return (
@@ -407,16 +305,9 @@ function AdminDashboard() {
         <p>Manage NGOs, volunteers, opportunities, and platform activity</p>
       </div>
 
-      {/* Stats */}
       <div className="admin-stats">
         {statCards.map((s) => (
-          <div
-            key={s.key}
-            className={`admin-stat ${s.color} ${flashStat === s.key ? "flash" : ""}`}
-            onClick={() => s.nav ? navigate(s.nav) : setActiveTab(s.tab)}
-            style={{ cursor: "pointer" }}
-            title={`View ${s.label}`}
-          >
+          <div key={s.key} className={`admin-stat ${s.color} ${flashStat === s.key ? "flash" : ""}`} onClick={() => s.nav ? navigate(s.nav) : setActiveTab(s.tab)} style={{ cursor: "pointer" }} title={`View ${s.label}`}>
             <div className="stat-bar"></div>
             <div className="stat-top"><span className="stat-num">{stats[s.key]}</span><span className="stat-icon">{s.icon}</span></div>
             <div className="stat-label">{s.label}</div>
@@ -425,7 +316,6 @@ function AdminDashboard() {
         ))}
       </div>
 
-      {/* Tabs */}
       <div className="admin-tabs">
         {tabList.map((tab) => (
           <button key={tab.key} className={activeTab === tab.key ? "active" : ""} onClick={() => { setActiveTab(tab.key); setCurrentPage(1); setSelectedIds(new Set()); }}>
@@ -434,40 +324,28 @@ function AdminDashboard() {
         ))}
       </div>
 
-      {/* Toolbar */}
       <div className="admin-toolbar">
         <div className="admin-search">
           <span>🔍</span>
           <input type="text" placeholder="Search..." value={search} onChange={(e) => { setSearch(e.target.value); setCurrentPage(1); }} />
         </div>
-
-        {/* Filters */}
         {(activeTab === "ngos" || activeTab === "approved" || activeTab === "rejected") && (
           <div className="admin-filters">
             <select value={filters.category} onChange={(e) => setFilters({ ...filters, category: e.target.value })}>
-              <option value="All">All Categories</option>
-              <option value="health">Healthcare</option>
-              <option value="edu">Education</option>
-              <option value="micro">Microfinance</option>
-              <option value="env">Environment</option>
+              <option value="All">All Categories</option><option value="health">Healthcare</option><option value="edu">Education</option><option value="micro">Microfinance</option><option value="env">Environment</option>
             </select>
             <select value={filters.location} onChange={(e) => setFilters({ ...filters, location: e.target.value })}>
-              <option value="All">All Locations</option>
-              <option value="karachi">Karachi</option>
-              <option value="lahore">Lahore</option>
-              <option value="islamabad">Islamabad</option>
+              <option value="All">All Locations</option><option value="karachi">Karachi</option><option value="lahore">Lahore</option><option value="islamabad">Islamabad</option>
             </select>
             <input type="date" value={filters.dateFrom} onChange={(e) => setFilters({ ...filters, dateFrom: e.target.value })} title="From date" />
             <input type="date" value={filters.dateTo} onChange={(e) => setFilters({ ...filters, dateTo: e.target.value })} title="To date" />
           </div>
         )}
-
         <div className="admin-actions">
           <button className="btn-export" onClick={() => exportCSV(currentList, activeTab)}>📥 Export CSV</button>
         </div>
       </div>
 
-      {/* Bulk bar */}
       {selectedIds.size > 0 && (activeTab === "ngos" || activeTab === "approved" || activeTab === "rejected") && (
         <div className="bulk-bar">
           <span>{selectedIds.size} selected</span>
@@ -479,16 +357,13 @@ function AdminDashboard() {
         </div>
       )}
 
-      {/* NGO Tables */}
       {(activeTab === "ngos" || activeTab === "approved" || activeTab === "rejected") && (
         <div className="admin-panel">
           <div className="panel-head">
             <h2>{activeTab === "ngos" ? "NGO Approval Requests" : activeTab === "approved" ? "Approved NGOs" : "Rejected NGOs"}</h2>
             <span className="panel-meta">{sortedNGOList.length} result{sortedNGOList.length !== 1 ? "s" : ""}</span>
           </div>
-          {sortedNGOList.length === 0 ? (
-            <div className="admin-empty">No NGOs found.</div>
-          ) : (
+          {sortedNGOList.length === 0 ? <div className="admin-empty">No NGOs found.</div> : (
             <>
               <div className="admin-table-wrap">
                 <table className="admin-table">
@@ -521,15 +396,8 @@ function AdminDashboard() {
                           <td>
                             <div className="row-actions">
                               <button className="btn btn-view" onClick={() => openModal(ngo, "ngo")}>👁 View</button>
-                              {status === "pending" && (
-                                <>
-                                  <button className="btn btn-approve" onClick={() => handleApprove(ngo.id)}>✓ Approve</button>
-                                  <button className="btn btn-reject" onClick={() => handleReject(ngo.id)}>✕ Reject</button>
-                                </>
-                              )}
-                              {status === "rejected" && (
-                                <button className="btn btn-approve" onClick={() => handleApprove(ngo.id)}>↩ Re-approve</button>
-                              )}
+                              {status === "pending" && <><button className="btn btn-approve" onClick={() => handleApprove(ngo.id)}>✓ Approve</button><button className="btn btn-reject" onClick={() => handleReject(ngo.id)}>✕ Reject</button></>}
+                              {status === "rejected" && <button className="btn btn-approve" onClick={() => handleApprove(ngo.id)}>↩ Re-approve</button>}
                             </div>
                           </td>
                         </tr>
@@ -538,7 +406,6 @@ function AdminDashboard() {
                   </tbody>
                 </table>
               </div>
-              {/* Pagination */}
               <div className="pagination">
                 <button disabled={currentPage === 1} onClick={() => setCurrentPage((p) => p - 1)}>← Prev</button>
                 <span>Page {currentPage} of {totalPages(sortedNGOList)}</span>
@@ -549,20 +416,14 @@ function AdminDashboard() {
         </div>
       )}
 
-      {/* Opportunities */}
       {activeTab === "opportunities" && (
         <div className="admin-panel">
-          <div className="panel-head">
-            <h2>NGO Opportunities / Posts</h2>
-            <span className="panel-meta">{filteredOpps.length} result{filteredOpps.length !== 1 ? "s" : ""}</span>
-          </div>
+          <div className="panel-head"><h2>NGO Opportunities / Posts</h2><span className="panel-meta">{filteredOpps.length} result{filteredOpps.length !== 1 ? "s" : ""}</span></div>
           {filteredOpps.length === 0 ? <div className="admin-empty">No opportunities found.</div> : (
             <>
               <div className="admin-table-wrap">
                 <table className="admin-table">
-                  <thead>
-                    <tr><th>Opportunity</th><th>NGO</th><th>Category</th><th>Location</th><th>Type</th><th>Posted</th><th>Actions</th></tr>
-                  </thead>
+                  <thead><tr><th>Opportunity</th><th>NGO</th><th>Category</th><th>Location</th><th>Type</th><th>Posted</th><th>Actions</th></tr></thead>
                   <tbody>
                     {paginate(filteredOpps).map((opp) => (
                       <tr key={opp.id}>
@@ -593,20 +454,14 @@ function AdminDashboard() {
         </div>
       )}
 
-      {/* Applications */}
       {activeTab === "applications" && (
         <div className="admin-panel">
-          <div className="panel-head">
-            <h2>All Applications</h2>
-            <span className="panel-meta">{filteredApps.length} result{filteredApps.length !== 1 ? "s" : ""}</span>
-          </div>
+          <div className="panel-head"><h2>All Applications</h2><span className="panel-meta">{filteredApps.length} result{filteredApps.length !== 1 ? "s" : ""}</span></div>
           {filteredApps.length === 0 ? <div className="admin-empty">No applications found.</div> : (
             <>
               <div className="admin-table-wrap">
                 <table className="admin-table">
-                  <thead>
-                    <tr><th>Volunteer</th><th>Opportunity</th><th>NGO</th><th>Status</th><th>Applied</th><th>Actions</th></tr>
-                  </thead>
+                  <thead><tr><th>Volunteer</th><th>Opportunity</th><th>NGO</th><th>Status</th><th>Applied</th><th>Actions</th></tr></thead>
                   <tbody>
                     {paginate(filteredApps).map((app) => {
                       const opp = app.opportunities || {};
@@ -614,10 +469,7 @@ function AdminDashboard() {
                       const status = (app.status || "pending").toLowerCase();
                       return (
                         <tr key={app.id}>
-                          <td>
-                            <div className="ngo-name">{prof.full_name || "Unknown"}</div>
-                            <div className="ngo-sub">{prof.email || "No email"}</div>
-                          </td>
+                          <td><div className="ngo-name">{prof.full_name || "Unknown"}</div><div className="ngo-sub">{prof.email || "No email"}</div></td>
                           <td>{opp.title || "Opportunity"}</td>
                           <td>{opp.ngo_name || "NGO"}</td>
                           <td><span className={`status-pill s-${status}`}>{app.status || "Pending"}</span></td>
@@ -625,12 +477,7 @@ function AdminDashboard() {
                           <td>
                             <div className="row-actions">
                               <button className="btn btn-view" onClick={() => openModal(app, "application")}>👁 View</button>
-                              {status === "pending" && (
-                                <>
-                                  <button className="btn btn-approve" onClick={() => handleApproveApp(app.id)}>✓ Approve</button>
-                                  <button className="btn btn-reject" onClick={() => handleRejectApp(app.id)}>✕ Reject</button>
-                                </>
-                              )}
+                              {status === "pending" && <><button className="btn btn-approve" onClick={() => handleApproveApp(app.id)}>✓ Approve</button><button className="btn btn-reject" onClick={() => handleRejectApp(app.id)}>✕ Reject</button></>}
                             </div>
                           </td>
                         </tr>
@@ -649,20 +496,14 @@ function AdminDashboard() {
         </div>
       )}
 
-      {/* Volunteers */}
       {activeTab === "volunteers" && (
         <div className="admin-panel">
-          <div className="panel-head">
-            <h2>Volunteers</h2>
-            <span className="panel-meta">{filteredVols.length} result{filteredVols.length !== 1 ? "s" : ""}</span>
-          </div>
+          <div className="panel-head"><h2>Volunteers</h2><span className="panel-meta">{filteredVols.length} result{filteredVols.length !== 1 ? "s" : ""}</span></div>
           {filteredVols.length === 0 ? <div className="admin-empty">No volunteers found.</div> : (
             <>
               <div className="admin-table-wrap">
                 <table className="admin-table">
-                  <thead>
-                    <tr><th>Volunteer</th><th>Email</th><th>Joined</th><th>Status</th><th>Actions</th></tr>
-                  </thead>
+                  <thead><tr><th>Volunteer</th><th>Email</th><th>Joined</th><th>Status</th><th>Actions</th></tr></thead>
                   <tbody>
                     {paginate(filteredVols).map((v) => (
                       <tr key={v.id}>
@@ -670,19 +511,26 @@ function AdminDashboard() {
                           <div className="vol-row-cell">
                             <div className="vol-avatar">{v.full_name?.charAt(0) || "V"}</div>
                             <div>
-                              <div className="ngo-name">{v.full_name || "Unknown"}</div>
-                              <div className="ngo-sub">{v.email || "No email"}</div>
+                              <div className="ngo-name">{v.full_name || "Unnamed"}</div>
+                              <div className="ngo-sub">{v.phone || "No phone"}</div>
                             </div>
                           </div>
                         </td>
-                        <td>{v.email || "N/A"}</td>
-                        <td>{new Date(v.created_at).toLocaleDateString()}</td>
-                        <td>{v.suspended ? <span className="status-pill s-rejected">Suspended</span> : <span className="status-pill s-approved">Active</span>}</td>
+                        <td>{v.email || <span className="contact-missing">⚠️ Not provided</span>}</td>
+                        <td>{v.created_at ? new Date(v.created_at).toLocaleDateString() : "N/A"}</td>
+                        <td>
+                          <span className={`status-pill ${v.suspended ? "s-rejected" : "s-approved"}`}>
+                            {v.suspended ? "Suspended" : "Active"}
+                          </span>
+                        </td>
                         <td>
                           <div className="row-actions">
                             <button className="btn btn-view" onClick={() => openModal(v, "volunteer")}>👁 View</button>
-                            <button className={`btn ${v.suspended ? "btn-unsuspend" : "btn-suspend"}`} onClick={() => handleSuspend(v.id, v.suspended, v.full_name)}>
-                              {v.suspended ? "↩ Unsuspend" : "⛔ Suspend"}
+                            <button
+                              className={v.suspended ? "btn btn-approve" : "btn btn-reject"}
+                              onClick={() => handleSuspend(v.id, v.suspended, v.full_name)}
+                            >
+                              {v.suspended ? "↩ Unsuspend" : "⏸ Suspend"}
                             </button>
                           </div>
                         </td>
@@ -701,30 +549,23 @@ function AdminDashboard() {
         </div>
       )}
 
-      {/* Activity Log */}
       {activeTab === "activity" && (
         <div className="admin-panel">
-          <div className="panel-head">
-            <h2>Activity Log</h2>
-            <span className="panel-meta">{activityLog.length} entries</span>
-          </div>
-          {activityLog.length === 0 ? <div className="admin-empty">No activity yet. Actions you take will appear here.</div> : (
-            <div className="admin-table-wrap">
-              <table className="admin-table">
-                <thead>
-                  <tr><th>Time</th><th>Action</th><th>Target</th><th>Detail</th></tr>
-                </thead>
-                <tbody>
-                  {activityLog.map((log) => (
-                    <tr key={log.id}>
-                      <td>{new Date(log.timestamp).toLocaleString()}</td>
-                      <td><span className={`badge ${log.action.includes("Approved") ? "b-health" : log.action.includes("Rejected") || log.action.includes("Deleted") ? "b-reject" : "b-general"}`}>{log.action}</span></td>
-                      <td>{log.target}</td>
-                      <td>{log.detail || "—"}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
+          <div className="panel-head"><h2>Activity Log</h2><span className="panel-meta">{activityLog.length} entries</span></div>
+          {activityLog.length === 0 ? (
+            <div className="admin-empty">No activity yet. Actions you take will appear here.</div>
+          ) : (
+            <div className="activity-list">
+              {activityLog.map((entry) => (
+                <div key={entry.id} className="activity-item">
+                  <div className="activity-dot"></div>
+                  <div className="activity-body">
+                    <div className="activity-action">{entry.action}</div>
+                    <div className="activity-target">{entry.target} {entry.detail && <span className="activity-detail">— {entry.detail}</span>}</div>
+                    <div className="activity-time">{new Date(entry.timestamp).toLocaleString()}</div>
+                  </div>
+                </div>
+              ))}
             </div>
           )}
         </div>
@@ -732,151 +573,128 @@ function AdminDashboard() {
 
       {/* Detail Modal */}
       {showModal && selectedItem && (
-        <div className="admin-modal-overlay" onClick={closeModal}>
-          <div className="admin-modal" onClick={(e) => e.stopPropagation()}>
-            <div className="admin-modal-header">
-              <h2>
-                {modalType === "ngo" ? (selectedItem.name || "NGO Profile") :
-                 modalType === "volunteer" ? (selectedItem.full_name || "Volunteer Profile") :
-                 modalType === "application" ? "Application Details" :
-                 modalType === "opportunity" ? (selectedItem.title || "Opportunity") : "Details"}
-              </h2>
+        <div className="modal-overlay" onClick={closeModal}>
+          <div className="modal-card" onClick={(e) => e.stopPropagation()}>
+            <div className="modal-header">
+              <h3>
+                {modalType === "ngo" && (selectedItem.name || "NGO Details")}
+                {modalType === "opportunity" && (selectedItem.title || "Opportunity Details")}
+                {modalType === "application" && "Application Details"}
+                {modalType === "volunteer" && (selectedItem.full_name || "Volunteer Details")}
+              </h3>
               <button className="modal-close" onClick={closeModal}>✕</button>
             </div>
-            <div className="admin-modal-body">
+            <div className="modal-body">
               {modalType === "ngo" && (
-                <>
-                  <div className="modal-row"><label>Category:</label><span className={`badge ${getCategoryBadge(selectedItem.category).class}`}>{getCategoryBadge(selectedItem.category).label}</span></div>
-                  <div className="modal-row"><label>Location:</label><span>{selectedItem.location || "N/A"}</span></div>
-                  <div className="modal-row"><label>Email:</label><span>{selectedItem.email || <span className="contact-missing">⚠️ Not provided</span>}</span></div>
-                  <div className="modal-row"><label>Phone:</label><span>{selectedItem.phone || <span className="contact-missing">⚠️ Not provided</span>}</span></div>
-                  <div className="modal-row"><label>Status:</label><span className={`status-pill s-${(selectedItem.approval_status || "pending").toLowerCase()}`}>{selectedItem.approval_status || "Pending"}</span></div>
-                  {selectedItem.rejection_reason && <div className="modal-row"><label>Rejection Reason:</label><span className="reject-reason">{selectedItem.rejection_reason}</span></div>}
-                  <div className="modal-desc"><label>About / Mission:</label><p>{selectedItem.description || "No description provided."}</p></div>
+                <div className="detail-grid">
+                  <div className="detail-row"><span className="detail-label">Name</span><span className="detail-value">{selectedItem.name || "N/A"}</span></div>
+                  <div className="detail-row"><span className="detail-label">Category</span><span className="detail-value">{selectedItem.category || "N/A"}</span></div>
+                  <div className="detail-row"><span className="detail-label">Location</span><span className="detail-value">{selectedItem.location || "N/A"}</span></div>
+                  <div className="detail-row"><span className="detail-label">Email</span><span className="detail-value">{selectedItem.email || "N/A"}</span></div>
+                  <div className="detail-row"><span className="detail-label">Phone</span><span className="detail-value">{selectedItem.phone || "N/A"}</span></div>
+                  <div className="detail-row"><span className="detail-label">Registration No</span><span className="detail-value">{selectedItem.registration_no || "N/A"}</span></div>
+                  <div className="detail-row"><span className="detail-label">Status</span><span className="detail-value"><span className={`status-pill s-${(selectedItem.approval_status || "pending").toLowerCase()}`}>{selectedItem.approval_status || "Pending"}</span></span></div>
+                  <div className="detail-row"><span className="detail-label">Description</span><span className="detail-value">{selectedItem.description || "No description provided."}</span></div>
+                  <div className="detail-row"><span className="detail-label">Documents</span><span className="detail-value">{selectedItem.documents?.length > 0 ? selectedItem.documents.map((d, i) => <div key={i}>📄 <a href={d} target="_blank" rel="noreferrer">Document {i + 1}</a></div>) : "No documents uploaded"}</span></div>
+                  <div className="detail-row"><span className="detail-label">Registered</span><span className="detail-value">{selectedItem.created_at ? new Date(selectedItem.created_at).toLocaleString() : "N/A"}</span></div>
+                </div>
+              )}
 
-                  {/* Document Verification */}
-                  <div className="modal-section">
-                    <label>📎 Document Verification</label>
-                    <div className="doc-verify">
-                      <div className="doc-item">
-                        <span>Registration Certificate</span>
-                        <span className="doc-status pending">⏳ Pending Verification</span>
-                      </div>
-                      <div className="doc-item">
-                        <span>Tax Exemption (NTN)</span>
-                        <span className="doc-status pending">⏳ Pending Verification</span>
-                      </div>
-                      <div className="doc-item">
-                        <span>Proof of Address</span>
-                        <span className="doc-status pending">⏳ Pending Verification</span>
-                      </div>
-                      <p className="doc-note">⚠️ Verify documents before approving this NGO to prevent fake registrations.</p>
-                    </div>
-                  </div>
-                </>
-              )}
-              {modalType === "volunteer" && (
-                <>
-                  <div className="modal-row"><label>Name:</label><span>{selectedItem.full_name || "Unknown"}</span></div>
-                  <div className="modal-row"><label>Email:</label><span>{selectedItem.email || "N/A"}</span></div>
-                  <div className="modal-row"><label>Phone:</label><span>{selectedItem.phone || "N/A"}</span></div>
-                  <div className="modal-row"><label>Joined:</label><span>{new Date(selectedItem.created_at).toLocaleDateString()}</span></div>
-                  <div className="modal-row"><label>Status:</label><span>{selectedItem.suspended ? <span className="status-pill s-rejected">Suspended</span> : <span className="status-pill s-approved">Active</span>}</span></div>
-                </>
-              )}
-              {modalType === "application" && (
-                <>
-                  <div className="modal-row"><label>Volunteer:</label><span>{selectedItem.profiles?.full_name || "Unknown"} ({selectedItem.profiles?.email || "No email"})</span></div>
-                  <div className="modal-row"><label>Opportunity:</label><span>{selectedItem.opportunities?.title || "N/A"}</span></div>
-                  <div className="modal-row"><label>NGO:</label><span>{selectedItem.opportunities?.ngo_name || "N/A"}</span></div>
-                  <div className="modal-row"><label>Location:</label><span>{selectedItem.opportunities?.location || "Remote"}</span></div>
-                  <div className="modal-row"><label>Status:</label><span className={`status-pill s-${(selectedItem.status || "pending").toLowerCase()}`}>{selectedItem.status || "Pending"}</span></div>
-                  <div className="modal-row"><label>Applied:</label><span>{new Date(selectedItem.applied_at).toLocaleDateString()}</span></div>
-                  {selectedItem.experience && <div className="modal-desc"><label>Experience:</label><p>{selectedItem.experience}</p></div>}
-                  {selectedItem.motivation && <div className="modal-desc"><label>Motivation:</label><p>{selectedItem.motivation}</p></div>}
-                </>
-              )}
               {modalType === "opportunity" && (
-                <>
-                  <div className="modal-row"><label>Title:</label><span>{selectedItem.title || "Untitled"}</span></div>
-                  <div className="modal-row"><label>NGO:</label><span>{selectedItem.ngo_name || selectedItem.ngos?.name || "NGO"}</span></div>
-                  <div className="modal-row"><label>Category:</label><span className={`badge ${getCategoryBadge(selectedItem.category).class}`}>{selectedItem.category || "General"}</span></div>
-                  <div className="modal-row"><label>Location:</label><span>{selectedItem.location || "Remote"}</span></div>
-                  <div className="modal-row"><label>Type:</label><span>{selectedItem.type || "N/A"}</span></div>
-                  <div className="modal-desc"><label>Description:</label><p>{selectedItem.description || "No description."}</p></div>
-                </>
+                <div className="detail-grid">
+                  <div className="detail-row"><span className="detail-label">Title</span><span className="detail-value">{selectedItem.title || "N/A"}</span></div>
+                  <div className="detail-row"><span className="detail-label">NGO</span><span className="detail-value">{selectedItem.ngo_name || selectedItem.ngos?.name || "N/A"}</span></div>
+                  <div className="detail-row"><span className="detail-label">Category</span><span className="detail-value">{selectedItem.category || "N/A"}</span></div>
+                  <div className="detail-row"><span className="detail-label">Location</span><span className="detail-value">{selectedItem.location || "Remote"}</span></div>
+                  <div className="detail-row"><span className="detail-label">Type</span><span className="detail-value">{selectedItem.type || "N/A"}</span></div>
+                  <div className="detail-row"><span className="detail-label">Description</span><span className="detail-value">{selectedItem.description || "No description."}</span></div>
+                  <div className="detail-row"><span className="detail-label">Posted</span><span className="detail-value">{selectedItem.created_at ? new Date(selectedItem.created_at).toLocaleString() : "N/A"}</span></div>
+                </div>
+              )}
+
+              {modalType === "application" && (
+                <div className="detail-grid">
+                  <div className="detail-row"><span className="detail-label">Volunteer</span><span className="detail-value">{selectedItem.profiles?.full_name || "Unknown"}</span></div>
+                  <div className="detail-row"><span className="detail-label">Email</span><span className="detail-value">{selectedItem.profiles?.email || "N/A"}</span></div>
+                  <div className="detail-row"><span className="detail-label">Phone</span><span className="detail-value">{selectedItem.profiles?.phone || "N/A"}</span></div>
+                  <div className="detail-row"><span className="detail-label">Opportunity</span><span className="detail-value">{selectedItem.opportunities?.title || "N/A"}</span></div>
+                  <div className="detail-row"><span className="detail-label">NGO</span><span className="detail-value">{selectedItem.opportunities?.ngo_name || "N/A"}</span></div>
+                  <div className="detail-row"><span className="detail-label">Location</span><span className="detail-value">{selectedItem.opportunities?.location || "N/A"}</span></div>
+                  <div className="detail-row"><span className="detail-label">Status</span><span className="detail-value"><span className={`status-pill s-${(selectedItem.status || "pending").toLowerCase()}`}>{selectedItem.status || "Pending"}</span></span></div>
+                  <div className="detail-row"><span className="detail-label">Message</span><span className="detail-value">{selectedItem.message || "No message provided."}</span></div>
+                  <div className="detail-row"><span className="detail-label">Applied At</span><span className="detail-value">{selectedItem.applied_at ? new Date(selectedItem.applied_at).toLocaleString() : "N/A"}</span></div>
+                </div>
+              )}
+
+              {modalType === "volunteer" && (
+                <div className="detail-grid">
+                  <div className="detail-row"><span className="detail-label">Name</span><span className="detail-value">{selectedItem.full_name || "N/A"}</span></div>
+                  <div className="detail-row"><span className="detail-label">Email</span><span className="detail-value">{selectedItem.email || "N/A"}</span></div>
+                  <div className="detail-row"><span className="detail-label">Phone</span><span className="detail-value">{selectedItem.phone || "N/A"}</span></div>
+                  <div className="detail-row"><span className="detail-label">Location</span><span className="detail-value">{selectedItem.location || "N/A"}</span></div>
+                  <div className="detail-row"><span className="detail-label">Skills</span><span className="detail-value">{selectedItem.skills?.length ? selectedItem.skills.join(", ") : "None listed"}</span></div>
+                  <div className="detail-row"><span className="detail-label">Bio</span><span className="detail-value">{selectedItem.bio || "No bio provided."}</span></div>
+                  <div className="detail-row"><span className="detail-label">Status</span><span className="detail-value"><span className={`status-pill ${selectedItem.suspended ? "s-rejected" : "s-approved"}`}>{selectedItem.suspended ? "Suspended" : "Active"}</span></span></div>
+                  <div className="detail-row"><span className="detail-label">Joined</span><span className="detail-value">{selectedItem.created_at ? new Date(selectedItem.created_at).toLocaleString() : "N/A"}</span></div>
+                </div>
               )}
             </div>
-            <div className="admin-modal-footer">
-              <button className="btn btn-view" onClick={closeModal}>Close</button>
-              {modalType === "ngo" && (selectedItem.approval_status || "pending").toLowerCase() === "pending" && (
-                <>
-                  <button className="btn btn-reject" onClick={() => { handleReject(selectedItem.id); closeModal(); }}>✕ Reject</button>
-                  <button className="btn btn-approve" onClick={() => { handleApprove(selectedItem.id); closeModal(); }}>✓ Approve</button>
-                </>
-              )}
-              {modalType === "application" && (selectedItem.status || "pending").toLowerCase() === "pending" && (
-                <>
-                  <button className="btn btn-reject" onClick={() => { handleRejectApp(selectedItem.id); closeModal(); }}>✕ Reject</button>
-                  <button className="btn btn-approve" onClick={() => { handleApproveApp(selectedItem.id); closeModal(); }}>✓ Approve</button>
-                </>
-              )}
-              {modalType === "opportunity" && (
-                <button className="btn btn-reject" onClick={() => { handleDeleteOpportunity(selectedItem.id, selectedItem.title); closeModal(); }}>🗑 Delete Post</button>
-              )}
+            <div className="modal-footer">
+              <button className="btn btn-secondary" onClick={closeModal}>Close</button>
             </div>
           </div>
         </div>
       )}
 
-      {/* Confirmation Modal */}
+      {/* Confirm Modal */}
       {confirmModal.open && (
-        <div className="admin-modal-overlay" onClick={closeConfirm}>
-          <div className="admin-modal confirm-modal" onClick={(e) => e.stopPropagation()}>
-            <div className="admin-modal-header">
-              <h2>
-                {confirmModal.action === "approve" ? "Confirm Approval" :
-                 confirmModal.action === "reject" ? "Confirm Rejection" :
-                 confirmModal.action === "approveApp" ? "Confirm Approval" :
-                 confirmModal.action === "rejectApp" ? "Confirm Rejection" :
-                 confirmModal.action === "deleteOpp" ? "Confirm Deletion" :
-                 confirmModal.action === "suspend" ? "Confirm Suspension" : "Confirm Action"}
-              </h2>
+        <div className="modal-overlay" onClick={closeConfirm}>
+          <div className="modal-card confirm-card" onClick={(e) => e.stopPropagation()}>
+            <div className="modal-header">
+              <h3>
+                {confirmModal.action === "approve" && "Approve NGO"}
+                {confirmModal.action === "reject" && "Reject NGO"}
+                {confirmModal.action === "approveApp" && "Approve Application"}
+                {confirmModal.action === "rejectApp" && "Reject Application"}
+                {confirmModal.action === "deleteOpp" && "Delete Opportunity"}
+                {confirmModal.action === "suspend" && `${confirmModal.item?.suspended ? "Unsuspend" : "Suspend"} User`}
+              </h3>
               <button className="modal-close" onClick={closeConfirm}>✕</button>
             </div>
-            <div className="admin-modal-body">
+            <div className="modal-body">
               <p className="confirm-text">
-                {confirmModal.action === "approve" ? `Are you sure you want to approve "${confirmModal.item?.name || "this NGO"}"?` :
-                 confirmModal.action === "reject" ? `Are you sure you want to reject "${confirmModal.item?.name || "this NGO"}"?` :
-                 confirmModal.action === "deleteOpp" ? `Delete opportunity "${confirmModal.item?.title || "Untitled"}"? This cannot be undone.` :
-                 confirmModal.action === "suspend" ? `${confirmModal.item?.suspended ? "Unsuspend" : "Suspend"} ${confirmModal.item?.full_name || "this user"}?` :
-                 "Are you sure you want to proceed?"}
+                {confirmModal.action === "approve" && <>Are you sure you want to approve <strong>{confirmModal.item?.name}</strong>?</>}
+                {confirmModal.action === "reject" && <>Are you sure you want to reject <strong>{confirmModal.item?.name}</strong>?</>}
+                {confirmModal.action === "approveApp" && <>Approve application from <strong>{confirmModal.item?.profiles?.full_name || "this volunteer"}</strong>?</>}
+                {confirmModal.action === "rejectApp" && <>Reject application from <strong>{confirmModal.item?.profiles?.full_name || "this volunteer"}</strong>?</>}
+                {confirmModal.action === "deleteOpp" && <>Delete opportunity <strong>{confirmModal.item?.title}</strong>? This cannot be undone.</>}
+                {confirmModal.action === "suspend" && <>{confirmModal.item?.suspended ? "Unsuspend" : "Suspend"} user <strong>{confirmModal.item?.full_name}</strong>?</>}
               </p>
 
               {confirmModal.action === "reject" && (
                 <div className="form-group">
-                  <label>Rejection Reason *</label>
+                  <label>Rejection Reason (optional)</label>
                   <textarea
-                    rows="3"
-                    placeholder="Explain why this NGO is being rejected..."
+                    rows={3}
                     value={confirmModal.reason}
                     onChange={(e) => setConfirmModal({ ...confirmModal, reason: e.target.value })}
+                    placeholder="Enter reason for rejection..."
                   />
-                  <p className="field-hint">This reason will be stored for audit purposes.</p>
                 </div>
               )}
             </div>
-            <div className="admin-modal-footer">
-              <button className="btn btn-view" onClick={closeConfirm}>Cancel</button>
+            <div className="modal-footer">
+              <button className="btn btn-secondary" onClick={closeConfirm}>Cancel</button>
               <button
-                className={`btn ${confirmModal.action.includes("reject") || confirmModal.action.includes("delete") || confirmModal.action === "suspend" ? "btn-reject" : "btn-approve"}`}
+                className={`btn ${confirmModal.action.includes("reject") || confirmModal.action === "deleteOpp" || confirmModal.action === "suspend" && !confirmModal.item?.suspended ? "btn-reject" : "btn-approve"}`}
                 onClick={executeConfirm}
-                disabled={confirmModal.action === "reject" && !confirmModal.reason.trim()}
               >
-                {confirmModal.action === "approve" || confirmModal.action === "approveApp" ? "✓ Confirm Approve" :
-                 confirmModal.action === "reject" || confirmModal.action === "rejectApp" ? "✕ Confirm Reject" :
-                 confirmModal.action === "deleteOpp" ? "🗑 Confirm Delete" :
-                 confirmModal.action === "suspend" ? "⛔ Confirm" : "Confirm"}
+                {confirmModal.action === "approve" && "Yes, Approve"}
+                {confirmModal.action === "reject" && "Yes, Reject"}
+                {confirmModal.action === "approveApp" && "Yes, Approve"}
+                {confirmModal.action === "rejectApp" && "Yes, Reject"}
+                {confirmModal.action === "deleteOpp" && "Yes, Delete"}
+                {confirmModal.action === "suspend" && (confirmModal.item?.suspended ? "Yes, Unsuspend" : "Yes, Suspend")}
               </button>
             </div>
           </div>

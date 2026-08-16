@@ -21,7 +21,6 @@ function Navbar() {
       setUser(session?.user || null);
     });
 
-    // Scroll listener for glass effect
     const handleScroll = () => setScrolled(window.scrollY > 10);
     window.addEventListener("scroll", handleScroll);
 
@@ -49,13 +48,11 @@ function Navbar() {
   return (
     <nav className={`navbar ${scrolled ? "scrolled" : ""}`}>
       <div className="nav-inner">
-        {/* Logo */}
         <Link to="/" className="nav-logo" onClick={() => setMenuOpen(false)}>
           <span className="logo-icon">🌿</span>
           <span className="logo-text">NGO Connect</span>
         </Link>
 
-        {/* Center Links */}
         <div className={`nav-center ${menuOpen ? "open" : ""}`}>
           {navLinks.map((link) => (
             <Link
@@ -67,7 +64,6 @@ function Navbar() {
               {link.label}
             </Link>
           ))}
-          
           {user && (
             <Link
               to="/admin"
@@ -79,7 +75,6 @@ function Navbar() {
           )}
         </div>
 
-        {/* Right Side */}
         <div className={`nav-right ${menuOpen ? "open" : ""}`}>
           {user ? (
             <button className="nav-btn nav-btn-dark" onClick={handleLogout}>
@@ -97,7 +92,6 @@ function Navbar() {
           )}
         </div>
 
-        {/* Hamburger */}
         <button className="hamburger" onClick={() => setMenuOpen(!menuOpen)}>
           <span></span>
           <span></span>
