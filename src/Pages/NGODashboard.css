@@ -1,591 +1,676 @@
-/* ===== BASE ===== */
 .ngo-dashboard {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 0 24px 60px;
-  background: #F7F5EF;
+  padding-top: 100px;
   min-height: 100vh;
-  font-family: 'Inter', sans-serif;
-  color: #1C2B22;
+  background: #f5f4f0;
+  font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+  padding-bottom: 60px;
 }
 
-.ngo-loading {
-  text-align: center;
-  padding: 5rem;
-  color: #28503B;
-  font-size: 1.2rem;
+/* ─── Loading ─── */
+.loading-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 60vh;
+  gap: 16px;
 }
 
-/* ===== TOAST ===== */
-.ngo-toast {
-  position: fixed;
-  top: 100px;
-  right: 24px;
-  padding: 1rem 1.5rem;
+.loading-spinner {
+  width: 40px;
+  height: 40px;
+  border: 3px solid #ddd;
+  border-top-color: #2d5a3d;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* ─── Error Box ─── */
+.error-box {
+  background: white;
   border-radius: 12px;
-  font-weight: 600;
-  z-index: 9999;
-  animation: slideIn 0.3s ease;
-  box-shadow: 0 12px 40px rgba(0,0,0,0.12);
+  padding: 40px;
+  max-width: 500px;
+  margin: 40px auto;
+  text-align: center;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.06);
 }
 
-.ngo-toast.success { background: #d4edda; color: #155724; border: 1px solid #95d5b2; }
-.ngo-toast.error { background: #f8d7da; color: #721c24; border: 1px solid #ef9a9a; }
-
-@keyframes slideIn {
-  from { transform: translateX(100%); opacity: 0; }
-  to { transform: translateX(0); opacity: 1; }
+.error-box h3 {
+  color: #c0392b;
+  margin-bottom: 12px;
 }
 
-/* ===== HEADER ===== */
+.error-box p {
+  color: #666;
+  margin-bottom: 20px;
+}
+
+/* ─── Header ─── */
 .ngo-header {
   display: flex;
-  align-items: center;
   justify-content: space-between;
-  flex-wrap: wrap;
-  gap: 16px;
-  padding: 2rem 0 1rem;
+  align-items: flex-start;
+  padding: 24px 40px 16px;
+  max-width: 1200px;
+  margin: 0 auto;
 }
 
-.ngo-header h1 {
-  font-family: 'Fraunces', serif;
-  font-size: 2rem;
-  font-weight: 600;
-  color: #1B3A28;
-  margin: 0 0 6px;
-}
-
-.ngo-header p {
-  margin: 0;
-  color: #6B7268;
-  font-size: 0.95rem;
+.ngo-header-left h1 {
+  font-size: 1.8rem;
+  color: #2d4a3e;
+  margin: 0 0 8px 0;
+  font-weight: 700;
 }
 
 .ngo-status {
-  display: inline-block;
-  padding: 4px 12px;
-  border-radius: 20px;
-  font-size: 12px;
-  font-weight: 600;
-  font-family: 'IBM Plex Mono', monospace;
-}
-
-.ngo-status-approved {
-  background: #E7EFEA;
-  color: #1F4038;
-}
-
-.ngo-status-pending {
-  background: #FBF1DF;
-  color: #7A5A17;
-}
-
-.ngo-status-rejected {
-  background: #FBE9E7;
-  color: #B24444;
-}
-
-.ngo-actions {
   display: flex;
-  gap: 10px;
-  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.85rem;
 }
 
-.ngo-btn-primary {
-  background: #2F5D50;
+.status-label {
+  color: #888;
+}
+
+.status-badge {
+  background: #e8f5e9;
+  color: #2d7a3d;
+  padding: 2px 10px;
+  border-radius: 12px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: lowercase;
+}
+
+.ngo-header-right {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.btn-post {
+  background: #2d5a3d;
   color: white;
   border: none;
-  border-radius: 10px;
   padding: 10px 20px;
-  font-size: 14px;
+  border-radius: 8px;
+  font-size: 0.9rem;
   font-weight: 600;
-  font-family: inherit;
   cursor: pointer;
-  text-decoration: none;
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
+  transition: background 0.2s;
+}
+
+.btn-post:hover {
+  background: #244a30;
+}
+
+.btn-edit-profile {
+  background: white;
+  color: #555;
+  border: 1px solid #ddd;
+  padding: 10px 20px;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
   transition: all 0.2s;
 }
 
-.ngo-btn-primary:hover {
-  background: #1B3A28;
-  transform: translateY(-1px);
+.btn-edit-profile:hover {
+  background: #f8f8f8;
+  border-color: #bbb;
 }
 
-.ngo-btn-secondary {
+/* ─── Notification Bell ─── */
+.notif-wrapper {
+  position: relative;
+}
+
+.notif-bell {
   background: white;
-  color: #4B534E;
-  border: 1.5px solid #E4E0D6;
-  border-radius: 10px;
-  padding: 10px 20px;
-  font-size: 14px;
-  font-weight: 600;
-  font-family: inherit;
+  border: 1px solid #ddd;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  font-size: 1.1rem;
   cursor: pointer;
-  text-decoration: none;
-  display: inline-flex;
+  display: flex;
   align-items: center;
   justify-content: center;
-  gap: 6px;
+  position: relative;
   transition: all 0.2s;
 }
 
-.ngo-btn-secondary:hover {
-  background: #F7F5EF;
-  border-color: #28503B;
-  color: #1B3A28;
+.notif-bell:hover {
+  background: #f8f8f8;
+  border-color: #2d5a3d;
 }
 
-/* ===== STATS ===== */
-.ngo-stats {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 14px;
-  margin: 20px 0 28px;
+.notif-badge {
+  position: absolute;
+  top: -2px;
+  right: -2px;
+  background: #e74c3c;
+  color: white;
+  font-size: 0.65rem;
+  font-weight: bold;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid white;
 }
 
-.ngo-stat {
+/* ─── Notification Panel ─── */
+.notif-panel {
+  position: absolute;
+  right: 0;
+  top: 50px;
+  width: 340px;
+  max-height: 420px;
   background: white;
-  border: 1px solid #E4E0D6;
   border-radius: 12px;
-  padding: 20px;
-  text-align: center;
-  transition: transform 0.2s, box-shadow 0.2s;
-}
-
-.ngo-stat:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 8px 24px rgba(0,0,0,0.06);
-}
-
-.ngo-stat-value {
-  font-family: 'Fraunces', serif;
-  font-size: 32px;
-  font-weight: 600;
-  color: #1B3A28;
-  margin-bottom: 4px;
-}
-
-.ngo-stat-label {
-  font-size: 13px;
-  color: #6B7268;
-  font-weight: 500;
-}
-
-/* ===== GRID LAYOUT ===== */
-.ngo-grid {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 24px;
-}
-
-.ngo-left {
-  display: flex;
-  flex-direction: column;
-  gap: 0;
-}
-
-.ngo-right {
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-}
-
-/* ===== PANEL ===== */
-.ngo-panel {
-  background: white;
-  border: 1px solid #E4E0D6;
-  border-radius: 14px;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.1);
+  border: 1px solid #e8e8e8;
   overflow: hidden;
-  margin-bottom: 24px;
+  z-index: 200;
 }
 
-.ngo-panel-head {
+.notif-header {
   display: flex;
-  align-items: center;
   justify-content: space-between;
-  padding: 18px 22px;
-  border-bottom: 1px solid #E4E0D6;
+  align-items: center;
+  padding: 14px 18px;
+  border-bottom: 1px solid #f0f0f0;
+  background: #fafafa;
 }
 
-.ngo-panel-head h2 {
-  font-family: 'Fraunces', serif;
-  font-size: 17px;
+.notif-header h4 {
   margin: 0;
+  color: #2d4a3e;
+  font-size: 0.95rem;
+}
+
+.mark-all-btn {
+  background: none;
+  border: none;
+  color: #2d5a3d;
+  font-size: 0.75rem;
+  cursor: pointer;
   font-weight: 600;
-  color: #1B3A28;
 }
 
-.ngo-panel-meta {
-  font-size: 12px;
-  color: #6B7268;
-  font-family: 'IBM Plex Mono', monospace;
+.notif-list {
+  max-height: 360px;
+  overflow-y: auto;
 }
 
-/* ===== OPPORTUNITIES LIST ===== */
-.ngo-opp-row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 16px;
-  padding: 16px 22px;
-  border-bottom: 1px solid #EEEBE2;
+.notif-item {
+  padding: 12px 18px;
+  border-bottom: 1px solid #f5f5f5;
+  cursor: pointer;
   transition: background 0.15s;
 }
 
-.ngo-opp-row:hover {
-  background: #FAFAF7;
+.notif-item:hover {
+  background: #f8faf8;
 }
 
-.ngo-opp-row:last-child {
-  border-bottom: none;
+.notif-item.unread {
+  background: #f0f7f0;
+  border-left: 3px solid #2d5a3d;
 }
 
-.ngo-opp-title {
-  font-weight: 600;
-  color: #1C2B22;
-  font-size: 14px;
+.notif-item.legal_notice {
+  border-left: 3px solid #e74c3c;
+  background: #fdf2f2;
+}
+
+.notif-item.warning {
+  border-left: 3px solid #f39c12;
+  background: #fef9f0;
+}
+
+.notif-item strong {
+  display: block;
+  color: #2d3a2d;
+  font-size: 0.85rem;
   margin-bottom: 3px;
 }
 
-.ngo-opp-meta {
-  font-size: 12.5px;
-  color: #6B7268;
+.notif-item p {
+  margin: 0;
+  color: #666;
+  font-size: 0.78rem;
+  line-height: 1.3;
 }
 
-.ngo-opp-actions {
-  display: flex;
-  gap: 8px;
-  flex-shrink: 0;
+.notif-item small {
+  color: #999;
+  font-size: 0.7rem;
+  display: block;
+  margin-top: 4px;
 }
 
-.ngo-btn-ghost {
-  background: transparent;
-  color: #4B534E;
-  border: 1px solid #E4E0D6;
-  border-radius: 8px;
-  padding: 6px 14px;
-  font-size: 12.5px;
-  font-weight: 600;
-  font-family: inherit;
-  cursor: pointer;
-  text-decoration: none;
-  display: inline-flex;
-  align-items: center;
-  transition: all 0.2s;
+.notif-empty {
+  text-align: center;
+  padding: 30px;
+  color: #999;
+  font-size: 0.85rem;
 }
 
-.ngo-btn-ghost:hover {
-  background: #F7F5EF;
-}
-
-.ngo-btn-danger {
-  background: #FBE9E7;
-  color: #B24444;
-  border: none;
-  border-radius: 8px;
-  padding: 6px 14px;
-  font-size: 12.5px;
-  font-weight: 600;
-  font-family: inherit;
-  cursor: pointer;
-  transition: all 0.2s;
-}
-
-.ngo-btn-danger:hover {
-  background: #B24444;
-  color: white;
-}
-
-/* ===== APPLICATIONS LIST ===== */
-.ngo-app-row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
+/* ─── Stats Row ─── */
+.stats-row {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
   gap: 16px;
-  padding: 14px 22px;
-  border-bottom: 1px solid #EEEBE2;
+  padding: 0 40px 24px;
+  max-width: 1200px;
+  margin: 0 auto;
 }
 
-.ngo-app-row:hover {
-  background: #FAFAF7;
-}
-
-.ngo-app-row:last-child {
-  border-bottom: none;
-}
-
-.ngo-app-info {
-  flex: 1;
-  min-width: 0;
-}
-
-.ngo-app-name {
-  font-weight: 600;
-  color: #1C2B22;
-  font-size: 14px;
-  margin-bottom: 2px;
-}
-
-.ngo-app-meta {
-  font-size: 12px;
-  color: #6B7268;
-}
-
-.ngo-app-actions {
-  display: flex;
-  gap: 8px;
-  align-items: center;
-  flex-shrink: 0;
-  flex-wrap: wrap;
-}
-
-.ngo-btn-approve {
-  background: #E7EFEA;
-  color: #1F4038;
-  border: none;
-  border-radius: 8px;
-  padding: 6px 12px;
-  font-size: 12px;
-  font-weight: 600;
-  font-family: inherit;
-  cursor: pointer;
-  transition: all 0.2s;
-}
-
-.ngo-btn-approve:hover {
-  background: #2F5D50;
-  color: white;
-}
-
-.ngo-btn-reject {
-  background: #FBE9E7;
-  color: #B24444;
-  border: none;
-  border-radius: 8px;
-  padding: 6px 12px;
-  font-size: 12px;
-  font-weight: 600;
-  font-family: inherit;
-  cursor: pointer;
-  transition: all 0.2s;
-}
-
-.ngo-btn-reject:hover {
-  background: #B24444;
-  color: white;
-}
-
-.ngo-status-pill {
-  font-family: 'IBM Plex Mono', monospace;
-  font-size: 11px;
-  padding: 3px 9px;
-  border-radius: 5px;
-  font-weight: 600;
-}
-
-.ngo-status-pill.s-pending { background: #FBF1DF; color: #7A5A17; }
-.ngo-status-pill.s-approved { background: #E7EFEA; color: #1F4038; }
-.ngo-status-pill.s-rejected { background: #FBE9E7; color: #B24444; }
-
-/* ===== PROFILE MINI CARD ===== */
-.ngo-profile-mini {
-  padding: 22px;
+.stat-box {
   background: white;
+  border-radius: 12px;
+  padding: 24px 20px;
+  text-align: center;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+  border: 1px solid #eae8e3;
 }
 
-.ngo-profile-mini h3 {
-  font-family: 'Fraunces', serif;
-  font-size: 17px;
-  margin: 0 0 14px;
-  color: #1B3A28;
+.stat-number {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #2d4a3e;
+  margin-bottom: 4px;
 }
 
-.ngo-profile-mini p {
-  margin: 0 0 10px;
-  font-size: 13.5px;
-  color: #4B534E;
-  line-height: 1.5;
+.stat-label {
+  font-size: 0.8rem;
+  color: #888;
+  font-weight: 500;
 }
 
-.ngo-profile-mini p b {
-  color: #1B3A28;
+/* ─── Dashboard Columns ─── */
+.dashboard-columns {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 24px;
+  padding: 0 40px;
+  max-width: 1200px;
+  margin: 0 auto;
 }
 
-/* ===== COMPLAINTS SECTION ===== */
-.ngo-complaints-list {
+.column-left {
   display: flex;
   flex-direction: column;
-  gap: 2px;
 }
 
-.ngo-complaint-row {
+.column-right {
   display: flex;
-  align-items: flex-start;
-  gap: 12px;
-  padding: 14px 22px;
-  border-bottom: 1px solid #FBE9E7;
-  background: #FFFCFB;
+  flex-direction: column;
 }
 
-.ngo-complaint-row:last-child {
+/* ─── Cards ─── */
+.card {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+  border: 1px solid #eae8e3;
+  overflow: hidden;
+}
+
+.card-header {
+  padding: 18px 24px;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.card-header h3 {
+  margin: 0;
+  font-size: 1rem;
+  color: #2d4a3e;
+  font-weight: 600;
+}
+
+.card-empty {
+  padding: 32px 24px;
+  text-align: center;
+  color: #888;
+}
+
+.card-empty p {
+  margin: 0 0 16px 0;
+}
+
+/* ─── Opportunities List ─── */
+.opp-list {
+  padding: 8px 0;
+}
+
+.opp-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 24px;
+  border-bottom: 1px solid #f5f5f5;
+}
+
+.opp-item:last-child {
   border-bottom: none;
 }
 
-.ngo-complaint-icon {
-  width: 32px;
-  height: 32px;
-  border-radius: 8px;
-  background: #FBE9E7;
-  color: #B24444;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 14px;
-  flex-shrink: 0;
+.opp-title {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #2d3a2d;
+  margin-bottom: 4px;
 }
 
-.ngo-complaint-info {
+.opp-meta {
+  font-size: 0.78rem;
+  color: #999;
+}
+
+.opp-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.btn-edit-small {
+  padding: 6px 14px;
+  border: 1px solid #ddd;
+  background: white;
+  color: #555;
+  border-radius: 6px;
+  font-size: 0.78rem;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.btn-edit-small:hover {
+  background: #f8f8f8;
+  border-color: #bbb;
+}
+
+.btn-delete-small {
+  padding: 6px 14px;
+  border: none;
+  background: #fde8e8;
+  color: #c0392b;
+  border-radius: 6px;
+  font-size: 0.78rem;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.btn-delete-small:hover {
+  background: #fcd5d5;
+}
+
+/* ─── Applications List ─── */
+.app-list {
+  padding: 8px 0;
+}
+
+.app-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 24px;
+  border-bottom: 1px solid #f5f5f5;
+}
+
+.app-item:last-child {
+  border-bottom: none;
+}
+
+.app-name {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #2d3a2d;
+  margin-bottom: 4px;
+}
+
+.app-meta {
+  font-size: 0.78rem;
+  color: #999;
+}
+
+.app-status {
+  padding: 4px 12px;
+  border-radius: 12px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: lowercase;
+}
+
+.app-status.approved {
+  background: #e8f5e9;
+  color: #2d7a3d;
+}
+
+.app-status.pending {
+  background: #fff3e0;
+  color: #e65100;
+}
+
+.app-status.rejected {
+  background: #fde8e8;
+  color: #c0392b;
+}
+
+/* ─── Profile Card ─── */
+.profile-card {
+  height: fit-content;
+}
+
+.profile-fields {
+  padding: 16px 24px;
+}
+
+.profile-field {
+  display: flex;
+  justify-content: space-between;
+  padding: 12px 0;
+  border-bottom: 1px solid #f5f5f5;
+}
+
+.profile-field:last-child {
+  border-bottom: none;
+}
+
+.field-label {
+  color: #888;
+  font-size: 0.85rem;
+}
+
+.field-value {
+  color: #2d3a2d;
+  font-size: 0.85rem;
+  font-weight: 500;
+}
+
+/* ─── Buttons ─── */
+.btn-primary {
+  padding: 10px 24px;
+  background: #2d5a3d;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.btn-primary:hover {
+  background: #244a30;
+}
+
+
+/* ─── Complaints Section ─── */
+.complaints-card {
+  border-left: 3px solid #e74c3c;
+}
+
+.complaints-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #fdf6f6;
+}
+
+.complaints-header h3 {
+  color: #c0392b;
+}
+
+.complaint-count {
+  background: #fde8e8;
+  color: #c0392b;
+  padding: 2px 10px;
+  border-radius: 12px;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.complaint-list {
+  padding: 8px 0;
+}
+
+.complaint-item {
+  display: flex;
+  gap: 14px;
+  padding: 16px 24px;
+  border-bottom: 1px solid #f5f5f5;
+  align-items: flex-start;
+}
+
+.complaint-item:last-child {
+  border-bottom: none;
+}
+
+.complaint-icon {
+  font-size: 1.2rem;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.complaint-body {
   flex: 1;
 }
 
-.ngo-complaint-title {
-  font-weight: 600;
-  color: #1C2B22;
-  font-size: 14px;
+.complaint-top {
   display: flex;
+  justify-content: space-between;
   align-items: center;
-  gap: 8px;
-  flex-wrap: wrap;
+  margin-bottom: 6px;
 }
 
-.ngo-complaint-meta {
-  font-size: 12px;
-  color: #6B7268;
-  margin-top: 3px;
-}
-
-.ngo-complaint-desc {
-  margin-top: 6px;
-  font-size: 13px;
-  color: #4B534E;
-  line-height: 1.5;
-}
-
-.ngo-complaint-admin-note {
-  margin-top: 8px;
-  padding: 8px 12px;
-  background: #E7EFEA;
-  border-radius: 8px;
-  font-size: 12.5px;
-  color: #1F4038;
-  line-height: 1.5;
-}
-
-/* ===== STATUS PILLS (shared) ===== */
-.status-pill {
-  font-family: 'IBM Plex Mono', monospace;
-  font-size: 11px;
-  padding: 3px 9px;
-  border-radius: 5px;
+.complaint-reporter {
   font-weight: 600;
-  display: inline-block;
+  color: #2d3a2d;
+  font-size: 0.9rem;
 }
 
-.status-pill.s-pending { background: #FBF1DF; color: #7A5A17; }
-.status-pill.s-approved { background: #E7EFEA; color: #1F4038; }
-.status-pill.s-rejected { background: #FBE9E7; color: #B24444; }
-
-/* ===== EMPTY STATE ===== */
-.ngo-empty {
-  text-align: center;
-  padding: 2.5rem;
-  color: #6B7268;
-  font-size: 14px;
-}
-
-.ngo-empty a {
-  color: #2F5D50;
+.complaint-status {
+  padding: 3px 10px;
+  border-radius: 10px;
+  font-size: 0.7rem;
   font-weight: 600;
-  text-decoration: none;
+  text-transform: lowercase;
 }
 
-.ngo-empty a:hover {
-  text-decoration: underline;
+.complaint-status.resolved {
+  background: #e8f5e9;
+  color: #2d7a3d;
 }
 
-/* ===== RESPONSIVE ===== */
-@media(min-width: 1024px) {
-  .ngo-grid {
-    grid-template-columns: 1fr 300px;
-  }
-  
-  .ngo-stats {
-    grid-template-columns: repeat(4, 1fr);
-  }
+.complaint-status.pending {
+  background: #fff3e0;
+  color: #e65100;
 }
 
-@media(min-width: 640px) and (max-width: 1023px) {
-  .ngo-stats {
-    grid-template-columns: repeat(4, 1fr);
-  }
+.complaint-status.reviewed {
+  background: #e3f2fd;
+  color: #1565c0;
 }
 
-@media(max-width: 640px) {
-  .ngo-dashboard {
-    padding: 0 16px 40px;
+.complaint-reason {
+  color: #666;
+  font-size: 0.82rem;
+  line-height: 1.4;
+  margin-bottom: 4px;
+}
+
+.complaint-date {
+  color: #aaa;
+  font-size: 0.72rem;
+}
+
+
+/* ─── Responsive ─── */
+@media (max-width: 900px) {
+  .dashboard-columns {
+    grid-template-columns: 1fr;
   }
-  
+
+  .stats-row {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
   .ngo-header {
     flex-direction: column;
-    align-items: flex-start;
+    gap: 16px;
   }
-  
-  .ngo-header h1 {
-    font-size: 1.6rem;
+
+  .ngo-header-right {
+    width: 100%;
+    justify-content: flex-start;
   }
-  
-  .ngo-stats {
+}
+
+@media (max-width: 600px) {
+  .ngo-dashboard {
+    padding-top: 80px;
+  }
+
+  .ngo-header,
+  .stats-row,
+  .dashboard-columns {
+    padding-left: 20px;
+    padding-right: 20px;
+  }
+
+  .stats-row {
     grid-template-columns: repeat(2, 1fr);
     gap: 10px;
   }
-  
-  .ngo-stat-value {
-    font-size: 26px;
+
+  .stat-box {
+    padding: 16px 12px;
   }
-  
-  .ngo-opp-row,
-  .ngo-app-row {
+
+  .stat-number {
+    font-size: 1.5rem;
+  }
+
+  .opp-item,
+  .app-item {
     flex-direction: column;
     align-items: flex-start;
     gap: 10px;
   }
-  
-  .ngo-opp-actions,
-  .ngo-app-actions {
+
+  .opp-actions {
     width: 100%;
-  }
-  
-  .ngo-btn-ghost,
-  .ngo-btn-danger,
-  .ngo-btn-approve,
-  .ngo-btn-reject {
-    flex: 1;
-    justify-content: center;
-  }
-  
-  .ngo-app-actions {
-    flex-direction: row;
-  }
-  
-  .ngo-panel-head {
-    padding: 14px 16px;
-  }
-  
-  .ngo-opp-row,
-  .ngo-app-row,
-  .ngo-complaint-row {
-    padding: 12px 16px;
+    justify-content: flex-end;
   }
 }

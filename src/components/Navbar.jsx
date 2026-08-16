@@ -5,6 +5,7 @@ import "./Navbar.css";
 
 function Navbar() {
   const [user, setUser] = useState(null);
+  const [userRole, setUserRole] = useState(null);
   const [menuOpen, setMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const navigate = useNavigate();
@@ -14,11 +15,19 @@ function Navbar() {
     const getUser = async () => {
       const { data: { user } } = await supabase.auth.getUser();
       setUser(user);
+      if (user) {
+        await fetchUserRole(user.id);
+      }
     };
     getUser();
 
     const { data: listener } = supabase.auth.onAuthStateChange((_event, session) => {
       setUser(session?.user || null);
+      if (session?.user) {
+        fetchUserRole(session.user.id);
+      } else {
+        setUserRole(null);
+      }
     });
 
     const handleScroll = () => setScrolled(window.scrollY > 10);
@@ -30,13 +39,52 @@ function Navbar() {
     };
   }, []);
 
+  const fetchUserRole = async (userId) => {
+    // Check profiles table first (admin, volunteer)
+    const { data: profile } = await supabase
+      .from("profiles")
+      .select("role")
+      .eq("id", userId)
+      .single();
+
+    if (profile?.role) {
+      setUserRole(profile.role);
+      return;
+    }
+
+    // Check ngos table (ngo user)
+    const { data: ngo } = await supabase
+      .from("ngos")
+      .select("id")
+      .eq("user_id", userId)
+      .single();
+
+    if (ngo) {
+      setUserRole("ngo");
+      return;
+    }
+
+    setUserRole(null);
+  };
+
   const handleLogout = async () => {
     await supabase.auth.signOut();
     setUser(null);
+    setUserRole(null);
     navigate("/");
   };
 
   const isActive = (path) => location.pathname === path;
+
+  // Determine dashboard path based on role
+  const getDashboardPath = () => {
+    switch (userRole) {
+      case "admin": return "/admin";
+      case "ngo": return "/ngo/dashboard";
+      case "volunteer": return "/volunteer/dashboard";
+      default: return "/";
+    }
+  };
 
   const navLinks = [
     { path: "/", label: "Home" },
@@ -44,6 +92,8 @@ function Navbar() {
     { path: "/opportunities", label: "Opportunities" },
     { path: "/about", label: "About" },
   ];
+
+  const dashboardPath = getDashboardPath();
 
   return (
     <nav className={`navbar ${scrolled ? "scrolled" : ""}`}>
@@ -64,10 +114,10 @@ function Navbar() {
               {link.label}
             </Link>
           ))}
-          {user && (
+          {user && userRole && (
             <Link
-              to="/admin"
-              className={`nav-link ${isActive("/admin") ? "active" : ""}`}
+              to={dashboardPath}
+              className={`nav-link ${isActive(dashboardPath) ? "active" : ""}`}
               onClick={() => setMenuOpen(false)}
             >
               Dashboard

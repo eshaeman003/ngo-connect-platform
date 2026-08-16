@@ -102,7 +102,7 @@ function Opportunities() {
         {filtered.map(opp => (
           <div className="opp-card" key={opp.id}>
             <div className="opp-image">
-              <img src={`https://picsum.photos/seed/${opp.id}/400/250`} alt={opp.title} />
+              <img src={`https://placehold.co/400x250/2d5a3d/ffffff?text=${encodeURIComponent((opp.ngo_name || "NGO").substring(0, 12))}`} alt={opp.ngo_name || "NGO"} />
               <div className="opp-image-overlay" />
               <span className="opp-spots">Open</span>
               <span className="opp-type-badge">{opp.type || "Volunteer"}</span>

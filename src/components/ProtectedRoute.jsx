@@ -13,12 +13,56 @@ function ProtectedRoute({ children, allowedRole }) {
       setUser(user);
 
       if (user) {
-        const { data } = await supabase
+        // Check profiles table first (admin, volunteer)
+        const { data: profile } = await supabase
           .from("profiles")
-          .select("role")
+          .select("role, suspended, legal_notice_received")
           .eq("id", user.id)
           .single();
-        setRole(data?.role || null);
+
+        if (profile?.role) {
+          // Check if suspended
+          if (profile.suspended || profile.legal_notice_received) {
+            await supabase.auth.signOut();
+            setUser(null);
+            setRole(null);
+            setLoading(false);
+            return;
+          }
+          setRole(profile.role);
+          setLoading(false);
+          return;
+        }
+
+        // Check ngos table (ngo user)
+        const { data: ngo } = await supabase
+          .from("ngos")
+          .select("id, approval_status, suspended, legal_notice_received")
+          .eq("user_id", user.id)
+          .single();
+
+        if (ngo) {
+          // Check if suspended or not approved
+          if (ngo.suspended || ngo.legal_notice_received) {
+            await supabase.auth.signOut();
+            setUser(null);
+            setRole(null);
+            setLoading(false);
+            return;
+          }
+          if (ngo.approval_status !== "approved") {
+            await supabase.auth.signOut();
+            setUser(null);
+            setRole(null);
+            setLoading(false);
+            return;
+          }
+          setRole("ngo");
+          setLoading(false);
+          return;
+        }
+
+        setRole(null);
       }
       setLoading(false);
     };

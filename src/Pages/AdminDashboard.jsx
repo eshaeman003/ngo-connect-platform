@@ -52,7 +52,7 @@ function AdminDashboard() {
         supabase.from("opportunities").select("*", { count: "exact", head: true }),
         supabase.from("complaints").select("*", { count: "exact", head: true }).eq("status", "pending"),
         supabase.from("ngos").select("*").order("created_at", { ascending: false }),
-        supabase.from("applications").select(`*, opportunities:opportunity_id (title, ngo_name, location), profiles:volunteer_id (full_name, email, phone)`).order("applied_at", { ascending: false }),
+        supabase.from("applications").select("*, opportunities:opportunity_id (title, ngo_name, location), profiles:volunteer_id (full_name, email, phone)").order("applied_at", { ascending: false }),
         supabase.from("profiles").select("*").eq("role", "volunteer").order("created_at", { ascending: false }),
         supabase.from("opportunities").select("*, ngos(name)").order("created_at", { ascending: false }),
       ]);
@@ -77,13 +77,13 @@ function AdminDashboard() {
       .on("postgres_changes", { event: "INSERT", schema: "public", table: "ngos" }, (payload) => {
         setNgos((prev) => [payload.new, ...prev]);
         setStats((s) => ({ ...s, pendingApprovals: s.pendingApprovals + 1 }));
-        showToast("🆕 New NGO registration received!", "info");
+        showToast("New NGO registration received!", "info");
         setFlashStat("pendingApprovals");
         setTimeout(() => setFlashStat(null), 2000);
       })
       .on("postgres_changes", { event: "INSERT", schema: "public", table: "complaints" }, (payload) => {
         setStats((s) => ({ ...s, pendingComplaints: s.pendingComplaints + 1 }));
-        showToast("🚨 New complaint filed!", "error");
+        showToast("New complaint filed!", "error");
         setFlashStat("pendingComplaints");
         setTimeout(() => setFlashStat(null), 2000);
       })
@@ -124,7 +124,7 @@ function AdminDashboard() {
     else {
       setNgos((prev) => prev.map((n) => n.id === id ? { ...n, approval_status: "approved" } : n));
       setStats((s) => ({ ...s, pendingApprovals: Math.max(0, s.pendingApprovals - 1), approvedNGOs: s.approvedNGOs + 1 }));
-      showToast("✓ NGO approved successfully!");
+      showToast("NGO approved successfully!");
       logActivity("Approved NGO", ngos.find((n) => n.id === id)?.name || "NGO");
     }
   };
@@ -136,7 +136,7 @@ function AdminDashboard() {
     else {
       setNgos((prev) => prev.map((n) => n.id === id ? { ...n, approval_status: "rejected" } : n));
       setStats((s) => ({ ...s, pendingApprovals: Math.max(0, s.pendingApprovals - 1) }));
-      showToast("✕ NGO rejected.");
+      showToast("NGO rejected.");
       logActivity("Rejected NGO", ngos.find((n) => n.id === id)?.name || "NGO", reason);
     }
   };
@@ -152,10 +152,8 @@ function AdminDashboard() {
         setStats((s) => ({ ...s, approvedNGOs: Math.max(0, s.approvedNGOs - 1) }));
       } else if (deleted?.approval_status === "pending") {
         setStats((s) => ({ ...s, pendingApprovals: Math.max(0, s.pendingApprovals - 1) }));
-      } else if (deleted?.approval_status === "rejected") {
-        // rejected count is derived, no stat to update
       }
-      showToast(`🗑 ${name || "NGO"} deleted.`);
+      showToast(name + " deleted.");
       logActivity("Deleted NGO", name || "NGO");
     }
   };
@@ -166,8 +164,8 @@ function AdminDashboard() {
     if (error) showToast("Error", "error");
     else {
       setApplications((prev) => prev.map((a) => a.id === id ? { ...a, status: "approved" } : a));
-      showToast("✓ Application approved!");
-      logActivity("Approved Application", `#${id.slice(0, 8)}`);
+      showToast("Application approved!");
+      logActivity("Approved Application", "#" + id.slice(0, 8));
     }
   };
 
@@ -177,19 +175,19 @@ function AdminDashboard() {
     if (error) showToast("Error", "error");
     else {
       setApplications((prev) => prev.map((a) => a.id === id ? { ...a, status: "rejected" } : a));
-      showToast("✕ Application rejected.");
-      logActivity("Rejected Application", `#${id.slice(0, 8)}`);
+      showToast("Application rejected.");
+      logActivity("Rejected Application", "#" + id.slice(0, 8));
     }
   };
 
   const handleSuspend = async (userId, currentStatus, name, skipConfirm = false) => {
     if (!skipConfirm) { openConfirm("suspend", { id: userId, suspended: currentStatus, full_name: name }); return; }
     const { error } = await supabase.from("profiles").update({ suspended: !currentStatus }).eq("id", userId);
-    if (error) showToast(`Error: ${error.message}`, "error");
+    if (error) showToast("Error: " + error.message, "error");
     else {
       setVolunteers((prev) => prev.map((v) => v.id === userId ? { ...v, suspended: !currentStatus } : v));
-      showToast(`${name || "User"} ${!currentStatus ? "suspended" : "unsuspended"}`);
-      logActivity(`${!currentStatus ? "Suspended" : "Unsuspended"} User`, name || "User");
+      showToast((name || "User") + " " + (!currentStatus ? "suspended" : "unsuspended"));
+      logActivity((!currentStatus ? "Suspended" : "Unsuspended") + " User", name || "User");
     }
   };
 
@@ -218,7 +216,7 @@ function AdminDashboard() {
   };
 
   const handleBulkApprove = async () => {
-    if (!window.confirm(`Approve ${selectedIds.size} selected NGOs?`)) return;
+    if (!window.confirm("Approve " + selectedIds.size + " selected NGOs?")) return;
     setBulkActionLoading(true);
     const ids = Array.from(selectedIds);
     await Promise.all(ids.map((id) => supabase.from("ngos").update({ approval_status: "approved" }).eq("id", id)));
@@ -226,12 +224,12 @@ function AdminDashboard() {
     setStats((s) => ({ ...s, pendingApprovals: Math.max(0, s.pendingApprovals - selectedIds.size) }));
     setSelectedIds(new Set());
     setBulkActionLoading(false);
-    showToast(`✓ ${ids.length} NGOs approved!`);
-    logActivity("Bulk Approved NGOs", `${ids.length} NGOs`);
+    showToast(ids.length + " NGOs approved!");
+    logActivity("Bulk Approved NGOs", ids.length + " NGOs");
   };
 
   const handleBulkReject = async () => {
-    if (!window.confirm(`Reject ${selectedIds.size} selected NGOs?`)) return;
+    if (!window.confirm("Reject " + selectedIds.size + " selected NGOs?")) return;
     setBulkActionLoading(true);
     const ids = Array.from(selectedIds);
     await Promise.all(ids.map((id) => supabase.from("ngos").update({ approval_status: "rejected" }).eq("id", id)));
@@ -239,8 +237,8 @@ function AdminDashboard() {
     setStats((s) => ({ ...s, pendingApprovals: Math.max(0, s.pendingApprovals - selectedIds.size) }));
     setSelectedIds(new Set());
     setBulkActionLoading(false);
-    showToast(`✕ ${ids.length} NGOs rejected.`);
-    logActivity("Bulk Rejected NGOs", `${ids.length} NGOs`);
+    showToast(ids.length + " NGOs rejected.");
+    logActivity("Bulk Rejected NGOs", ids.length + " NGOs");
   };
 
   const handleSort = (key) => setSortConfig((prev) => ({ key, direction: prev.key === key && prev.direction === "asc" ? "desc" : "asc" }));
@@ -253,13 +251,13 @@ function AdminDashboard() {
   const exportCSV = (data, filename) => {
     if (!data.length) return;
     const headers = Object.keys(data[0]).join(",");
-    const rows = data.map((row) => Object.values(row).map((v) => `"${String(v).replace(/"/g, '""')}"`).join(","));
+    const rows = data.map((row) => Object.values(row).map((v) => '"' + String(v).replace(/"/g, '""') + '"').join(","));
     const csv = [headers, ...rows].join("\n");
     const blob = new Blob([csv], { type: "text/csv" });
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
-    a.href = url; a.download = `${filename}.csv`; a.click(); URL.revokeObjectURL(url);
-    showToast(`📥 ${filename}.csv downloaded`);
+    a.href = url; a.download = filename + ".csv"; a.click(); URL.revokeObjectURL(url);
+    showToast(filename + ".csv downloaded");
   };
 
   const applyNGOFilters = (list) => list.filter((ngo) => {
@@ -317,17 +315,17 @@ function AdminDashboard() {
 
   return (
     <div className="admin-page">
-      {toast.show && <div className={`admin-toast ${toast.type}`}><span>{toast.msg}</span></div>}
+      {toast.show && <div className={"admin-toast " + toast.type}><span>{toast.msg}</span></div>}
 
       <div className="admin-header">
-        <div className="admin-eyebrow">Admin · Platform Management</div>
+        <div className="admin-eyebrow">Admin - Platform Management</div>
         <h1>Admin Dashboard</h1>
         <p>Manage NGOs, volunteers, opportunities, and platform activity</p>
       </div>
 
       <div className="admin-stats">
         {statCards.map((s) => (
-          <div key={s.key} className={`admin-stat ${s.color} ${flashStat === s.key ? "flash" : ""}`} onClick={() => s.nav ? navigate(s.nav) : setActiveTab(s.tab)} style={{ cursor: "pointer" }} title={`View ${s.label}`}>
+          <div key={s.key} className={"admin-stat " + s.color + (flashStat === s.key ? " flash" : "")} onClick={() => s.nav ? navigate(s.nav) : setActiveTab(s.tab)} style={{ cursor: "pointer" }} title={"View " + s.label}>
             <div className="stat-bar"></div>
             <div className="stat-top"><span className="stat-num">{stats[s.key]}</span><span className="stat-icon">{s.icon}</span></div>
             <div className="stat-label">{s.label}</div>
@@ -346,7 +344,7 @@ function AdminDashboard() {
 
       <div className="admin-toolbar">
         <div className="admin-search">
-          <span>🔍</span>
+          <span>S</span>
           <input type="text" placeholder="Search..." value={search} onChange={(e) => { setSearch(e.target.value); setCurrentPage(1); }} />
         </div>
         {(activeTab === "ngos" || activeTab === "approved" || activeTab === "rejected") && (
@@ -362,7 +360,7 @@ function AdminDashboard() {
           </div>
         )}
         <div className="admin-actions">
-          <button className="btn-export" onClick={() => exportCSV(currentList, activeTab)}>📥 Export CSV</button>
+          <button className="btn-export" onClick={() => exportCSV(currentList, activeTab)}>Export CSV</button>
         </div>
       </div>
 
@@ -370,8 +368,8 @@ function AdminDashboard() {
         <div className="bulk-bar">
           <span>{selectedIds.size} selected</span>
           <div className="bulk-actions">
-            <button onClick={handleBulkApprove} disabled={bulkActionLoading} className="btn-bulk-approve">✓ Approve All</button>
-            <button onClick={handleBulkReject} disabled={bulkActionLoading} className="btn-bulk-reject">✕ Reject All</button>
+            <button onClick={handleBulkApprove} disabled={bulkActionLoading} className="btn-bulk-approve">Approve All</button>
+            <button onClick={handleBulkReject} disabled={bulkActionLoading} className="btn-bulk-reject">Reject All</button>
             <button onClick={() => setSelectedIds(new Set())} className="btn-bulk-clear">Clear</button>
           </div>
         </div>
@@ -409,16 +407,16 @@ function AdminDashboard() {
                             <div className="ngo-name">{ngo.name || "Unnamed"}</div>
                             <div className="ngo-sub" onClick={() => openModal(ngo, "ngo")} style={{ cursor: "pointer", color: "#28503B" }}>View full profile →</div>
                           </td>
-                          <td><span className={`badge ${badge.class}`}>{badge.label}</span></td>
+                          <td><span className={"badge " + badge.class}>{badge.label}</span></td>
                           <td>{ngo.location || "N/A"}</td>
-                          <td>{ngo.email || ngo.phone ? <>{ngo.email && <div>{ngo.email}</div>}{ngo.phone && <div>{ngo.phone}</div>}</> : <span className="contact-missing">⚠️ Not provided</span>}</td>
-                          <td><span className={`status-pill s-${status}`}>{status}</span></td>
+                          <td>{ngo.email || ngo.phone ? <>{ngo.email && <div>{ngo.email}</div>}{ngo.phone && <div>{ngo.phone}</div>}</> : <span className="contact-missing">Not provided</span>}</td>
+                          <td><span className={"status-pill s-" + status}>{status}</span></td>
                           <td>
                             <div className="row-actions">
-                              <button className="btn btn-view" onClick={() => openModal(ngo, "ngo")}>👁 View</button>
-                              {status === "pending" && <><button className="btn btn-approve" onClick={() => handleApprove(ngo.id)}>✓ Approve</button><button className="btn btn-reject" onClick={() => handleReject(ngo.id)}>✕ Reject</button></>}
-                              {status === "rejected" && <button className="btn btn-approve" onClick={() => handleApprove(ngo.id)}>↩ Re-approve</button>}
-                              <button className="btn btn-reject" onClick={() => handleDeleteNGO(ngo.id, ngo.name)}>🗑 Delete</button>
+                              <button className="btn btn-view" onClick={() => openModal(ngo, "ngo")}>View</button>
+                              {status === "pending" && <><button className="btn btn-approve" onClick={() => handleApprove(ngo.id)}>Approve</button><button className="btn btn-reject" onClick={() => handleReject(ngo.id)}>Reject</button></>}
+                              {status === "rejected" && <button className="btn btn-approve" onClick={() => handleApprove(ngo.id)}>Re-approve</button>}
+                              <button className="btn btn-delete" onClick={() => handleDeleteNGO(ngo.id, ngo.name)}>Delete</button>
                             </div>
                           </td>
                         </tr>
@@ -450,14 +448,14 @@ function AdminDashboard() {
                       <tr key={opp.id}>
                         <td><div className="ngo-name">{opp.title || "Untitled"}</div></td>
                         <td>{opp.ngo_name || opp.ngos?.name || "NGO"}</td>
-                        <td><span className={`badge ${getCategoryBadge(opp.category).class}`}>{opp.category || "General"}</span></td>
+                        <td><span className={"badge " + getCategoryBadge(opp.category).class}>{opp.category || "General"}</span></td>
                         <td>{opp.location || "Remote"}</td>
                         <td>{opp.type || "N/A"}</td>
                         <td>{new Date(opp.created_at).toLocaleDateString()}</td>
                         <td>
                           <div className="row-actions">
-                            <button className="btn btn-view" onClick={() => openModal(opp, "opportunity")}>👁 View</button>
-                            <button className="btn btn-reject" onClick={() => handleDeleteOpportunity(opp.id, opp.title)}>🗑 Delete</button>
+                            <button className="btn btn-view" onClick={() => openModal(opp, "opportunity")}>View</button>
+                            <button className="btn btn-reject" onClick={() => handleDeleteOpportunity(opp.id, opp.title)}>Delete</button>
                           </div>
                         </td>
                       </tr>
@@ -493,12 +491,12 @@ function AdminDashboard() {
                           <td><div className="ngo-name">{prof.full_name || "Unknown"}</div><div className="ngo-sub">{prof.email || "No email"}</div></td>
                           <td>{opp.title || "Opportunity"}</td>
                           <td>{opp.ngo_name || "NGO"}</td>
-                          <td><span className={`status-pill s-${status}`}>{app.status || "Pending"}</span></td>
+                          <td><span className={"status-pill s-" + status}>{app.status || "Pending"}</span></td>
                           <td>{new Date(app.applied_at).toLocaleDateString()}</td>
                           <td>
                             <div className="row-actions">
-                              <button className="btn btn-view" onClick={() => openModal(app, "application")}>👁 View</button>
-                              {status === "pending" && <><button className="btn btn-approve" onClick={() => handleApproveApp(app.id)}>✓ Approve</button><button className="btn btn-reject" onClick={() => handleRejectApp(app.id)}>✕ Reject</button></>}
+                              <button className="btn btn-view" onClick={() => openModal(app, "application")}>View</button>
+                              {status === "pending" && <><button className="btn btn-approve" onClick={() => handleApproveApp(app.id)}>Approve</button><button className="btn btn-reject" onClick={() => handleRejectApp(app.id)}>Reject</button></>}
                             </div>
                           </td>
                         </tr>
@@ -537,21 +535,21 @@ function AdminDashboard() {
                             </div>
                           </div>
                         </td>
-                        <td>{v.email || <span className="contact-missing">⚠️ Not provided</span>}</td>
+                        <td>{v.email || <span className="contact-missing">Not provided</span>}</td>
                         <td>{v.created_at ? new Date(v.created_at).toLocaleDateString() : "N/A"}</td>
                         <td>
-                          <span className={`status-pill ${v.suspended ? "s-rejected" : "s-approved"}`}>
+                          <span className={"status-pill " + (v.suspended ? "s-rejected" : "s-approved")}>
                             {v.suspended ? "Suspended" : "Active"}
                           </span>
                         </td>
                         <td>
                           <div className="row-actions">
-                            <button className="btn btn-view" onClick={() => openModal(v, "volunteer")}>👁 View</button>
+                            <button className="btn btn-view" onClick={() => openModal(v, "volunteer")}>View</button>
                             <button
                               className={v.suspended ? "btn btn-approve" : "btn btn-reject"}
                               onClick={() => handleSuspend(v.id, v.suspended, v.full_name)}
                             >
-                              {v.suspended ? "↩ Unsuspend" : "⏸ Suspend"}
+                              {v.suspended ? "Unsuspend" : "Suspend"}
                             </button>
                           </div>
                         </td>
@@ -582,7 +580,7 @@ function AdminDashboard() {
                   <div className="activity-dot"></div>
                   <div className="activity-body">
                     <div className="activity-action">{entry.action}</div>
-                    <div className="activity-target">{entry.target} {entry.detail && <span className="activity-detail">— {entry.detail}</span>}</div>
+                    <div className="activity-target">{entry.target} {entry.detail && <span className="activity-detail">- {entry.detail}</span>}</div>
                     <div className="activity-time">{new Date(entry.timestamp).toLocaleString()}</div>
                   </div>
                 </div>
@@ -592,7 +590,6 @@ function AdminDashboard() {
         </div>
       )}
 
-      {/* Detail Modal */}
       {showModal && selectedItem && (
         <div className="modal-overlay" onClick={closeModal}>
           <div className="modal-card" onClick={(e) => e.stopPropagation()}>
@@ -603,7 +600,7 @@ function AdminDashboard() {
                 {modalType === "application" && "Application Details"}
                 {modalType === "volunteer" && (selectedItem.full_name || "Volunteer Details")}
               </h3>
-              <button className="modal-close" onClick={closeModal}>✕</button>
+              <button className="modal-close" onClick={closeModal}>X</button>
             </div>
             <div className="modal-body">
               {modalType === "ngo" && (
@@ -614,7 +611,7 @@ function AdminDashboard() {
                   <div className="detail-row"><span className="detail-label">Email</span><span className="detail-value">{selectedItem.email || "N/A"}</span></div>
                   <div className="detail-row"><span className="detail-label">Phone</span><span className="detail-value">{selectedItem.phone || "N/A"}</span></div>
                   <div className="detail-row"><span className="detail-label">Registration No</span><span className="detail-value">{selectedItem.registration_no || "N/A"}</span></div>
-                  <div className="detail-row"><span className="detail-label">Status</span><span className="detail-value"><span className={`status-pill s-${(selectedItem.approval_status || "pending").toLowerCase()}`}>{selectedItem.approval_status || "Pending"}</span></span></div>
+                  <div className="detail-row"><span className="detail-label">Status</span><span className="detail-value"><span className={"status-pill s-" + (selectedItem.approval_status || "pending").toLowerCase()}>{selectedItem.approval_status || "Pending"}</span></span></div>
                   <div className="detail-row"><span className="detail-label">Description</span><span className="detail-value">{selectedItem.description || "No description provided."}</span></div>
                   <div className="detail-row"><span className="detail-label">Documents</span><span className="detail-value">{selectedItem.documents?.length > 0 ? selectedItem.documents.map((d, i) => <div key={i}>📄 <a href={d} target="_blank" rel="noreferrer">Document {i + 1}</a></div>) : "No documents uploaded"}</span></div>
                   <div className="detail-row"><span className="detail-label">Registered</span><span className="detail-value">{selectedItem.created_at ? new Date(selectedItem.created_at).toLocaleString() : "N/A"}</span></div>
@@ -641,7 +638,7 @@ function AdminDashboard() {
                   <div className="detail-row"><span className="detail-label">Opportunity</span><span className="detail-value">{selectedItem.opportunities?.title || "N/A"}</span></div>
                   <div className="detail-row"><span className="detail-label">NGO</span><span className="detail-value">{selectedItem.opportunities?.ngo_name || "N/A"}</span></div>
                   <div className="detail-row"><span className="detail-label">Location</span><span className="detail-value">{selectedItem.opportunities?.location || "N/A"}</span></div>
-                  <div className="detail-row"><span className="detail-label">Status</span><span className="detail-value"><span className={`status-pill s-${(selectedItem.status || "pending").toLowerCase()}`}>{selectedItem.status || "Pending"}</span></span></div>
+                  <div className="detail-row"><span className="detail-label">Status</span><span className="detail-value"><span className={"status-pill s-" + (selectedItem.status || "pending").toLowerCase()}>{selectedItem.status || "Pending"}</span></span></div>
                   <div className="detail-row"><span className="detail-label">Message</span><span className="detail-value">{selectedItem.message || "No message provided."}</span></div>
                   <div className="detail-row"><span className="detail-label">Applied At</span><span className="detail-value">{selectedItem.applied_at ? new Date(selectedItem.applied_at).toLocaleString() : "N/A"}</span></div>
                 </div>
@@ -655,7 +652,7 @@ function AdminDashboard() {
                   <div className="detail-row"><span className="detail-label">Location</span><span className="detail-value">{selectedItem.location || "N/A"}</span></div>
                   <div className="detail-row"><span className="detail-label">Skills</span><span className="detail-value">{selectedItem.skills?.length ? selectedItem.skills.join(", ") : "None listed"}</span></div>
                   <div className="detail-row"><span className="detail-label">Bio</span><span className="detail-value">{selectedItem.bio || "No bio provided."}</span></div>
-                  <div className="detail-row"><span className="detail-label">Status</span><span className="detail-value"><span className={`status-pill ${selectedItem.suspended ? "s-rejected" : "s-approved"}`}>{selectedItem.suspended ? "Suspended" : "Active"}</span></span></div>
+                  <div className="detail-row"><span className="detail-label">Status</span><span className="detail-value"><span className={"status-pill " + (selectedItem.suspended ? "s-rejected" : "s-approved")}>{selectedItem.suspended ? "Suspended" : "Active"}</span></span></div>
                   <div className="detail-row"><span className="detail-label">Joined</span><span className="detail-value">{selectedItem.created_at ? new Date(selectedItem.created_at).toLocaleString() : "N/A"}</span></div>
                 </div>
               )}
@@ -667,7 +664,6 @@ function AdminDashboard() {
         </div>
       )}
 
-      {/* Confirm Modal */}
       {confirmModal.open && (
         <div className="modal-overlay" onClick={closeConfirm}>
           <div className="modal-card confirm-card" onClick={(e) => e.stopPropagation()}>
@@ -675,22 +671,22 @@ function AdminDashboard() {
               <h3>
                 {confirmModal.action === "approve" && "Approve NGO"}
                 {confirmModal.action === "reject" && "Reject NGO"}
-                {confirmModal.action === "deleteNgo" && "Delete NGO"}
                 {confirmModal.action === "approveApp" && "Approve Application"}
                 {confirmModal.action === "rejectApp" && "Reject Application"}
                 {confirmModal.action === "deleteOpp" && "Delete Opportunity"}
-                {confirmModal.action === "suspend" && `${confirmModal.item?.suspended ? "Unsuspend" : "Suspend"} User`}
+                {confirmModal.action === "deleteNgo" && "Delete NGO"}
+                {confirmModal.action === "suspend" && (confirmModal.item?.suspended ? "Unsuspend" : "Suspend") + " User"}
               </h3>
-              <button className="modal-close" onClick={closeConfirm}>✕</button>
+              <button className="modal-close" onClick={closeConfirm}>X</button>
             </div>
             <div className="modal-body">
               <p className="confirm-text">
                 {confirmModal.action === "approve" && <>Are you sure you want to approve <strong>{confirmModal.item?.name}</strong>?</>}
                 {confirmModal.action === "reject" && <>Are you sure you want to reject <strong>{confirmModal.item?.name}</strong>?</>}
-                {confirmModal.action === "deleteNgo" && <>Delete NGO <strong>{confirmModal.item?.name}</strong>? This cannot be undone.</>}
                 {confirmModal.action === "approveApp" && <>Approve application from <strong>{confirmModal.item?.profiles?.full_name || "this volunteer"}</strong>?</>}
                 {confirmModal.action === "rejectApp" && <>Reject application from <strong>{confirmModal.item?.profiles?.full_name || "this volunteer"}</strong>?</>}
                 {confirmModal.action === "deleteOpp" && <>Delete opportunity <strong>{confirmModal.item?.title}</strong>? This cannot be undone.</>}
+                {confirmModal.action === "deleteNgo" && <>Delete NGO <strong>{confirmModal.item?.name}</strong>? This cannot be undone.</>}
                 {confirmModal.action === "suspend" && <>{confirmModal.item?.suspended ? "Unsuspend" : "Suspend"} user <strong>{confirmModal.item?.full_name}</strong>?</>}
               </p>
 
@@ -709,15 +705,15 @@ function AdminDashboard() {
             <div className="modal-footer">
               <button className="btn btn-secondary" onClick={closeConfirm}>Cancel</button>
               <button
-                className={`btn ${confirmModal.action.includes("reject") || confirmModal.action === "deleteOpp" || confirmModal.action === "deleteNgo" || (confirmModal.action === "suspend" && !confirmModal.item?.suspended) ? "btn-reject" : "btn-approve"}`}
+                className={"btn " + (confirmModal.action.includes("reject") || confirmModal.action === "deleteOpp" || confirmModal.action === "deleteNgo" || (confirmModal.action === "suspend" && !confirmModal.item?.suspended) ? "btn-reject" : "btn-approve")}
                 onClick={executeConfirm}
               >
                 {confirmModal.action === "approve" && "Yes, Approve"}
                 {confirmModal.action === "reject" && "Yes, Reject"}
-                {confirmModal.action === "deleteNgo" && "Yes, Delete"}
                 {confirmModal.action === "approveApp" && "Yes, Approve"}
                 {confirmModal.action === "rejectApp" && "Yes, Reject"}
                 {confirmModal.action === "deleteOpp" && "Yes, Delete"}
+                {confirmModal.action === "deleteNgo" && "Yes, Delete"}
                 {confirmModal.action === "suspend" && (confirmModal.item?.suspended ? "Yes, Unsuspend" : "Yes, Suspend")}
               </button>
             </div>
