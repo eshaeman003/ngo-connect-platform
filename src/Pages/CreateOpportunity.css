@@ -1,0 +1,136 @@
+.opp-page {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 24px 60px;
+  background: #F7F5EF;
+  min-height: 100vh;
+  font-family: 'Inter', sans-serif;
+  color: #1C2B22;
+}
+
+.opp-loading {
+  text-align: center;
+  padding: 5rem;
+  color: #28503B;
+  font-size: 1.2rem;
+}
+
+.opp-header {
+  padding: 2rem 0 1.5rem;
+  text-align: center;
+}
+
+.opp-header h1 {
+  font-family: 'Fraunces', serif;
+  font-size: 2rem;
+  color: #1B3A28;
+  margin: 0 0 8px;
+}
+
+.opp-header p {
+  margin: 0;
+  color: #6B7268;
+  font-size: 0.95rem;
+}
+
+.opp-toast {
+  position: fixed;
+  top: 100px;
+  right: 24px;
+  padding: 1rem 1.5rem;
+  border-radius: 12px;
+  font-weight: 600;
+  z-index: 9999;
+  animation: slideIn 0.3s ease;
+}
+
+.opp-toast.success { background: #d4edda; color: #155724; border: 1px solid #95d5b2; }
+.opp-toast.error { background: #f8d7da; color: #721c24; border: 1px solid #ef9a9a; }
+
+.opp-form {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.opp-form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.opp-form-group label {
+  font-size: 13px;
+  font-weight: 600;
+  color: #28503B;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.opp-form-group input,
+.opp-form-group select,
+.opp-form-group textarea {
+  padding: 12px 14px;
+  border: 1.5px solid #E4E0D6;
+  border-radius: 10px;
+  font-family: inherit;
+  font-size: 14px;
+  color: #1C2B22;
+  background: #FAFAF7;
+  outline: none;
+  resize: vertical;
+}
+
+.opp-form-group input:focus,
+.opp-form-group select:focus,
+.opp-form-group textarea:focus {
+  border-color: #28503B;
+  background: white;
+}
+
+.opp-btn-primary {
+  flex: 1;
+  background: #2F5D50;
+  color: white;
+  border: none;
+  border-radius: 10px;
+  padding: 12px 20px;
+  font-size: 14px;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.opp-btn-primary:hover {
+  background: #1B3A28;
+}
+
+.opp-btn-primary:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.opp-btn-secondary {
+  flex: 1;
+  background: #FBFAF7;
+  color: #4B534E;
+  border: 1.5px solid #E4E0D6;
+  border-radius: 10px;
+  padding: 12px 20px;
+  font-size: 14px;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.opp-btn-secondary:hover {
+  background: #F7F5EF;
+}
+
+@media(max-width: 640px) {
+  .opp-page { padding: 0 16px 40px; }
+  .opp-header h1 { font-size: 1.6rem; }
+  .opp-form { padding: 20px !important; }
+}
