@@ -17,7 +17,7 @@ This project was developed as the final deliverable for the ZYNVEX Solutions Fro
 
 ## Live Demo
 
-**Deployed URL**: [https://ngo-connect-platform.vercel.app](https://ngo-connect-platform.vercel.app) *(replace with your actual Vercel URL)*
+**Deployed URL**: https://ngo-connect-platform.vercel.app?_vercel_share=qoy5yEtGMwRz3eBu7bJxVclfZBmzIhaS
 
 **GitHub Repository**: [https://github.com/eshaeman003/ngo-connect-platform](https://github.com/eshaeman003/ngo-connect-platform)
 
