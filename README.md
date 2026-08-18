@@ -114,7 +114,7 @@ go-connect-platform/
 
 ### Test Credentials
 
-To evaluate the platform, please use the following pre-registered accounts:
+To evaluate the platform, please use the following pre-registered accounts or you can create your own accounts:
 
 | Role | Email | Password | What to Test |
 |------|-------|----------|--------------|
