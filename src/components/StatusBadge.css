@@ -1,0 +1,17 @@
+.status-badge-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: capitalize;
+  padding: 5px 12px;
+  border-radius: var(--radius-full);
+  font-family: var(--font-sans);
+  white-space: nowrap;
+}
+
+.status-badge-pill.tone-good { background: var(--green-pale); color: var(--green-deep); }
+.status-badge-pill.tone-warn { background: var(--accent-amber-soft); color: #92640f; }
+.status-badge-pill.tone-bad  { background: var(--accent-red-soft); color: var(--accent-red); }
+.status-badge-pill.tone-neutral { background: var(--cream-dark); color: var(--text-muted); }
